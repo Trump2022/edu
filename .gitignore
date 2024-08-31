@@ -1,6 +1,6 @@
-.idea
-.user.ini
-runtime
-vendor
-.env
-update/sh
+/.idea
+/.user.ini
+/runtime
+/vendor
+/.env
+/update/sh
