@@ -1,5 +1,6 @@
 /.idea
 /.user.ini
+/public/.user.ini
 /runtime
 /vendor
 /.env
