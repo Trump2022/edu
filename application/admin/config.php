@@ -10,6 +10,7 @@
 // +----------------------------------------------------------------------
 
 
+use think\Env;
 
 return [
     'session'                => [
@@ -22,7 +23,7 @@ return [
         //有效期
         'expire' => 604800,
     ],
-    'app_debug'              => false,
+    'app_debug'              => Env::get('app_debug', false),
     // 应用Trace
     'app_trace'              => false,
     // 视图输出字符串内容替换

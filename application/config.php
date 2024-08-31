@@ -9,6 +9,7 @@
 // | Author: CRMEB Team <admin@crmeb.com>
 // +----------------------------------------------------------------------
 
+use think\Env;
 
 return [
     // +----------------------------------------------------------------------
@@ -18,7 +19,7 @@ return [
     // 应用命名空间
     'app_namespace' => 'app',
     // 应用调试模式
-    'app_debug' => true,
+    'app_debug' => Env::get('app_debug', false),
     // 应用Trace
     'app_trace' => false,
     // 应用模式状态
@@ -42,7 +43,7 @@ return [
     // 默认JSONP处理方法
     'var_jsonp_handler' => 'callback',
     // 默认时区
-    'default_timezone' => 'PRC',
+    'default_timezone' => Env::get('app.default_timezone', 'PRC'),
     // 是否开启多语言
     'lang_switch_on' => false,
     // 默认全局过滤方法 用逗号分隔多个
@@ -192,7 +193,7 @@ return [
     'cache' => [
         // 驱动方式
         // 使用复合缓存类型
-        'type'  =>  'complex',
+        'type'  =>  Env::get('cache.driver', 'complex'),
         // 默认使用的缓存
         'default'   =>  [
             // 驱动方式
@@ -209,9 +210,9 @@ return [
             // 驱动方式
             'type'   => 'redis',
             // 服务器地址
-            'host'  => '127.0.0.1',
-            'password'   => '',
-            'port'   => '6379',
+            'host'  => Env::get('redis.redis_hostname', '127.0.0.1'),
+            'password'   => Env::get('redis.redis_password', ''),
+            'port'   => Env::get('redis.port', '6379'),
         ],
     ],
 

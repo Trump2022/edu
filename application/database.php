@@ -9,30 +9,36 @@
 // | Author: CRMEB Team <admin@crmeb.com>
 // +----------------------------------------------------------------------
 
+use think\Env;
+
 return [
     // 数据库类型
-    'type'            => 'mysql',
+    'type'            => Env::get('database.type', 'mysql'),
     // 服务器地址
-    'hostname'        => 'localhost',
+    'hostname'        => Env::get('database.hostname', 'localhost'),
     // 数据库名
-    'database'        => 'lb_edu',
+    'database'        => Env::get('database.database', 'lb_edu'),
     // 用户名
-    'username'        => 'lb_edu',
+    'username'        => Env::get('database.username', 'lb_edu'),
     // 密码
-    'password'        => 'ZkPkALFjKbymYKdm',
+    'password'        => Env::get('database.password', 'ZkPkALFjKbymYKdm'),
 
     // 端口
-    'hostport'        => '3306',
+    'hostport'        => Env::get('database.hostport', '3306'),
+
     // 连接dsn
     'dsn'             => '',
     // 数据库连接参数
     'params'          => [],
     // 数据库编码默认采用utf8
-    'charset'         => 'utf8mb4',
+    'charset'         => Env::get('database.charset', 'utf8mb4'),
+
     // 数据库表前缀
-    'prefix'          => 'eb_',
+    'prefix'          => Env::get('database.prefix', 'eb_'),
+
     // 数据库调试模式
-    'debug'           => false,
+    'debug'           => Env::get('database.debug', false),
+
     // 数据库部署方式:0 集中式(单一服务器),1 分布式(主从服务器)
     'deploy'          => 0,
     // 数据库读写是否分离 主从式有效
