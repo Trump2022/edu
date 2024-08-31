@@ -211,7 +211,7 @@ return [
             // 服务器地址
             'host'  => '127.0.0.1',
             'password'   => '',
-            'port'   => 6379,
+            'port'   => '6379',
         ],
     ],
 
@@ -230,9 +230,9 @@ return [
         // 是否自动开启 SESSION
         'auto_start' => true,
         //有效期
-        'expire' => 604800,
+        'expire' => 86400,
         //session_cache_expire
-        'cache_expire' => 604800
+        'cache_expire' => 86400
     ],
 
     // +----------------------------------------------------------------------
@@ -242,7 +242,7 @@ return [
         // cookie 名称前缀
         'prefix' => '',
         // cookie 保存时间
-        'expire' => 604800,
+        'expire' => 86400,
         // cookie 保存路径
         'path' => '/',
         // cookie 有效域名
@@ -294,9 +294,6 @@ return [
 
     //消息队列名称
     'queue_name' => 'doPinkJobQueue',
-
-    //总后台访问名称
-    'total_background_access' => 'api',
 
     'upload' => [
         'Validate' => [
