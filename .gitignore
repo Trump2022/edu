@@ -2,3 +2,5 @@
 .user.ini
 runtime
 vendor
+.env
+update/sh
