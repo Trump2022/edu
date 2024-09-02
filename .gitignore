@@ -17,3 +17,4 @@ think
 /public/audio.mp3
 /vendor/workerman/workerman.log
 /vendor/workerman/_www_wwwroot_edu_think.pid
+/thinkphp/library/think/log
