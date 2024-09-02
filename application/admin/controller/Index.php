@@ -1058,7 +1058,8 @@ class Index extends AuthController
 
     public function check_auth()
     {
-        return JsonService::successful('ok', $this->checkAuthDecrypt());
+        return JsonService::successful('');
+        // return JsonService::successful('ok', $this->checkAuthDecrypt());
     }
 
     /**
