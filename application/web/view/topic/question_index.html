@@ -1,0 +1,376 @@
+{extend name="public/container" /}
+{block name="title"}{$titles}{/block}
+{block name="style"}
+<style>
+    .question-index .panel {
+        width: 900px;
+        padding: 80px 0 20px;
+        border-top: 10px solid #2C8EFF;
+        border-radius: 4px;
+        margin: 70px auto 0;
+        background-color: #FFFFFF;
+        box-shadow: 0 3px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .question-index .panel .title {
+        text-align: center;
+        font-size: 24px;
+        line-height: 31px;
+        color: #282828;
+    }
+
+    .question-index .panel .message {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        padding-bottom: 35px;
+        margin: 20px -35px 0 0;
+    }
+
+    .question-index .panel .message::after {
+        content: " ";
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 50px;
+        height: 3px;
+        background-color: rgba(255, 107, 0, 0.3);
+        transform: translateX(-50%);
+    }
+
+    .question-index .panel .message .item {
+        margin-right: 35px;
+        font-size: 14px;
+        line-height: 19px;
+        color: #666666;
+    }
+
+    .question-index .panel .message .value {
+        display: inline-block;
+        margin-left: 12px;
+    }
+
+    .question-index .panel .message .time .value,
+    .question-index .panel .message .total .value {
+        color: #2C8EFF;
+    }
+
+    .question-index .panel .message .number {
+        margin-right: 3px;
+        font-weight: bold;
+        font-size: 26px;
+        line-height: 35px;
+    }
+
+    .question-index .panel .message .degree {
+        padding-bottom: 5px;
+    }
+
+    .question-index .panel .message .degree .value {
+        margin-right: -5px;
+    }
+
+    .question-index .panel .message .degree .iconfont {
+        margin-right: 5px;
+        font-size: 14px;
+        color: #FFF0E5;
+    }
+
+    .question-index .panel .message .degree .active {
+        color: #FF6B00;
+    }
+
+    .question-index .panel .message .surplus {
+        padding-bottom: 5px;
+        color: #FF6B00;
+    }
+
+    .question-index .panel .message .people {
+        padding-bottom: 5px;
+        color: #999999;
+    }
+
+    .question-index .panel .summary {
+        padding: 0 120px;
+        margin-top: 45px;
+    }
+
+    .question-index .panel .summary-head {
+        font-size: 14px;
+        line-height: 19px;
+        color: #282828;
+    }
+
+    .question-index .panel .summary-body {
+        margin-top: 9px;
+        font-size: 12px;
+        line-height: 16px;
+        color: #666666;
+    }
+
+    .question-index .panel .notice {
+        padding: 0 120px;
+        margin-top: 30px;
+    }
+
+    .question-index .panel .notice-head {
+        font-size: 14px;
+        line-height: 19px;
+        color: #282828;
+    }
+
+    .question-index .panel .notice-body {
+        margin-top: 9px;
+        font-size: 12px;
+        line-height: 16px;
+        color: #666666;
+    }
+
+    .question-index .panel .button {
+        display: block;
+        width: 660px;
+        height: 60px;
+        border: none;
+        border-radius: 30px;
+        margin: 34px auto 0;
+        background-color: #2C8EFF;
+        font-size: 16px;
+        color: #FFFFFF;
+    }
+
+    .question-index .panel .button div {
+        display: inline-block;
+    }
+
+    .question-index .panel .money {
+        margin-left: 10px;
+    }
+
+    .question-index .panel .money span {
+        font-size: 22px;
+    }
+
+    .question-index .panel .member {
+        font-size: 14px;
+    }
+
+    .question-index .panel .back {
+        padding: 20px 0;
+        text-align: center;
+    }
+
+    .question-index .panel .back a {
+        display: inline-block;
+        font-size: 14px;
+        line-height: 19px;
+        color: #2C8EFF;
+    }
+
+    .question-index .panel .back .iconfont {
+        margin-left: 5px;
+        vertical-align: top;
+        font-size: 9px;
+    }
+</style>
+{/block}
+{block name="app"}
+<div v-cloak id="app" class="question-index">
+    <base-header :public-data="publicData" :user-info="userInfo"></base-header>
+    <div class="panel">
+        <div class="title">{{ paper.title }}</div>
+        <div class="message">
+            <div class="item time">
+                建议用时<div class="value"><span class="number">{{ paper.txamination_time }}</span>分钟</div>
+            </div>
+            <div class="item total">
+                试卷总分<div class="value"><span class="number">{{ paper.total_score }}</span>分</div>
+            </div>
+            <div class="item degree">
+                试题难度<div class="value"><i v-for="item in 5" :class="{ active: item <= paper.difficulty }" class="iconfont icondengji-shixin"></i>
+                </div>
+            </div>
+            <div v-if="paper.surplus != -1" class="item surplus">可答题{{ paper.surplus }}次</div>
+            <div class="item people">{{ paper.answer + paper.fake_sales }}人已答题</div>
+        </div>
+        <div class="summary">
+            <div class="summary-head">题型介绍</div>
+            <div class="summary-body">单项选择题（选项中只有1个正确答案)；多项选择题（选项中至少有2个正确答案)；判断题（选项中只有1个正确答案)。</div>
+        </div>
+        <div class="notice">
+            <div class="notice-head">考前必读</div>
+            <div class="notice-body">
+                <div>1.答题者准备好后，可点击“开始做题”按钮开始考试；</div>
+                <div>2.做题前可看题目后的标签，明白此题是单选、多选还是判断；</div>
+                <div>3.答题卡可查看该题是‘已答’或‘未答’状态；</div>
+                <div>4.作答完所有的题目点击“提交并查看结果”按钮，即可查看自己的考试结果。</div>
+            </div>
+        </div>
+        <template v-if="paper.isPay">
+            <button v-if="status == 0" class="button" @click="answer">开始答题</button>
+            <button v-if="status == 1" class="button" @click="answer">再次答题</button>
+            <button v-if="status == 2" class="button" @click="answer">继续答题</button>
+        </template>
+        <button v-else class="button" @click="payAnswer">支付答题<div class="money">￥<span>{{ paper.money }}</span></div>
+            <div class="member">（会员价：￥{{ paper.member_money }}）</div>
+        </button>
+        <div class="back">
+            <a :href="$router.question_category + '?type=2'">返回试题列表<i class="iconfont iconxiangyou"></i></a>
+        </div>
+    </div>
+    <base-login :public-data="publicData" :agree-content="agreeContent"></base-login>
+    <base-agree :agree-content="agreeContent"></base-agree>
+</div>
+{/block}
+{block name="vm"}
+<script>
+    require([
+        'vue',
+        'ELEMENT',
+        'components/base-header/index',
+        'components/base-footer/index',
+        'components/base-login/index',
+        'components/base-agree/index',
+        'mixins/base',
+        'router/index',
+        'store/index',
+        'api/topic',
+        'api/home',
+    ], function (
+        Vue,
+        ELEMENT,
+        BaseHeader,
+        BaseFooter,
+        BaseLogin,
+        BaseAgree,
+        baseMixin,
+        router,
+        store,
+        topicApi,
+        homeApi,
+    ) {
+        Vue.use(ELEMENT);
+        Vue.use(router);
+        var id = {$id};
+        new Vue({
+            el: '#app',
+            components: {
+                'base-header': BaseHeader,
+                'base-footer': BaseFooter,
+                'base-login': BaseLogin,
+                'base-agree': BaseAgree,
+            },
+            mixins: [baseMixin],
+            data: {
+                paper: {
+                    surplus: -1,
+                    answer: 0,
+                    fake_sales: 0,
+                },
+                status: 0
+            },
+            watch: {
+                userInfo: function (value) {
+                    if (value) {
+                        this.getPaper();
+                        this.getStatus();
+                    }
+                }
+            },
+            created: function () {
+                this.getPaper();
+            },
+            methods: {
+                getPaper: function () {
+                    var vm = this;
+                    topicApi.testPaperDetails({
+                        id: id
+                    }).then(function (res) {
+                        vm.paper = res.data;
+                    });
+                },
+                getStatus: function () {
+                    var vm = this;
+                    topicApi.situationRecord({
+                        id: id
+                    }).then(function (res) {
+                        vm.status = res.data;
+                    });
+                },
+                // 开始答题
+                getAnswer: function () {
+                    var vm = this;
+                    topicApi.userAnswer({
+                        test_id: id,
+                        type: 2
+                    }).then(function (res) {
+                        localStorage.setItem('record_id', res.data);
+                        localStorage.setItem('test_id', id);
+                        localStorage.removeItem('leftTime');
+                        window.location.assign(vm.$router.question_detail + '?test_id=' + vm.paper.id);
+                    }).catch(function (err) {
+                        vm.$message(err.msg);
+                    });
+                },
+                // 再次答题
+                getAnswerAgain: function () {
+                    var vm = this;
+                    topicApi.takeTheTestAgain({
+                        test_id: id,
+                        type: 2
+                    }).then(function (res) {
+                        localStorage.setItem('record_id', res.data);
+                        localStorage.setItem('test_id', id);
+                        localStorage.removeItem('leftTime');
+                        window.location.assign(vm.$router.question_detail + '?test_id=' + vm.paper.id);
+                    }).catch(function (err) {
+                        vm.$message(err.msg);
+                    });
+                },
+                // 继续答题
+                getAnswerContinue: function () {
+                    var vm = this;
+                    topicApi.continueAnswer({
+                        test_id: id,
+                        type: 2
+                    }).then(function (res) {
+                        localStorage.setItem('record_id', res.data);
+                        localStorage.setItem('test_id', id);
+                        window.location.assign(vm.$router.question_detail + '?test_id=' + vm.paper.id);
+                    }).catch(function (err) {
+                        vm.$message(err.msg);
+                    });
+                },
+                // 支付答题
+                payAnswer: function () {
+                    var vm = this;
+                    homeApi.user_login().then(function () {
+                        localStorage.setItem('test_id', id);
+                        window.location.assign(vm.$router.payment + '?type=5&id=' + vm.paper.id);
+                    }).catch(function () {
+                        store.setLoginAction(true);
+                    });
+                },
+                answer: function () {
+                    var vm = this;
+                    homeApi.user_login().then(function () {
+                        switch (vm.status) {
+                            case 0:
+                                vm.getAnswer();
+                                break;
+                            case 1:
+                                vm.getAnswerAgain();
+                                break;
+                            case 2:
+                                vm.getAnswerContinue();
+                                break;
+                        }
+                    }).catch(function () {
+                        store.setLoginAction(true);
+                    });
+                }
+            }
+        });
+    });
+</script>
+{/block}

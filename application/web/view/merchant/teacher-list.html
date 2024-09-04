@@ -1,0 +1,104 @@
+{extend name="public/container"}
+{block name="title"}讲师列表{/block}
+{block name="app"}
+<div v-cloak id="app">
+    <base-header :public-data="publicData" :user-info="userInfo"></base-header>
+<div class="container">
+    <el-breadcrumb separator-class="el-icon-arrow-right">
+        <el-breadcrumb-item><a :href="$router.home">首页</a></el-breadcrumb-item>
+        <el-breadcrumb-item>讲师列表</el-breadcrumb-item>
+    </el-breadcrumb>
+    <div class="container_list">
+        <div class="container_list_item" v-for="item in lecturerList" :key="item.id">
+            <div class="container_list_item_image">
+                <img :src="item.lecturer_head" :alt="item.lecturer_name">
+            </div>
+            <div class="container_list_item_content">
+                <div class="container_list_item_content_title">
+                    <span>{{ item.lecturer_name }}</span>
+                </div>
+                <div class="container_list_item_content_value">
+                    <span>{{ item.explain }}</span>
+                </div>
+            </div>
+            <div class="container_list_item_handle">
+                <div class="container_list_item_handle_detils" @click="handleSelectDetils(item.id)">
+                    <span>查看详情</span>
+                    <i class="el-icon-d-arrow-right"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="pagination">
+        <el-pagination :page-size="paginationData.pageSize" :total="total" :current-page="paginationData.pageNum" layout="prev, pager, next" prev-text="上一页" next-text="下一页" hide-on-single-page @current-change="handleCurrentChange"></el-pagination>
+    </div>
+</div>
+<base-footer :public-data="publicData"></base-footer>
+<base-login :public-data="publicData" :agree-content="agreeContent"></base-login>
+<base-agree :agree-content="agreeContent"></base-agree>
+</div>
+{/block}
+{block name="vm"}
+<script>
+    require([
+        'vue',
+        'ELEMENT',
+        'components/base-header/index',
+        'components/base-footer/index',
+        'components/base-login/index',
+        'components/base-agree/index',
+        'mixins/base',
+        'api/merchant',
+        'scripts/util',
+        'router/index',
+        'css!styles/instructorList.css'
+    ], function (Vue, ELEMENT, BaseHeader, BaseFooter, BaseLogin, BaseAgree, baseMixin, merchantApi, util, router) {
+        Vue.use(ELEMENT);
+        Vue.use(router);
+        var vm = new Vue({
+            el: '#app',
+            components: {
+                'base-header': BaseHeader,
+                'base-footer': BaseFooter,
+                'base-login': BaseLogin,
+                'base-agree': BaseAgree
+            },
+            mixins: [baseMixin],
+            data: {
+                paginationData: {
+                    pageSize: 16,
+                    pageNum: 1
+                },
+                total: 0,
+                lecturerList: []
+            },
+            created: function () {
+                this.get_lecturer_list();
+            },
+            methods: {
+                // 讲师列表
+                get_lecturer_list: function () {
+                    merchantApi.get_lecturer_list({
+                        page: this.paginationData.pageNum,
+                        limit: this.paginationData.pageSize
+                    }).then(function (res) {
+                        vm.total = res.data.count;
+                        vm.lecturerList = res.data.data;
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+                // 分页
+                handleCurrentChange(val) {
+                    this.paginationData.pageNum = val;
+                    this.get_lecturer_list();
+                },
+                // 跳转到详情页
+                handleSelectDetils: function (id) {
+                    window.location.assign(this.$router.teacher_detail + '?id=' + id);
+                }
+            }
+        });
+    });
+</script>
+{/block}

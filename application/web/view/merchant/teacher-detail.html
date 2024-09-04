@@ -1,0 +1,561 @@
+{extend name="public/container"}
+{block name="title"}讲师详情{/block}
+{block name="style"}
+<style>
+    .problem {
+        padding: 30px 0 0 30px;
+        background-color: #FFFFFF;
+    }
+
+    .problem .list {
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+    }
+
+    .problem .item {
+        width: 370px;
+        padding: 20px 20px 29px;
+        border-radius: 8px;
+        margin: 0 15px 15px 0;
+        box-shadow: 0 2px 15px 1px rgba(79, 109, 143, 0.15);
+    }
+
+    .problem .title {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+        height: 54px;
+        font-size: 18px;
+        line-height: 27px;
+        color: #282828;
+    }
+
+    .problem .attribute {
+        padding: 18px 0 30px;
+        font-size: 0;
+    }
+
+    .problem .attribute span {
+        margin-left: 13px;
+        font-size: 14px;
+        line-height: 19px;
+        color: #999999;
+    }
+
+    .problem .attribute span:first-child {
+        margin-left: 0;
+    }
+
+    .problem .attribute .em {
+        color: #FF6B00;
+    }
+
+    .problem .button {
+        height: 30px;
+        padding: 0 23px;
+        border: none;
+        border-radius: 15px;
+        background-color: #2C8EFF;
+        font-size: 14px;
+        color: #FFFFFF;
+    }
+
+    .problem .iconfont {
+        margin-right: 5px;
+        font-size: 14px;
+    }
+
+    .question {
+        padding: 30px 0 0 30px;
+        background-color: #FFFFFF;
+    }
+
+    .question .list {
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start
+    }
+
+    .question .item {
+        width: 262px;
+        border-radius: 8px;
+        margin: 0 30px 30px 0;
+        box-shadow: 0 2px 15px 1px rgba(79, 109, 143, 0.15);
+    }
+
+    .question .item img {
+        display: block;
+        width: 263px;
+        height: 148px;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .question .title {
+        padding: 14px 20px 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        font-size: 16px;
+        line-height: 21px;
+        color: #282828;
+    }
+
+    .question .money {
+        padding: 12px 20px 0;
+        font-size: 12px;
+        color: #FF6B00;
+    }
+
+    .question .money span {
+        font-size: 20px;
+    }
+
+    .question .attribute {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 20px 13px;
+        font-size: 14px;
+        color: #999999;
+    }
+
+    .question button {
+        height: 26px;
+        padding: 0 11px;
+        border: none;
+        border-radius: 13px;
+        background-color: #2C8EFF;
+        font-size: 14px;
+        color: #FFFFFF;
+    }
+
+    .question .iconfont {
+        margin-right: 6px;
+        font-size: 14px;
+    }
+</style>
+{/block}
+{block name="app"}
+<div v-cloak id="app">
+    <base-header :public-data="publicData" :user-info="userInfo"></base-header>
+    <div class="container">
+        <el-breadcrumb separator-class="el-icon-arrow-right">
+            <el-breadcrumb-item><a :href="$router.home">首页</a></el-breadcrumb-item>
+            <el-breadcrumb-item><a :href="$router.teacher_list">讲师列表</a></el-breadcrumb-item>
+            <el-breadcrumb-item>讲师详情</el-breadcrumb-item>
+        </el-breadcrumb>
+        <div class="container_content">
+            <div class="container_content_message">
+                <div class="container_content_message_image">
+                    <img :src="lecturerDetails.lecturer_head" :alt="lecturerDetails.lecturer_name">
+                </div>
+                <div class="container_content_message_value">
+                    <div class="container_content_message_value_name">
+                        <span>{{ lecturerDetails.lecturer_name }}</span>
+                        <button :class="{ followed: !isFollow}" @click="follow">
+                            <i v-if="!isFollow" class="iconfont icontianjia"></i>
+                            {{ isFollow ? '已关注' : '关注' }}
+                        </button>
+                    </div>
+                    <div class="container_content_message_value_tap">
+                        <span v-for="(label, index) in lecturerDetails.label" :key="index">{{ label }}</span>
+                    </div>
+                    <div class="container_content_message_value_detils">
+                        <span>
+                            {{ lecturerDetails.explain }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container_selectTap">
+            <div class="container_selectTap_tip" :style="{ left: tipLeft}">
+                <img src="{__PUBLIC_WEB_PATH}pc/images/select.png" alt="">
+            </div>
+            <div class="container_selectTap_item">
+                <div class="container_selectTap_item_value" :class="{'selectEd': selectValue == item.value}" v-for="(item, index) in tipList" :key="index" :ref=`react${item.value}`
+                     @click="selectTip(item, index)">
+                    <span>{{item.title}}</span>
+                </div>
+            </div>
+        </div>
+        <div class="tab-main">
+            <!-- 讲师详情 -->
+            <div v-show="selectValue === 1" class="detail" v-html="lecturerDetails.introduction"></div>
+            <!-- 专题课程 -->
+            <div v-show="selectValue === 2" class="special">
+                <div class="list">
+                    <a v-for="item in listArr" :key="item.id" :href="item.href + '?id=' + item.id" class="item">
+                        <div class="item-header">
+                            <img :src="item.image" :alt="item.title">
+                            <img v-if="item.type === 1" src="{__PUBLIC_WEB_PATH}pc/images/course3.png" alt="">
+                            <img v-else-if="item.type === 2" src="{__PUBLIC_WEB_PATH}pc/images/course2.png" alt="">
+                            <img v-else-if="item.type === 3" src="{__PUBLIC_WEB_PATH}pc/images/course1.png" alt="">
+                        </div>
+                        <div class="item-main">
+                            <div class="title">{{ item.title }}</div>
+                            <div class="tags"><span v-for="(label, index) in item.label" :key="index" class="tag">{{ label }}</span></div>
+                            <div class="wrap">
+                                <div class="money-wrap">
+                                    <div v-if="item.pay_type" class="money">￥<span>{{ item.money }}</span></div>
+                                    <div class="vip">￥{{ item.member_money }}</div>
+                                </div>
+                                <div v-if="item.type !== 4 && !item.is_light" class="number">共{{ item.count }}节</div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <!-- 资料 -->
+            <div v-show="selectValue === 3" class="material">
+                <div class="list">
+                    <a v-for="item in listArr" :key="item.id" :href="item.href + '?id=' + item.id" class="item">
+                        <img :src="item.image" alt="">
+                        <div class="title">{{ item.title }}</div>
+                        <div class="money">￥<span>{{ item.money }}</span></div>
+                        <div class="number">{{ item.sales }}人已下载</div>
+                    </a>
+                </div>
+            </div>
+            <!-- 活动 -->
+            <div v-show="selectValue === 4" class="activity">
+                <div class="list">
+                    <a v-for="item in listArr" :key="item.id" :href="item.href + '?id=' + item.id" class="item">
+                        <div><img :src="item.image" alt=""></div>
+                        <div class="item-main">
+                            <div class="title">{{ item.title }}</div>
+                            <div class="time"><i class="iconfont"></i>活动时间：{{ item.time }}</div>
+                            <div class="address"><i class="iconfont"></i>活动地址：{{ item.province + item.city + item.district + item.detail }}</div>
+                        </div>
+                        <div class="money">￥<span>{{ item.price }}</span></div>
+                    </a>
+                </div>
+            </div>
+            <!-- 练习 -->
+            <div v-show="selectValue === 5" class="problem">
+                <ul class="list">
+                    <li v-for="item in problemList" :key="item.id" class="item">
+                        <div class="title">{{ item.title }}</div>
+                        <div class="attribute">
+                            <span class="light">共{{ item.item_number }}题</span>
+                            <span>{{ item.fake_sales + item.answer }}人已答题</span>
+                        </div>
+                        <button class="button" @click="goProblem(item)"><i class="iconfont icon-19-lianxi"></i>练习</button>
+                    </li>
+                </ul>
+                <el-pagination :page-size="limit" :total="problemTotal" :current-page.sync="problemPage" layout="prev, pager, next" prev-text="上一页" next-text="下一页"
+                               hide-on-single-page @current-change="getProblemList">
+                </el-pagination>
+                <el-empty v-if="!problemList.length && problemFinished"></el-empty>
+            </div>
+            <!-- 考试 -->
+            <div v-show="selectValue === 6" class="question">
+                <ul class="list">
+                    <li v-for="item in questionList" :key="item.id" class="item">
+                        <img :src="item.image" alt="">
+                        <div class="title">{{ item.title }}</div>
+                        <div class="money">￥<span>{{ item.money }}</span></div>
+                        <div class="attribute">
+                            <div>{{ item.fake_sales + item.answer }}人已答题</div>
+                            <button @click="goQuestion(item)"><i class="iconfont icon-19-lianxi"></i>答题</button>
+                        </div>
+                    </li>
+                </ul>
+                <el-pagination :page-size="limit" :total="questionTotal" :current-page.sync="questionPage" layout="prev, pager, next" prev-text="上一页" next-text="下一页"
+                               hide-on-single-page @current-change="getQuestionList">
+                </el-pagination>
+                <el-empty v-if="!questionList.length && questionFinished"></el-empty>
+            </div>
+            <el-empty v-if="finished" :image-size="200"></el-empty>
+            <el-pagination v-if="selectValue !== 1 && !finished" :page-size="pageSize" :total="total" :current-page.sync="currentPage" layout="prev, pager, next" prev-text="上一页"
+                           next-text="下一页" hide-on-single-page @current-change="handleCurrentPage">
+            </el-pagination>
+        </div>
+    </div>
+    <base-footer :public-data="publicData"></base-footer>
+    <base-login :public-data="publicData" :agree-content="agreeContent"></base-login>
+    <base-agree :agree-content="agreeContent"></base-agree>
+</div>
+{/block}
+{block name="vm"}
+<script>
+    require([
+        'vue',
+        'ELEMENT',
+        'components/base-header/index',
+        'components/base-footer/index',
+        'components/base-login/index',
+        'components/base-agree/index',
+        'mixins/base',
+        'api/home',
+        'api/auth',
+        'api/merchant',
+        'scripts/util',
+        'router/index',
+        'store/index',
+        'css!styles/instructorListDetils.css'
+    ], function (Vue, ELEMENT, BaseHeader, BaseFooter, BaseLogin, BaseAgree, baseMixin, homeApi, authApi, merchantApi, util, router, store) {
+        Vue.use(ELEMENT);
+        Vue.use(router);
+        var id = {$id};
+        var vm = new Vue({
+            el: '#app',
+            components: {
+                'base-header': BaseHeader,
+                'base-footer': BaseFooter,
+                'base-login': BaseLogin,
+                'base-agree': BaseAgree
+            },
+            mixins: [baseMixin],
+            data: {
+                lecturerDetails: {},
+                tipList: [
+                    {
+                        title: '简介',
+                        value: 1
+                    },
+                    {
+                        title: '专题',
+                        value: 2
+                    },
+                    {
+                        title: '资料',
+                        value: 3
+                    },
+                    {
+                        title: '活动',
+                        value: 4
+                    },
+                    {
+                        title: '练习',
+                        value: 5
+                    },
+                    {
+                        title: '考试',
+                        value: 6
+                    }
+                ],
+                tipLeft: 0,
+                selectValue: 1,
+                pageSize: 12,
+                total: 0,
+                currentPage: 1,
+                list: [],
+                finished: false,
+                isFollow: false,
+                problemList: [],
+                problemTotal: 0,
+                problemPage: 1,
+                problemFinished: false,
+                questionList: [],
+                questionTotal: 0,
+                questionPage: 1,
+                questionFinished: false,
+                limit: 16
+            },
+            computed: {
+                listArr: function () {
+                    var href = this.$router.special_detail;
+                    switch (this.selectValue) {
+                        case 3:
+                            href = this.$router.material_detail;
+                            break;
+                        case 4:
+                            href = this.$router.activity_detail;
+                            break;
+                    }
+                    return this.list.map(function (item) {
+                        if (vm.selectValue === 2) {
+                            switch (item.type) {
+                                case 4:
+                                    href = vm.$router.special_detail;
+                                    break;
+                                case 6:
+                                    href = vm.$router.single_detail;
+                                    break;
+                            }
+                        }
+                        item.href = href;
+                        return item;
+                    });
+                },
+                canIsFollow: function () {
+                    return this.userInfo && this.lecturerDetails.mer_id;
+                }
+            },
+            watch: {
+                selectValue: {
+                    handler: function (value) {
+                        this.list = [];
+                        this.total = 0;
+                        this.finished = false;
+                        this.currentPage = 1;
+                        switch (value) {
+                            case 1:
+                                this.lecturer_details();
+                                break;
+                            case 2:
+                                this.lecturer_special_list();
+                                break;
+                            case 3:
+                                this.lecturer_download_list();
+                                break;
+                            case 4:
+                                this.lecturer_event_list();
+                                break;
+                            case 5:
+                                this.getProblemList();
+                                break;
+                            case 6:
+                                this.getQuestionList();
+                                break;
+                        }
+                        this.$nextTick(function () {
+                            this.tipLeft = this.$refs['react' + value][0].offsetLeft + 'px';
+                        });
+                    },
+                    immediate: true
+                },
+                canIsFollow: function (value) {
+                    if (value) {
+                        this.getIsFollow();
+                    }
+                }
+            },
+            created: function () {
+
+            },
+            methods: {
+                handleCurrentPage: function () {
+                    switch (this.selectValue) {
+                        case 2:
+                            this.lecturer_special_list();
+                            break;
+                        case 3:
+                            this.lecturer_download_list();
+                            break;
+                        case 4:
+                            this.lecturer_event_list();
+                            break;
+                    }
+                },
+                // 选项卡
+                selectTip(item) {
+                    this.selectValue = item.value;
+                },
+                // 详情
+                lecturer_details: function () {
+                    var vm = this;
+                    authApi.lecturer_details({
+                        id: id
+                    }).then(function (res) {
+                        vm.lecturerDetails = res.data;
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+                // 讲师名下课程
+                lecturer_special_list: function () {
+                    var vm = this;
+                    merchantApi.lecturer_special_list({
+                        mer_id: this.lecturerDetails.mer_id,
+                        page: this.currentPage,
+                        limit: this.pageSize
+                    }).then(function (res) {
+                        vm.list = res.data.data;
+                        vm.total = res.data.count;
+                        vm.finished = !vm.total;
+                    });
+                },
+                // 讲师名下资料
+                lecturer_download_list: function () {
+                    var vm = this;
+                    merchantApi.lecturer_download_list({
+                        mer_id: this.lecturerDetails.mer_id,
+                        page: this.currentPage,
+                        limit: this.pageSize
+                    }).then(function (res) {
+                        vm.list = res.data.data;
+                        vm.total = res.data.count;
+                        vm.finished = !vm.total;
+                    });
+                },
+                // 讲师名下活动
+                lecturer_event_list: function () {
+                    var vm = this;
+                    merchantApi.lecturer_event_list({
+                        mer_id: this.lecturerDetails.mer_id,
+                        page: this.currentPage,
+                        limit: this.pageSize
+                    }).then(function (res) {
+                        vm.list = res.data.data;
+                        vm.total = res.data.count;
+                        vm.finished = !vm.total;
+                    });
+                },
+                // 是否关注
+                getIsFollow: function () {
+                    var vm = this;
+                    merchantApi.is_follow({
+                        mer_id: this.lecturerDetails.mer_id
+                    }).then(function (res) {
+                        vm.isFollow = res.data;
+                    });
+                },
+                follow: function () {
+                    var vm = this;
+                    homeApi.user_login().then(function () {
+                        merchantApi.user_follow({
+                            mer_id: vm.lecturerDetails.mer_id,
+                            is_follow: Number(!vm.isFollow)
+                        }).then(function (res) {
+                            vm.isFollow = !vm.isFollow;
+                            vm.$message.success(vm.isFollow ? '关注成功' : '取消关注成功');
+                        });
+                    }).catch(function () {
+                        store.setLoginAction(true);
+                    });
+                },
+                getProblemList: function () {
+                    var vm = this;
+                    merchantApi.lecturer_test_list({
+                        mer_id: this.lecturerDetails.mer_id,
+                        page: this.problemPage,
+                        limit: this.limit,
+                        type: 1
+                    }).then(function (res) {
+                        vm.problemList = res.data.data;
+                        vm.problemTotal = res.data.count;
+                        vm.problemFinished = vm.limit > vm.problemList.length;
+                    }).catch(function () {
+
+                    });
+                },
+                getQuestionList: function () {
+                    var vm = this;
+                    merchantApi.lecturer_test_list({
+                        mer_id: this.lecturerDetails.mer_id,
+                        page: this.questionPage,
+                        limit: this.limit,
+                        type: 2
+                    }).then(function (res) {
+                        vm.questionList = res.data.data;
+                        vm.questionTotal = res.data.count;
+                        vm.questionFinished = vm.limit > vm.questionList.length;
+                    }).catch(function () {
+
+                    });
+                },
+                goProblem: function (problem) {
+                    window.location.assign(vm.$router.problem_index + '?id=' + problem.id);
+                },
+                goQuestion: function (question) {
+                    window.location.assign(vm.$router.question_index + '?id=' + question.id);
+                }
+            }
+        });
+    });
+</script>
+{/block}

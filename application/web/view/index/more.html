@@ -1,0 +1,124 @@
+{extend name="public/container"}
+{block name="title"}精品课程{/block}
+{block name="app"}
+<div v-cloak id="app">
+    <base-header ref="baseHeader" :public-data="publicData" :user-info="userInfo"></base-header>
+<div class="layout">
+    <div class="container">
+        <el-breadcrumb separator-class="el-icon-arrow-right">
+            <el-breadcrumb-item><a :href="$router.home">首页</a></el-breadcrumb-item>
+            <el-breadcrumb-item>精品课程</el-breadcrumb-item>
+        </el-breadcrumb>
+        <!-- 课程列表开始 -->
+        <div class="container_curriculum_list">
+            <div v-if="unifiendList.length" class="container_curriculum_list_con">
+                <div class="container_curriculum_list_item" v-for="item in unifiendList" :key="item.id" @click="handleSelectDetils(item)">
+                    <div class="container_curriculum_list_item_image">
+                        <img class="image" :src="item.image" :alt="item.title">
+                        <img v-if="item.type == 1" class="type" src="{__PUBLIC_WEB_PATH}pc/images/course3.png" alt="图文">
+                        <img v-else-if="item.type == 2" class="type" src="{__PUBLIC_WEB_PATH}pc/images/course2.png" alt="音频">
+                        <img v-else-if="item.type == 3" class="type" src="{__PUBLIC_WEB_PATH}pc/images/course1.png" alt="视频">
+                        <img v-else-if="item.type == 4" class="type" src="{__PUBLIC_WEB_PATH}pc/images/course4.png" alt="直播">
+                        <img v-else-if="item.type == 5" class="type" src="{__PUBLIC_WEB_PATH}pc/images/course5.png" alt="专栏">
+                    </div>
+                    <div class="course">
+                        <div class="course_title">
+                            <span>{{item.title}}</span>
+                        </div>
+                        <div class="label-count">
+                            <div class="label-group">
+                                <div v-for="label in item.label" class="label">{{ label }}</div>
+                            </div>
+                            <div v-if="item.type !== 4 && !item.is_light">共{{ item.count }}节</div>
+                        </div>
+                        <div class="browse-money">
+                            <div>{{ item.browse_count }}人学习</div>
+                            <div v-if="item.pay_type == 1" class="money">￥<span>{{ item.money }}</span></div>
+                            <div v-else-if="item.pay_type == 0" class="money free">免费</div>
+                            <div v-else class="money free">加密</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <el-empty v-if="!unifiendList.length" image="{__PUBLIC_WEB_PATH}pc/images/empty1.png" description=" "></el-empty>
+        </div>
+        <!-- 课程列表结束 -->
+        <div class="pagination">
+            <el-pagination :page-size="limit" :total="total" :current-page.sync="page" layout="prev, pager, next" prev-text="上一页" next-text="下一页" hide-on-single-page @current-change="currentChange"></el-pagination>
+        </div>
+    </div>
+</div>
+<base-footer :public-data="publicData"></base-footer>
+<base-login :public-data="publicData" :agree-content="agreeContent"></base-login>
+<base-agree :agree-content="agreeContent"></base-agree>
+</div>
+{/block}
+{block name="vm"}
+<script>
+    require([
+        'vue',
+        'ELEMENT',
+        'components/base-header/index',
+        'components/base-footer/index',
+        'components/base-login/index',
+        'components/base-agree/index',
+        'mixins/base',
+        'api/home',
+        'scripts/util',
+        'router/index',
+        'css!styles/classification.css'
+    ], function (Vue, ELEMENT, BaseHeader, BaseFooter, BaseLogin, BaseAgree, baseMixin, homeApi, util, router) {
+        Vue.use(ELEMENT);
+        Vue.use(router);
+        new Vue({
+            el: '#app',
+            components: {
+                'base-header': BaseHeader,
+                'base-footer': BaseFooter,
+                'base-login': BaseLogin,
+                'base-agree': BaseAgree
+            },
+            mixins: [baseMixin],
+            data: {
+                courseList: [],
+                page: 1,
+                limit: 16,
+                recommend_id: '',
+                type: '',
+                unifiendList: [],
+                total: 0
+            },
+            created: function () {
+                this.recommend_id = util.getParmas('recommend_id');
+                this.type = util.getParmas('type');
+                this.get_unifiend_list();
+            },
+            methods: {
+                // 课程列表
+                get_unifiend_list: function () {
+                    var vm = this;
+                    homeApi.get_unifiend_list({
+                        page: this.page,
+                        limit: this.limit,
+                        recommend_id: this.recommend_id,
+                        type: this.type
+                    }).then(function (res) {
+                        vm.unifiendList = res.data.list;
+                        vm.total = res.data.count;
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+                // 点击分页
+                currentChange: function () {
+                    this.get_unifiend_list();
+                },
+                // 点击课程
+                handleSelectDetils: function (val) {
+                    window.location.href = (val.is_light ? this.$router.single_detail : this.$router.special_detail) + '?id=' + val.id + '&from=more_list&type=' + this.type + '&recommend_id=' + this.recommend_id;
+                }
+            }
+        });
+    });
+</script>
+{/block}

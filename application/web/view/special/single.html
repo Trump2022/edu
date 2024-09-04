@@ -1,0 +1,839 @@
+{extend name="public/container"}
+{block name="title"}{$title}{/block}
+{block name="style"}
+<style>
+    .problem {
+        padding: 28px 0 0 27px;
+        margin: -30px;
+    }
+
+    .problem .list {
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+    }
+
+    .problem .item {
+        width: 390px;
+        height: 180px;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 0 26px 26px 0;
+        box-shadow: 0 2px 15px 1px rgba(79, 109, 143, 0.15);
+    }
+
+    .problem .title {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+        height: 54px;
+        font-size: 18px;
+        line-height: 27px;
+        color: #282828;
+    }
+
+    .problem .progress {
+        margin-top: 12px;
+        font-size: 14px;
+        line-height: 20px;
+        color: #2C8EFF;
+    }
+
+    .problem .progress-bar {
+        display: inline-block;
+        width: 158px;
+        height: 8px;
+        border-radius: 4px;
+        margin-right: 10px;
+        background-color: #EEEEEE;
+    }
+
+    .problem .progress-inner {
+        width: 50%;
+        height: 8px;
+        border-radius: 4px;
+        background-color: #2C8EFF;
+    }
+
+    .problem .progress-text {
+        display: inline-block;
+    }
+
+    .problem .wrap {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 25px;
+        font-size: 14px;
+        color: #999999;
+    }
+
+    .problem button {
+        height: 30px;
+        padding: 0 17px;
+        border: none;
+        border-radius: 15px;
+        background-color: #2C8EFF;
+        font-size: 14px;
+        color: #FFFFFF;
+    }
+
+    .question {
+        padding: 30px 0 0 30px;
+        margin: -30px;
+    }
+
+    .question .list {
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+    }
+
+    .question .item {
+        width: 246px;
+        height: 240px;
+        border-radius: 8px;
+        margin: 0 30px 30px 0;
+        box-shadow: 0 2px 15px 1px rgba(79, 109, 143, 0.15);
+    }
+
+    .question .item img {
+        display: block;
+        width: 246px;
+        height: 138px;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .question .title {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        padding: 15px 20px 0;
+        font-size: 16px;
+        line-height: 21px;
+        color: #282828;
+    }
+
+    .question .wrap {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 20px 0;
+        font-size: 14px;
+        color: #FF6B00;
+    }
+
+    .question button {
+        height: 26px;
+        padding: 0 11px;
+        border: none;
+        border-radius: 13px;
+        background-color: #2C8EFF;
+        font-size: 14px;
+        color: #FFFFFF;
+    }
+
+    .question button .iconfont {
+        margin-right: 6px;
+        font-size: 13px;
+    }
+</style>
+{/block}
+{block name="app"}
+<div v-cloak id="app">
+    <base-header :public-data="publicData" :user-info="userInfo"></base-header>
+    <div class="layout">
+        <div class="container">
+            <el-breadcrumb separator-class="el-icon-arrow-right">
+                <el-breadcrumb-item><a :href="$router.home">首页</a></el-breadcrumb-item>
+                <el-breadcrumb-item v-if="from == 'live'"><a :href="$router.special_live">直播课</a></el-breadcrumb-item>
+                <el-breadcrumb-item v-else-if="from == 'special_cate'"><a :href="$router.special_cate">所有课程</a></el-breadcrumb-item>
+                <el-breadcrumb-item v-else><a :href="$router.more_list + '?type=' + type + '&recommend_id=' + recommend_id">精品课程</a></el-breadcrumb-item>
+                <el-breadcrumb-item>课程详情</el-breadcrumb-item>
+            </el-breadcrumb>
+            <div class="container_content">
+                <div class="container_content_imagelist">
+                    <el-image v-if="special.image" :src="special.image" fit="cover"></el-image>
+                </div>
+                <div class="container_content_message">
+                    <div class="content_message_title">{{ special.title }}</div>
+                    <div class="content_message_tap">
+                        <div class="message_tap_list">
+                            <span v-for="label in special.label">{{ label }}</span>
+                        </div>
+                    </div>
+                    <div class="content_message_validity">
+                        <div v-if="validity == -1" class="message_validity_item">
+                            <template v-if="special.validity">课程有效期为{{ special.validity }}天，过期后需重新购买哦！</template>
+                            <template v-else>课程永久有效哦！</template>
+                        </div>
+                        <div v-else-if="validity == 0" class="message_validity_item">课程永久有效哦！</div>
+                        <div v-else-if="validity > 0" class="message_validity_item">课程有效期剩余{{ validity | validityFormat }}天，过期后需重新购买哦！</div>
+                        <div class="content_message_priceBox">
+                            <div class="message_priceBox_item">
+                                <div class="message_priceBox_item_label">
+                                    <span>价格：</span>
+                                </div>
+                                <div v-if="special.pay_type === 1" class="message_priceBox_item_value">
+                                    <div>￥<span>{{ special.money }}</span></div>
+                                    <div><span>￥{{ special.member_money }}</span></div>
+                                </div>
+                                <div v-else class="message_priceBox_item_value">
+                                    <span class="free">免费</span>
+                                </div>
+                            </div>
+                            <div class="message_priceBox_number">
+                                <span>{{ recordCoujnt }}人已学</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="handle">
+                        <div class="container_handle">
+                            <div @click="collect">
+                                <template v-if="special.collect">
+                                    <i class="iconfont iconshoucang2"></i>已收藏
+                                </template>
+                                <template v-else>
+                                    <i class="iconfont iconshoucang11"></i>收藏
+                                </template>
+                            </div>
+                        </div>
+                        <div>
+                            <div v-if="!isPay && (special.member_pay_type || !isMember) && special.singleProfile.is_try" class="handle_button try-btn" @click="goTry">免费试看</div>
+                            <!-- <div v-if="!isPay && special.singleProfile.is_try" class="handle_button try-btn" @click="goPayment">免费试看</div> -->
+                            <div v-if="!special.pay_type || (!special.member_pay_type && isMember)" class="handle_button" @click="learn">免费学习</div>
+                            <div v-else-if="isPay" class="handle_button" @click="learn">去学习</div>
+                            <div v-else class="handle_button" @click="goPayment">立即购买</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="container_detils">
+            <div class="container_detils_con">
+                <div class="container_selectTap">
+                    <div class="container_selectTap_tip" :style="{ left: tipLeft }">
+                        <img src="{__PUBLIC_WEB_PATH}pc/images/select.png" alt="">
+                    </div>
+                    <div class="container_selectTap_item">
+                        <div class="container_selectTap_item_value" :class="{'selectEd': selectValue == item.value}" v-for="(item, index) in tipList" :key="index"
+                             :ref=`react${item.value}` @click="selectTip(item, index)">
+                            <span>{{item.title}}</span>
+                        </div>
+                    </div>
+                    <el-popover v-if="mobileUrl" trigger="hover" width="140" popper-class="phone-popper">
+                        <div ref="qrcode" class="qrcode"></div>
+                        <div class="tip">扫一扫，手机继续学</div>
+                        <el-button slot="reference" type="text"><i class="iconfont iconshouji"></i>手机端访问</el-button>
+                    </el-popover>
+                </div>
+                <div class="container_content_detils">
+                    <!-- 课程详情 -->
+                    <div v-if="selectValue == 1" class="container_content_detils_content" v-html="special.abstract"></div>
+                    <!-- 评价开始 -->
+                    <div class="evaluate" v-if="selectValue == 4">
+                        <div class="submit_evaluate">
+                            <div class="submit_evaluate_title">
+                                <el-rate v-model="rateValue" void-color="#CCCCCC" text-color="#AAAAAA" show-text></el-rate>
+                            </div>
+                            <div class="submit_evaluate_textarea">
+                                <el-form>
+                                    <el-input v-model.trim="comment" class="textarea" rows="5" type="textarea" placeholder="课程满足你的期待吗？说说你的想法，分享给想学习得他们吧~"></el-input>
+                                </el-form>
+                            </div>
+                            <div class="submit_evaluate_handle">
+                                <el-popover width="312" :title="'图片上传（最多' + uploadLimit + '张）'" placement="bottom-start" trigger="manual" popper-class="upload-popover"
+                                            v-model="fileList.length">
+                                    <ul v-if="fileList.length">
+                                        <li v-for="(item, index) in fileList" :key="index">
+                                            <img :src="item" :alt="item">
+                                            <div>
+                                                <i class="el-icon-delete" @click="removeUpload(index)"></i>
+                                            </div>
+                                        </li>
+                                        <li v-if="fileList.length < uploadLimit">
+                                            <i class="el-icon-plus avatar-uploader-icon" @click="popoverUpload"></i>
+                                        </li>
+                                    </ul>
+                                    <el-upload slot="reference" ref="upload" action="" :show-file-list="false" :limit="uploadLimit" :http-request="uploadRequest"
+                                               :on-exceed="uploadExceed">
+                                        <el-button type="text" icon="el-icon-upload">上传图片</el-button>
+                                    </el-upload>
+                                </el-popover>
+                                <el-button type="primary" @click="user_comment_special">发表评论</el-button>
+                            </div>
+                        </div>
+                        <div class="user_evaluate">
+                            <div class="user_evaluate_total_score">
+                                <span>课程评分：</span>
+                                <span>{{ replyData.score }}</span>
+                                <span>分</span>
+                            </div>
+                            <div class="user_evaluate_list">
+                                <div class="user_evaluate_list_item" v-for="(item, index) in replyList" :key="index">
+                                    <div class="user_evaluate_list_item_user">
+                                        <div class="user_evaluate_list_item_user_nick">
+                                            <div class="user_evaluate_list_item_user_nick_avator">
+                                                <img :src="item.avatar" :alt="item.nickname">
+                                            </div>
+                                            <div>
+                                                <span>{{item.nickname}}</span>
+                                            </div>
+                                            <div>
+                                                <span class="el-icon-star-on" v-for="(val, i) in 5" :key="i" :class="{ 'select_evaluate': i < item.star}"></span>
+                                            </div>
+                                        </div>
+                                        <div class="user_evaluate_list_item_user_time">
+                                            <span>{{item.add_time}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="user_evaluate_list_item_value">
+                                        <div class="user_evaluate_list_item_value_message">
+                                            <span>{{item.comment}}</span>
+                                        </div>
+                                        <div class="user_evaluate_list_item_value_imageList">
+                                            <div class="item_value_imageList_item" v-for="(val, i) in item.pics" :key="i">
+                                                <el-image :src="val" :preview-src-list="item.pics"></el-image>
+                                            </div>
+                                        </div>
+                                        <div v-if="item.merchant_reply_content" class="user_evaluate_list_item_value_reply">
+                                            <div class="user_evaluate_list_item_value_reply_item">
+                                                <div class="value_reply_item_label">
+                                                    <span>官方回复：</span>
+                                                </div>
+                                                <div class="value_reply_item_con">
+                                                    <span>{{item.merchant_reply_content}}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <el-pagination :page-size="limit" :total="replyTotal" :current-page.sync="replyPage" layout="prev, pager, next" prev-text="上一页" next-text="下一页"
+                                               hide-on-single-page @current-change="special_reply_list"></el-pagination>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 评价结束 -->
+                    <!-- 练习 -->
+                    <div v-if="selectValue == 5" class="problem">
+                        <ul class="list">
+                            <li v-for="item in problemList" :key="item.id" class="item">
+                                <div class="title">{{ item.title }}</div>
+                                <div class="progress">
+                                    <div class="progress-bar">
+                                        <div :style="{ width: item.progress + '%' }" class="progress-inner"></div>
+                                    </div>
+                                    <div class="progress-text">{{ item.progress }}%</div>
+                                </div>
+                                <div class="wrap">
+                                    <div>{{ item.fake_sales + item.answer }}人已答题</div>
+                                    <button @click="goProblem(item)">开始答题</button>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- 考试 -->
+                    <div v-if="selectValue == 6" class="question">
+                        <ul class="list">
+                            <li v-for="item in questionList" :key="item.id" class="item">
+                                <img :src="item.image" alt="">
+                                <div class="title">{{ item.title }}</div>
+                                <div class="wrap">
+                                    <div>共{{ item.item_number }}题</div>
+                                    <button @click="goQuestion(item)"><i class="iconfont icon-19-lianxi"></i>答题</button>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="container_detils_propaganda">
+                <!-- 讲师 -->
+                <div v-if="lecturerDetails.lecturer_name" class="propaganda_teacher" @click="goLecturer">
+                    <div class="propaganda_teacher_title">
+                        <div class="teacher_title_image">
+                            <img :src="lecturerDetails.lecturer_head" :alt="lecturerDetails.lecturer_name">
+                        </div>
+                        <div class="teacher_title_message">
+                            <div class="title_message_name">{{ lecturerDetails.lecturer_name }}</div>
+                            <div v-if="lecturerDetails.label.length" class="title_message_tap">
+                                <span v-for="(label, index) in lecturerDetails.label" :key="index">{{ label }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="propaganda_teacher_dic">{{ lecturerDetails.explain }}</div>
+                </div>
+                <!-- 关联资料 -->
+                <div v-if="dataDownload.length" class="propaganda_course">
+                    <div v-for="item in dataDownload" :key="item.id" class="propaganda_course_con" @click="goMaterialDetail(item.id)">
+                        <div class="propaganda_course_con_image">
+                            <img :src="item.image" :alt="item.title">
+                        </div>
+                        <div class="propaganda_course_con_dic">
+                            <div class="propaganda_course_con_dic_tit">{{ item.title }}</div>
+                            <div class="propaganda_course_con_dic_num">{{ item.ficti + item.sales }}人已下载</div>
+                            <div class="propaganda_course_handle">
+                                <div v-if="item.pay_type" class="propaganda_course_handle_price">￥<span>{{ item.money }}</span></div>
+                                <div v-else class="propaganda_course_handle_price free">免费</div>
+                                <div class="propaganda_course_handle_button">去下载</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 推荐课程 -->
+                <div v-if="recommendedCourses.length" class="propaganda_recommend">
+                    <div class="propaganda_recommend_more">
+                        <div class="propaganda_recommend_more_title">推荐课程</div>
+                        <div class="propaganda_recommend_more_icon" @click="goSpecialCate">更多<i class="el-icon-arrow-right"></i></div>
+                    </div>
+                    <div v-for="item in recommendedCourses" :key="item.id" class="propaganda_course_con" @click="goSpecial(item)">
+                        <div class="propaganda_course_con_image">
+                            <img :src="item.image" alt="">
+                        </div>
+                        <div class="propaganda_course_con_dic">
+                            <div class="propaganda_course_con_dic_tit">{{ item.title }}</div>
+                            <div class="propaganda_course_con_dic_tag">
+                                <div class="tag-group">
+                                    <div v-for="(label, index) in item.label" :key="index" class="tag">{{ label }}</div>
+                                </div>
+                                <div v-if="item.type !== 4 && !item.is_light">共{{ item.count }}节</div>
+                            </div>
+                            <div class="propaganda_course_con_dic_num">
+                                <div>{{ item.browse_count }}人已学</div>
+                                <div v-if="item.pay_type" class="money">￥<span>{{ item.money }}</span></div>
+                                <div v-else class="money free">免费</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button v-if="isBatch && !isPay" :style="{bottom: 'calc(50% + '+(sidebarHeight / 2)+'px)'}" class="exchange-button" type="button" @click="exchange">
+        <img src="{__PUBLIC_WEB_PATH}pc/images/exchange.png" alt="兑换码">
+    </button>
+    <base-footer :public-data="publicData" @action="baseFooterAction"></base-footer>
+    <base-login :public-data="publicData" :agree-content="agreeContent"></base-login>
+    <base-agree :agree-content="agreeContent"></base-agree>
+</div>
+{/block}
+{block name="vm"}
+<script>
+    require([
+        'vue',
+        'ELEMENT',
+        'components/base-header/index',
+        'components/base-footer/index',
+        'components/base-login/index',
+        'components/base-agree/index',
+        'mixins/base',
+        'api/auth',
+        'api/home',
+        'api/special',
+        'api/topic',
+        'scripts/util',
+        'router/index',
+        'store/index',
+        'qrcode',
+        'css!styles/courseListDetils.css'
+    ], function (Vue, ELEMENT, BaseHeader, BaseFooter, BaseLogin, BaseAgree, baseMixin, authApi, homeApi, specialApi, topicApi, util, router, store) {
+        var id = {$id};
+        var isBatch = '{$isBatch}';
+        var isPay = '{$isPay}';
+        var validity = {$validity};
+        var mobileUrl = '{$mobile_url}';
+        var isMember = {$is_member};
+        var recordCoujnt = '{$recordCoujnt}';
+        var commentSwitch = {$comment_switch};
+        var special = {$special};
+        Vue.use(ELEMENT);
+        Vue.use(router);
+        var vm = new Vue({
+            el: '#app',
+            components: {
+                'base-header': BaseHeader,
+                'base-footer': BaseFooter,
+                'base-login': BaseLogin,
+                'base-agree': BaseAgree
+            },
+            filters: {
+                validityFormat: function (value) {
+                    var result = '';
+                    var days = Math.floor(value / 60 / 60 / 24);
+                    var hours = Math.floor(value / 60 / 60 % 24);
+                    var minutes = Math.floor(value / 60 % 60);
+                    if (days) {
+                        result += days + '天';
+                    }
+                    if (hours) {
+                        result += hours + '小时';
+                    }
+                    return result + minutes + '分钟';
+                }
+            },
+            mixins: [baseMixin],
+            data: {
+                id: id,
+                isBatch: isBatch,
+                isPay: isPay,
+                validity: validity,
+                isMember: isMember,
+                recordCoujnt: recordCoujnt,
+                special: special.special,
+                lecturerDetails: {},
+                courses: 0,
+                dataDownload: [],
+                recommendedCourses: [],
+                tipList: [
+                    {
+                        title: '详情',
+                        value: 1
+                    },
+                    {
+                        title: '评论(0条)',
+                        value: 4
+                    }
+                ],
+                tipLeft: 0,
+                selectValue: 1,
+                replyData: {},
+                replyPage: 1,
+                limit: 10,
+                replyList: [],
+                replyFinished: false,
+                replyTotal: 0,
+                rateValue: 5,
+                comment: '',
+                uploadLimit: 6,
+                fileList: [],
+                from: '',
+                type: '',
+                recommend_id: '',
+                isReload: true,
+                mobileUrl: mobileUrl,
+                sidebarHeight: 0,
+                problemList: [],
+                questionList: []
+            },
+            watch: {
+                selectValue: {
+                    handler: function (val) {
+                        this.$nextTick(function () {
+                            this.tipLeft = this.$refs['react' + val][0].offsetLeft + 'px';
+                        });
+                    },
+                    immediate: true
+                }
+            },
+            created: function () {
+                this.from = util.getParmas('from');
+                this.type = util.getParmas('type');
+                this.recommend_id = util.getParmas('recommend_id');
+                this.special_data_download();
+                this.recommended_courses();
+                this.addLearningRecords();
+                this.getProblemList();
+                if (commentSwitch) {
+                    this.special_reply_data();
+                    this.special_reply_list();
+                } else {
+                    for (var i = this.tipList.length; i--;) {
+                        if (this.tipList[i].value == 4) {
+                            this.tipList.splice(i, 1);
+                            break;
+                        }
+                    }
+                }
+            },
+            mounted: function () {
+                this.$nextTick(function () {
+                    if (this.mobileUrl) {
+                        new QRCode(this.$refs.qrcode, this.mobileUrl);
+                    }
+                });
+            },
+            methods: {
+                baseFooterAction: function (value) {
+                    this.sidebarHeight = value;
+                },
+                // 免费试看
+                goTry: function () {
+                    var vm = this;
+                    homeApi.user_login().then(function () {
+                        window.location.assign(vm.$router.task_info + '?task_id=0&specialId=' + vm.id + '&special_title=' + vm.special.title);
+                    }).catch(function (err) {
+                        store.setLoginAction(true);
+                    });
+                },
+                // 专题详情
+                get_special_single_details: function () {
+                    specialApi.get_special_single_details({
+                        id: this.id
+                    }).then(function (res) {
+                        var data = res.data;
+                        vm.isBatch = data.isBatch;
+                        vm.isPay = data.isPay;
+                        vm.isMember = data.is_member;
+                        vm.recordCoujnt = data.recordCoujnt;
+                        vm.special = data.special;
+                        vm.validity = data.validity;
+                        document.title = data.title;
+                        vm.lecturer_details();
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+                // 讲师信息
+                lecturer_details: function () {
+                    authApi.lecturer_details({
+                        id: this.special.lecturer_id
+                    }).then(function (res) {
+                        vm.lecturerDetails = res.data || {};
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+                // 关联的资料
+                special_data_download: function () {
+                    specialApi.special_data_download({
+                        special_id: this.id
+                    }).then(function (res) {
+                        vm.dataDownload = res.data;
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+                // 推荐的专题
+                recommended_courses: function () {
+                    specialApi.recommended_courses({
+                        id: this.id
+                    }).then(function (res) {
+                        vm.recommendedCourses = res.data;
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+                // 评价概况
+                special_reply_data: function () {
+                    specialApi.special_reply_data({
+                        special_id: this.id
+                    }).then(function (res) {
+                        vm.replyData = res.data;
+                        var tip = vm.tipList.find(function (tipItem) {
+                            return tipItem.value === 4;
+                        });
+                        if (tip) {
+                            tip.title = '评论(' + vm.replyData.whole + '条)';
+                        }
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+                // 评价列表
+                special_reply_list: function () {
+                    specialApi.special_reply_list({
+                        page: this.replyPage,
+                        limit: this.limit,
+                        special_id: this.id
+                    }).then(function (res) {
+                        vm.replyList = res.data.list;
+                        vm.replyTotal = res.data.count;
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+                // 发表评论
+                user_comment_special: function () {
+                    specialApi.user_comment_special(this.id, {
+                        comment: this.comment,
+                        pics: this.fileList,
+                        satisfied_score: this.rateValue
+                    }).then(function (res) {
+                        vm.$message.success(res.msg);
+                        vm.comment = '';
+                        vm.fileList = [];
+                        vm.rateValue = 5;
+                        vm.replyPage = 1;
+                        vm.replyList = [];
+                        vm.replyFinished = false;
+                        vm.special_reply_data();
+                        vm.special_reply_list();
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+                // 点击图片弹窗的上传
+                popoverUpload: function () {
+                    this.$refs.upload.$refs['upload-inner'].$refs.input.click();
+                },
+                // 上传图片
+                uploadRequest: function (elUpload) {
+                    var formData = new FormData();
+                    formData.append('file', elUpload.file)
+                    authApi.upload(formData).then(function (res) {
+                        vm.$message.success(res.msg);
+                        vm.fileList.push(res.data.url);
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                        vm.$refs.upload.uploadFiles.pop();
+                    });
+                },
+                // 超出上传图片个数限制
+                uploadExceed: function () {
+                    this.$message.warning('最多上传' + this.uploadLimit + '张图');
+                },
+                // 删除上传图片
+                removeUpload: function (index) {
+                    this.fileList.splice(index, 1);
+                    this.$refs.upload.uploadFiles.splice(index, 1);
+                },
+                // 点击立即购买
+                goPayment: function () {
+                    homeApi.user_login().then(function () {
+                        window.location.href = vm.$router.payment + '?type=1&id=' + vm.id;
+                    }).catch(function (err) {
+                        store.setLoginAction(true);
+                    });
+                },
+                // 免费学习、去学习
+                learn: function () {
+                    var vm = this;
+                    homeApi.user_login().then(function () {
+                        window.location.href = vm.$router.task_info + '?task_id=0' + '&specialId=' + vm.id + '&special_title=' + vm.special.title;
+                    }).catch(function (err) {
+                        store.setLoginAction(true);
+                    });
+                },
+                // 切换课程目录、评价
+                selectTip: function (item) {
+                    this.selectValue = item.value
+                },
+                // 点击收藏
+                collect: function () {
+                    homeApi.user_login().then(function () {
+                        specialApi.collect({
+                            id: vm.id
+                        }).then(function (res) {
+                            vm.special.collect = !vm.special.collect;
+                            vm.$message.success(vm.special.collect ? '收藏成功' : '取消收藏成功');
+                        }).catch(function (err) {
+                            vm.$message.error(err.msg);
+                        });
+                    }).catch(function (err) {
+                        store.setLoginAction(true);
+                    });
+                },
+                // 点击讲师
+                goLecturer: function () {
+                    window.location.href = this.$router.teacher_detail + '?id=' + this.special.lecturer_id;
+                },
+                // 点击关联的资料
+                goMaterialDetail: function (id) {
+                    window.location.href = this.$router.material_detail + '?id=' + id;
+                },
+                // 点击推荐课程的更多
+                goSpecialCate: function () {
+                    window.location.href = this.$router.special_cate;
+                },
+                // 点击推荐课程
+                goSpecial: function (special) {
+                    window.location.href = (special.is_light ? this.$router.single_detail : this.$router.special_detail) + '?id=' + special.id;
+                },
+                // 增加浏览记录
+                addLearningRecords: function () {
+                    specialApi.addLearningRecords({
+                        id: this.id
+                    }).catch(function (err) {
+                        console.error(err.msg);
+                    });
+                },
+                // 兑换码
+                exchange: function () {
+                    homeApi.user_login().then(function () {
+                        vm.$prompt('', '课程兑换', {
+                            customClass: 'exchange-msgbox',
+                            showCancelButton: false,
+                            confirmButtonText: '立即兑换',
+                            inputPlaceholder: '请输入兑换码',
+                            inputPattern: /^\d{1,}$/,
+                            inputErrorMessage: '请输入兑换码',
+                            center: true
+                        }).then(function (data) {
+                            specialApi.exchange_submit({
+                                special_id: vm.id,
+                                code: data.value
+                            }).then(function () {
+                                vm.$message.success('兑换成功！');
+                                window.location.reload();
+                            }).catch(function (err) {
+                                vm.$message.error(err.msg);
+                            });
+                        }).catch(function () { });
+                    }).catch(function (err) {
+                        store.setLoginAction(true);
+                    });
+                },
+                getProblemList: function () {
+                    var vm = this;
+                    topicApi.specialTestPaper({
+                        special_id: this.id,
+                        type: 1
+                    }).then(function (res) {
+                        var problemList = res.data;
+                        if (problemList.length) {
+                            vm.tipList.splice(vm.tipList.length - 1, 0, {
+                                title: '练习',
+                                value: 5
+                            });
+                            problemList.forEach(function (problem) {
+                                problem.progress = Math.floor(problem.done / problem.item_number * 100);
+                            });
+                            vm.problemList = problemList;
+                        }
+                        vm.getQuestionList();
+                    }).catch(function () {
+                        vm.getQuestionList();
+                    });
+                },
+                getQuestionList: function () {
+                    var vm = this;
+                    topicApi.specialTestPaper({
+                        special_id: this.id,
+                        type: 2
+                    }).then(function (res) {
+                        var questionList = res.data;
+                        if (questionList.length) {
+                            vm.tipList.splice(vm.tipList.length - 1, 0, {
+                                title: '考试',
+                                value: 6
+                            });
+                            vm.questionList = questionList;
+                        }
+                    });
+                },
+                goProblem: function (problem) {
+                    homeApi.user_login().then(function (res) {
+                      window.location.assign(vm.$router.problem_index + '?id=' + problem.id);
+                    }).catch(function () {
+                        store.setLoginAction(true);
+                    });
+                },
+                goQuestion: function (question) {
+                    homeApi.user_login().then(function (res) {
+                        if (question.is_pay || vm.isPay) {
+                            window.location.assign(vm.$router.question_index + '?id=' + question.id);
+                        } else {
+                            vm.$message('购买课程后可进行考试答题');
+                        }
+                    }).catch(function () {
+                        store.setLoginAction(true);
+                    });
+                },
+            }
+        });
+    });
+</script>
+{/block}

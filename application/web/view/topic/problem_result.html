@@ -1,0 +1,281 @@
+{extend name="public/container" /}
+{block name="title"}练习结果{/block}
+{block name="style"}
+<style>
+    body {
+        background-color: #2C8EFF;
+    }
+
+    .question-result {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        width: 710px;
+        padding: 87px 85px 60px;
+        background: url("{__PUBLIC_WEB_PATH}pc/images/result.png") left top/100% 100% no-repeat;
+        transform: translate(-50%, -50%);
+    }
+
+    .question-result .question-title {
+        margin-bottom: 50px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        text-align: center;
+        font-size: 24px;
+        line-height: 31px;
+        color: #282828;
+    }
+
+    .question-result .question-user {
+        margin-bottom: 32px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        text-align: center;
+        font-size: 16px;
+        line-height: 26px;
+        color: #282828;
+    }
+
+    .question-result .avatar {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        margin-right: 10px;
+        vertical-align: middle;
+    }
+
+    .question-result .question-score {
+        display: flex;
+        margin-bottom: 20px;
+    }
+
+    .question-result .score {
+        flex: 1;
+        padding: 16px;
+        border-radius: 6px;
+        margin-left: 19px;
+        box-shadow: 0 3px 6px rgba(127, 141, 206, 0.2);
+        text-align: center;
+    }
+
+    .question-result .score:first-child {
+        margin-left: 0;
+    }
+
+    .question-result .score .name {
+        padding-left: 20px;
+        margin-bottom: 6px;
+        background: left center/15px 15px no-repeat;
+        font-size: 14px;
+        line-height: 19px;
+        color: #999999;
+    }
+
+    .question-result .score .value {
+        font-weight: bold;
+        font-size: 22px;
+        line-height: 29px;
+        color: #282828;
+    }
+
+    .question-result .score.grade .value {
+        font-size: 18px;
+    }
+
+    .question-result .question-basic {
+        display: flex;
+        border-radius: 6px;
+        box-shadow: 0 3px 6px rgba(127, 141, 206, 0.2);
+    }
+
+    .question-result .question-basic .item {
+        position: relative;
+        flex: 1;
+        padding: 18px 0 17px;
+        text-align: center;
+        font-size: 14px;
+        line-height: 19px;
+        color: #999999;
+    }
+
+    .question-result .question-basic .item::before {
+        content: "";
+        position: absolute;
+        top: 30px;
+        bottom: 30px;
+        left: 0;
+        z-index: 2;
+        width: 1px;
+        border-left: 1px solid #E9E9E9;
+    }
+
+    .question-result .question-basic .item:first-child::before {
+        display: none;
+    }
+
+    .question-result .question-basic .value {
+        margin-top: 7px;
+        font-weight: bold;
+        font-size: 22px;
+        line-height: 29px;
+        color: #282828;
+    }
+
+    .question-result .result-footer {
+        margin-top: 50px;
+        text-align: center;
+    }
+
+    .question-result .result-footer .button {
+        width: 180px;
+        height: 50px;
+        border: 1px solid #2C8EFF;
+        border-radius: 25px;
+        margin-left: 40px;
+        background-color: #FFFFFF;
+        font-size: 16px;
+        color: #2C8EFF;
+    }
+
+    .question-result .result-footer .button:first-child {
+        margin-left: 0;
+    }
+
+    .question-result .result-footer .button.fill {
+        background-color: #2C8EFF;
+        color: #FFFFFF;
+    }
+
+    .percent-text {
+        margin-bottom: 13px;
+        font-weight: normal !important;
+        color: #2C8EFF;
+    }
+
+    .percent-text+p {
+        font-size: 16px;
+        color: #999999;
+    }
+
+    .user {
+        position: absolute;
+        top: 60px;
+        right: 60px;
+        font-size: 14px;
+        line-height: 19px;
+        color: #666666;
+    }
+
+    .user .iconfont {
+        font-size: 12px;
+    }
+</style>
+{/block}
+{block name="app"}
+<div v-cloak id="app" class="question-result">
+    <a :href="$router.user + '?activeName=question'" class="user">返回考试评测<i class="iconfont iconxiangyou"></i></a>
+    <vue-circle-progress ref="circle" id="circle" :progress="0" :size="200" :reverse="false" line-cap="round" :fill="fill" empty-fill="rgba(213, 224, 236, 0.6)"
+                         :animation-start-value="0.0" :start-angle="Math.PI / 2" insert-mode="append" :thickness="5" inner-text="正确率" :show-percent="true"
+                         style="text-align: center;font-size: 16px;margin-bottom: 38px;color: #999999;">
+        <p>正确率</p>
+    </vue-circle-progress>
+    <div class="question-title">{{ result.title }}</div>
+    <div v-if="userInfo" class="question-user"><img :src="userInfo.avatar" class="avatar">{{ userInfo.nickname }}</div>
+    <div class="question-basic">
+        <div class="item">
+            <div>题目数</div>
+            <div class="value">{{ result.test_paper_question.length }}</div>
+        </div>
+        <div class="item">
+            <div>错题数</div>
+            <div class="value">{{ result.wrong_question }}</div>
+        </div>
+        <div class="item">
+            <div>未答数</div>
+            <div class="value">{{ result.not_questions }}</div>
+        </div>
+    </div>
+    <div v-if="recordId" class="result-footer">
+        <button class="button" @click="goProblem">返回答题卡</button>
+    </div>
+    <div v-else style="height: 70px;"></div>
+</div>
+{/block}
+{block name="vm"}
+<script>
+    require([
+        'vue',
+        'ELEMENT',
+        'components/base-header/index',
+        'components/base-footer/index',
+        'components/base-login/index',
+        'components/base-agree/index',
+        'mixins/base',
+        'router/index',
+        'api/topic',
+        'vue-circle-progress',
+    ], function (
+        Vue,
+        ELEMENT,
+        BaseHeader,
+        BaseFooter,
+        BaseLogin,
+        BaseAgree,
+        baseMixin,
+        router,
+        topicApi,
+        VueCircle
+    ) {
+        Vue.use(ELEMENT);
+        Vue.use(router);
+        new Vue({
+            el: '#app',
+            components: {
+                'base-header': BaseHeader,
+                'base-footer': BaseFooter,
+                'base-login': BaseLogin,
+                'base-agree': BaseAgree,
+                'vue-circle-progress': VueCircle
+            },
+            mixins: [baseMixin],
+            data: {
+                recordId: 0,
+                testId: 0,
+                result: {
+                    test_paper_question: []
+                },
+                fill: {gradient: ["rgba(44, 142, 255, 1)", "rgba(44, 142, 255, 0.05)"]},
+            },
+            created: function () {
+                var search = window.location.search.slice(1);
+                search = search.split('&');
+                var searchObj = {};
+                search.forEach(function (item) {
+                    item = item.split('=');
+                    searchObj[item[0]] = item[1];
+                });
+                this.testId = searchObj.test_id;
+                this.recordId = searchObj.record_id || 0;
+                this.getResult();
+            },
+            methods: {
+                getResult: function () {
+                    var vm = this;
+                    topicApi.examinationResults({
+                        test_id: this.testId,
+                        type: 1
+                    }).then(function (res) {
+                        vm.result = res.data;
+                        vm.$refs.circle.updateProgress(parseInt(vm.result.accuracy));
+                    });
+                },
+                goProblem: function () {
+                    window.location.replace(this.$router.problem_detail + '?is_analysis=1&test_id=' + this.testId + '&record_id=' + this.recordId);
+                }
+            }
+        });
+    });
+</script>
+{/block}

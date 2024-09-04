@@ -1,0 +1,922 @@
+{extend name="public/container"}
+{block name="title"}{$title}{/block}
+{block name="app"}
+<div v-cloak id="app">
+    <base-header :public-data="publicData" :user-info="userInfo"></base-header>
+    <div class="layout">
+        <div class="container">
+            <div class="classroom">
+                <div class="classroom_video">
+                    <div class="classroom_video_title">
+                        <div class="classroom_video_title_value">
+                            <span>{{ liveInfo.live_title }}</span>
+                        </div>
+                        <div class="classroom_video_title_teacher">
+                            <div v-if="lecturer.lecturer_head" class="classroom_video_title_teacher_avatar">
+                                <img :src="lecturer.lecturer_head" :alt="lecturer.lecturer_name">
+                            </div>
+                            <div v-if="lecturer.lecturer_name" class="classroom_video_title_teacher_name">
+                                <span>{{ lecturer.lecturer_name }}</span>
+                            </div>
+                            <div v-if="user_type == 1" class="classroom_video_title_teacher_tip">
+                                <span>讲师</span>
+                            </div>
+                            <div v-else-if="user_type == 0" class="classroom_video_title_teacher_tip">
+                                <span>助教</span>
+                            </div>
+                            <div class="classroom_video_title_teacher_time">
+                                <span class="iconfont">&#xe74e;</span>
+                                <span>直播时间：</span>
+                                <span>{{ liveInfo.start_play_time }} - {{ liveInfo.stop_play_time }}</span>
+                            </div>
+                            <div class="classroom_video_title_teacher_audience">
+                                <span class="iconfont">&#xe642;</span>
+                                <span>{{ UserSum }}人</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="classroom_video_content">
+                        <div v-show="liveInfo.is_play || liveInfo.is_playback" class="prism-player" id="J_prismPlayer"></div>
+                        <div v-show="!(liveInfo.is_play || liveInfo.is_playback)">
+                            <div v-if="live_status == 0" class="tip">直播即将开始</div>
+                            <div v-else-if="live_status == -1 || live_status == 1" class="tip">讲师离开一会~马上回来</div>
+                            <div v-else-if="live_status == 2" class="tip">直播已结束</div>
+                            <img :src="liveInfo.live_image" class="cover">
+                            <div class="shade"></div>
+                        </div>
+                    </div>
+                    <div class="classroom_video_methods">
+                        <!-- 礼物 -->
+                        <div class="classroom_video_methods_giftList">
+                            <div class="swiper-container">
+                                <div class="swiper-wrapper">
+                                    <div v-for="item in giftList" :key="item.id" class="swiper-slide">
+                                        <el-popover placement="top-start" width="368" trigger="hover" popper-class="gift-popover" @show="onPopoverShow">
+                                            <div class="gift-info">
+                                                <img :src="item.live_gift_show_img" :alt="item.live_gift_name">
+                                                <span>{{ item.live_gift_name }}</span>
+                                                <span>（{{ item.live_gift_price }}{{ goldInfo.gold_name }}/个）</span>
+                                            </div>
+                                            <div class="gift-size">
+                                                <div class="radio-group">
+                                                    <label v-for="num in item.live_gift_num" :key="num">
+                                                        <input v-model="giftRadio" :value="num" type="radio" hidden>
+                                                        <span>{{ num }}</span>
+                                                    </label>
+                                                </div>
+                                                <input v-model.number="giftInput" type="number" min="1" step="1" @focus="giftRadio = ''" @blur="!giftInput || 0 >= giftInput ? giftInput = 1 : null">
+                                                <button @click="sendGift(item)">赠送</button>
+                                            </div>
+                                            <img slot="reference" :src="item.live_gift_show_img" :alt="item.live_gift_name" :title="item.live_gift_name">
+                                        </el-popover>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-button-prev"></div>
+                            <div class="swiper-button-next"></div>
+                        </div>
+                        <!-- 金币 -->
+                        <div class="classroom_video_methods_pay">
+                            <div class="classroom_video_methods_pay_item">
+                                <div>
+                                    <img :src="goldInfo.gold_image" :alt="goldInfo.gold_name">
+                                </div>
+                                <div>
+                                    <span>{{ userInfo && userInfo.gold_num }}</span>
+                                </div>
+                            </div>
+                            <div class="classroom_video_methods_pay_item" @click="chargeIcon">
+                                <div>
+                                    <img src="{__PUBLIC_WEB_PATH}pc/images/recharge.png" alt="充值">
+                                </div>
+                                <div>
+                                    <span>充值</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="tapList.length" class="classroom_chat">
+                    <div class="classroom_chat_fun">
+                        <div class="classroom_chat_fun_item" v-for="(item, index) in tapList" :key="index" :class="{ 'selectEdTap': selectTapId == item.id }" @click="handleSelectTap(item)">
+                            <span>{{item.label}}</span>
+                        </div>
+                    </div>
+                    <!-- 聊天 -->
+                    <div ref="messageContainer" class="classroom_chat_con" v-show="selectTapId == 1" @scroll="chatContentScroll1">
+                        <div :class="{ right_box: item.uid == userInfo.uid }" class="classroom_chat_con_item" v-for="(item, index) in messageList" :key="item.id">
+                            <div class="classroom_chat_con_item_avator">
+                                <img :src="item.avatar" :alt="item.nickname">
+                            </div>
+                            <div class="classroom_chat_con_item_msg">
+                                <div class="user_message">
+                                    <div class="nickname">{{ item.nickname }}</div>
+                                    <div v-if="item.user_type == 1" class="identity">
+                                        <span>讲师</span>
+                                    </div>
+                                    <div v-if="item.user_type == 0" class="identity">
+                                        <span>助教</span>
+                                    </div>
+                                </div>
+                                <div class="message" v-if="item.type == 1">
+                                    <span v-html="item.content"></span>
+                                </div>
+                                <div class="message" v-else-if="item.type == 2">
+                                    <img :src="item.content" alt="">
+                                </div>
+                                <div class="gift" v-else-if="item.type == 4">
+                                    <div>{{ item.content }}</div>
+                                    <div>
+                                        <img :src="item.gift_image" :alt="item.gift_name">
+                                    </div>
+                                    <div>
+                                        <span>×{{ item.gift_num }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 聊天结束 -->
+                    <!-- 课堂开始 -->
+                    <div ref="classMessageContainer" class="classroom_chat_con" v-show="selectTapId == 2" @scroll="chatContentScroll2">
+                        <div class="classroom_chat_con_item" v-for="(item, index) in classMessageList" :key="item.id">
+                            <div class="classroom_chat_con_item_avator">
+                                <img :src="item.avatar" :alt="item.nickname">
+                            </div>
+                            <div class="classroom_chat_con_item_msg">
+                                <div class="user_message">
+                                    <div class="nickname">{{ item.nickname }}</div>
+                                    <div v-if="item.user_type == 1" class="identity">
+                                        <span>讲师</span>
+                                    </div>
+                                    <div v-if="item.user_type == 0" class="identity">
+                                        <span>助教</span>
+                                    </div>
+                                </div>
+                                <div class="message" v-if="item.type == 1">
+                                    <span v-html="item.content"></span>
+                                </div>
+                                <div class="message" v-else-if="item.type == 2">
+                                    <img :src="item.content" alt="">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 课堂结束 -->
+                    <!-- 讲师推荐开始 -->
+                    <div class="classroom_chat_con classroom_chat_con3" v-show="selectTapId == 3">
+                        <div v-for="item in goodsList" :key="item.id" class="instructor_recommendation" @click="goSpecial(item)">
+                            <div class="instructor_recommendation_img">
+                                <img :src="item.image" :alt="item.title">
+                                <div>{{ item.gfake_type ? '活动' : '专题' }}</div>
+                            </div>
+                            <div class="instructor_recommendation_value">
+                                <div class="instructor_recommendation_value_title">{{ item.title }}</div>
+                                <div class="instructor_recommendation_value_price">
+                                    <span>￥</span><span>{{ item.money }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 讲师推荐结束 -->
+                    <!-- 榜单开始 -->
+                    <div class="classroom_chat_con classroom_chat_con4" v-show="selectTapId == 4" v-infinite-scroll="get_live_reward" :infinite-scroll-immediate="liveRewardFinished">
+                        <div v-for="(item, index) in liveRewardList" class="classroom_chat_con_item">
+                            <div v-if="index + 1 == 1" class="classroom_chat_con_noun">
+                                <img src="{__PUBLIC_WEB_PATH}pc/images/live_rank1.png" alt="">
+                            </div>
+                            <div v-else-if="index + 1 == 2" class="classroom_chat_con_noun">
+                                <img src="{__PUBLIC_WEB_PATH}pc/images/live_rank2.png" alt="">
+                            </div>
+                            <div v-else-if="index + 1 == 3" class="classroom_chat_con_noun">
+                                <img src="{__PUBLIC_WEB_PATH}pc/images/live_rank3.png" alt="">
+                            </div>
+                            <div v-else class="classroom_chat_con_noun">
+                                <span>{{ index + 1 > 9 ? index + 1 : '0' + (index + 1) }}</span>
+                            </div>
+                            <div class="classroom_chat_con_user">
+                                <div class="avatar">
+                                    <img :src="item.avatar" :alt="item.nickname">
+                                </div>
+                                <div class="nickname">
+                                    <span>{{ item.nickname }}</span>
+                                </div>
+                            </div>
+                            <div class="classroom_chat_con_payEd">
+                                <span>{{ item.total_price }}</span>
+                                <img :src="goldInfo.gold_image" :alt="goldInfo.gold_name">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 榜单结束 -->
+                    <div v-show="selectTapId == 1 || (selectTapId == 2 && (user_type == 0 || user_type == 1))" class="classroom_chat_bottom">
+                        <div class="classroom_chat_bottom_top">
+                            <div class="faceList">
+                                <el-popover placement="top" width="332" trigger="hover" popper-class="emoji-popover">
+                                    <img v-for="item in emojiList" :src="item.url" :alt="item.name" :title="item.name" @click="sendEmoji(item)">
+                                    <span slot="reference" class="face"></span>
+                                </el-popover>
+                                <el-upload action="" :show-file-list="false" :http-request="sendPicture" accept="image/*">
+                                    <span class="face"></span>
+                                </el-upload>
+                            </div>
+                        </div>
+                        <div class="classroom_chat_bottom_input">
+                            <input v-model="message" type="text" @keyup.enter="sendMessage">
+                            <button @click="sendMessage">发送</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="container_detils_con">
+            <div class="container_selectTap">
+                <div class="container_selectTap_tip" :style="{ left: tipLeft}">
+                    <img src="{__PUBLIC_WEB_PATH}pc/images/select.png" alt="">
+                </div>
+                <div class="container_selectTap_item">
+                    <div class="container_selectTap_item_value" :class="{'selectEd': selectValue == item.value}" v-for="(item, index) in tipList" :key="index" :ref=`react${item.value}`
+                         @click="selectTip(item, index)">
+                        <span>{{item.title}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="container_introduce">
+                <div class="introduce" v-if="selectValue == 1" v-html="liveInfo.content"></div>
+                <div class="catalogue course_catalogue" v-if="selectValue == 2">
+                    <div class="course_catalogue_item" v-for="(item, index) in courseList" :key="item.id" :class="{ active: item.playback_url == PullUrl}" @click="selectCourse(item)">
+                        <div class="course_catalogue_item_value">
+                            <div class="playback-tag">回放</div>
+                            <div class="course_catalogue_item_value_message">
+                                <span>{{ index > 8 ? index + 1 : '0' + (index + 1) }} | {{ item.playback_name || liveInfo.live_title }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <el-empty v-if="!courseList.length" image="{__PUBLIC_WEB_PATH}pc/images/empty2.png" description=" "></el-empty>
+                    <el-pagination :page-size="limit" :total="total" :current-page.sync="liveRecordPage" layout="prev, pager, next" prev-text="上一页" next-text="下一页" hide-on-single-page
+                                   @current-change="get_live_record_list"></el-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+    <base-footer :public-data="publicData"></base-footer>
+    <base-login :public-data="publicData" :agree-content="agreeContent"></base-login>
+    <base-agree :agree-content="agreeContent"></base-agree>
+    <img src="" alt="" onload="">
+</div>
+{/block}
+{block name="vm"}
+<script>
+    require([
+        'vue',
+        'ELEMENT',
+        'components/base-header/index',
+        'components/base-footer/index',
+        'components/base-login/index',
+        'components/base-agree/index',
+        'mixins/base',
+        'api/auth',
+        'api/live',
+        'scripts/util',
+        'swiper',
+        '../wap/first/zsff/face/emoji',
+        'router/index',
+        'scripts/socket',
+        'css!styles/classroom.css'
+    ], function (Vue, ELEMENT, BaseHeader, BaseFooter, BaseLogin, BaseAgree, baseMixin, authApi, liveApi, util, Swiper, emoji, router, Socket) {
+        Vue.use(ELEMENT);
+        Vue.use(router);
+        var tapList = [
+            {
+                id: 1,
+                label: '聊天'
+            },
+            {
+                id: 2,
+                label: '课堂'
+            },
+            {
+                id: 3,
+                label: '讲师推荐'
+            },
+            {
+                id: 4,
+                label: '榜单'
+            }
+        ];
+        var vm = new Vue({
+            el: '#app',
+            components: {
+                'base-header': BaseHeader,
+                'base-footer': BaseFooter,
+                'base-login': BaseLogin,
+                'base-agree': BaseAgree
+            },
+            mixins: [baseMixin],
+            data: {
+                CommentCount: 0,
+                CommentTime: 0,
+                OpenCommentCount: 0,
+                OpenCommentTime: 0,
+                PullUrl: '',
+                UserSum: '0',
+                goldInfo: {},
+                lecturer: {},
+                liveInfo: {},
+                live_status: -1,
+                user_type: -1,
+                workerman: {},
+                openCommentPage: 1,
+                commentPage: 1,
+                liveRewardPage: 1,
+                liveRecordPage: 1,
+                limit: 15,
+                openCommentLoading: false,
+                openCommentFinished: false,
+                commentLoading: false,
+                commentFinished: false,
+                liveRewardFinished: false,
+                liveRecordFinished: false,
+                goodsList: [],
+                liveRewardList: [],
+                tipLeft: 0,
+                selectValue: 1,
+                tipList: [
+                    {
+                        title: '直播介绍',
+                        value: 1
+                    },
+                    {
+                        title: '回放目录',
+                        value: 2
+                    },
+                ],
+                userId: 1,
+                selectTapId: 1,
+                tapList: [],
+                messageList: [],
+                classMessageList: [],
+                giftList: [],
+                timeOut: '',
+                // 课程列表
+                courseList: [],
+                message: '',
+                giftRadio: '',
+                giftInput: 1,
+                emojiList: [],
+                isHandshake: false,
+                total: 0,
+                socket: null
+            },
+            computed: {
+                canSocket: function () {
+                    return this.workerman.port && this.userInfo && this.userInfo.uid && this.room;
+                },
+                canGetReward: function () {
+                    return this.canSocket && this.liveInfo.is_ranking;
+                }
+            },
+            watch: {
+                canGetReward: function (value) {
+                    if (value) {
+                        this.get_live_reward();
+                    }
+                },
+                selectValue: {
+                    handler(val) {
+                        this.$nextTick(() => {
+                            this.tipLeft = this.$refs[`react${val}`][0].offsetLeft + 'px';
+                        })
+                    },
+                    immediate: false
+                },
+                canSocket: function (value) {
+                    if (value) {
+                        this.connect();
+                    }
+                },
+                giftRadio: function (value) {
+                    if (typeof value === 'string' && !value) {
+                        this.giftInput = 1;
+                    } else {
+                        this.giftInput = value;
+                    }
+                },
+                liveInfo: function (value) {
+                    for (var i = tapList.length; i--;) {
+                        if (tapList[i].id === 1 && !value.is_chat) {
+                            tapList.splice(i, 1);
+                        } else if (tapList[i].id === 2 && !value.is_class_chat) {
+                            tapList.splice(i, 1);
+                        } else if (tapList[i].id === 3 && !value.is_live_recommend) {
+                            tapList.splice(i, 1);
+                        } else if (tapList[i].id === 4 && !value.is_ranking) {
+                            tapList.splice(i, 1);
+                        }
+                    }
+                    if (tapList.length) {
+                        this.tapList = tapList;
+                        this.selectTapId = tapList[0].id;
+                    }
+                },
+                messageList: function (newValue, oldValue) {
+                    this.scrollToBottom('messageContainer');
+                },
+                classMessageList: function () {
+                    this.scrollToBottom('classMessageContainer');
+                }
+            },
+            created: function () {
+                this.stream_name = util.getParmas('stream_name');
+                this.record_id = util.getParmas('record_id');
+                this.live_studio_index();
+                this.live_gift_list();
+                var emojiList = [];
+                emoji.forEach(function (item) {
+                    emojiList = emojiList.concat(item);
+                });
+                this.emojiList = emojiList;
+            },
+            methods: {
+                // 直播间信息
+                live_studio_index: function () {
+                    var vm = this;
+                    liveApi.live_studio_index({
+                        stream_name: this.stream_name
+                    }).then(function (res) {
+                        var data = res.data;
+                        vm.CommentCount = data.CommentCount;
+                        vm.CommentTime = data.CommentTime || 0;
+                        vm.OpenCommentCount = data.OpenCommentCount;
+                        vm.OpenCommentTime = data.OpenCommentTime || 0;
+                        vm.PullUrl = data.PullUrl || '';
+                        vm.UserSum = data.UserSum;
+                        vm.goldInfo = data.goldInfo;
+                        vm.is_ban = data.is_ban;
+                        vm.lecturer = data.lecturer;
+                        vm.liveInfo = data.liveInfo;
+                        vm.live_status = data.live_status;
+                        vm.room = data.room;
+                        vm.user_type = data.user_type;
+                        vm.workerman = data.workerman;
+                        if (vm.liveInfo.is_play || vm.liveInfo.is_playback) {
+                            vm.createPlayer();
+                        }
+                        if (vm.liveInfo.is_chat) {
+                            vm.get_open_comment_list();
+                        }
+                        if (vm.liveInfo.is_class_chat) {
+                            vm.get_comment_list();
+                        }
+                        if (vm.liveInfo.is_live_recommend) {
+                            vm.live_goods_list();
+                        }
+                        vm.get_live_record_list();
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+                // 礼物
+                live_gift_list: function () {
+                    var vm = this;
+                    liveApi.live_gift_list().then(function (res) {
+                        var data = res.data;
+                        data.forEach(function (item) {
+                            item.visible = false;
+                        });
+                        vm.giftList = res.data;
+                        vm.$nextTick(function () {
+                            var mySwiper = new Swiper('.swiper-container', {
+                                slidesPerView: 'auto',
+                                spaceBetween: 10,
+                                navigation: {
+                                    nextEl: '.swiper-button-next',
+                                    prevEl: '.swiper-button-prev'
+                                },
+                                observer: true,
+                                observeParents: true,
+                                observeSlideChildren: true
+                            })
+                        });
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+                // 聊天
+                get_open_comment_list: function () {
+                    var vm = this;
+                    if (vm.openCommentLoading || vm.openCommentFinished) {
+                        return;
+                    }
+                    vm.openCommentLoading = true;
+                    liveApi.get_open_comment_list({
+                        page: vm.openCommentPage++,
+                        limit: vm.limit,
+                        live_id: vm.room,
+                        add_time: vm.OpenCommentTime
+                    }).then(function (res) {
+                        var list = res.data.list;
+                        vm.openCommentLoading = false;
+                        vm.openCommentFinished = vm.limit > list.length;
+                        list.forEach(function (item) {
+                            if (item.type == 1) {
+                                item.content = vm.replace_em(item.content);
+                            }
+                            vm.messageList.unshift(item);
+                        });
+                        vm.$nextTick(function () {
+                            for (var i = vm.$refs.chat.getElementsByTagName('img').length; i--;) {
+                                vm.$refs.chat.getElementsByTagName('img')[i].addEventListener('load', function () {
+                                    vm.$refs.chat.scrollTop = vm.$refs.chat.scrollHeight - vm.OscrollHeight;
+                                });
+                            }
+                        });
+                        if (vm.openCommentPage === 2) {
+                            if (vm.socket.state() === 1) {
+                                vm.socket.send({
+                                    uid: vm.userInfo.uid,
+                                    room: vm.room,
+                                    type: 'room_user_count'
+                                });
+                            }
+                        }
+                    });
+                },
+                // 课堂
+                get_comment_list: function () {
+                    var vm = this;
+                    if (vm.commentLoading || vm.commentFinished) {
+                        return;
+                    }
+                    vm.commentLoading = true;
+                    liveApi.get_comment_list({
+                        page: vm.commentPage++,
+                        limit: vm.limit,
+                        live_id: vm.liveInfo.id,
+                        add_time: vm.CommentTime
+                    }).then(function (res) {
+                        var list = res.data.list;
+                        vm.commentLoading = false;
+                        vm.commentFinished = vm.limit > list.length;
+                        list.forEach(function (item) {
+                            if (item.type == 1) {
+                                item.content = vm.replace_em(item.content);
+                            }
+                            vm.classMessageList.unshift(item);
+                        });
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+                // 讲师推荐
+                live_goods_list: function () {
+                    var vm = this;
+                    liveApi.live_goods_list({
+                        live_id: vm.liveInfo.id,
+                    }).then(function (res) {
+                        vm.goodsList = res.data.list;
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+                // 排行榜
+                get_live_reward: function () {
+                    var vm = this;
+                    liveApi.get_live_reward({
+                        uid: vm.userInfo.uid,
+                        live_id: vm.liveInfo.id,
+                        page: vm.liveRewardPage++,
+                        limit: vm.limit
+                    }).then(function (res) {
+                        var list = res.data.list;
+                        vm.liveRewardFinished = vm.limit > list.length;
+                        vm.liveRewardList = vm.liveRewardList.concat(list);
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+                // 回放目录
+                get_live_record_list: function () {
+                    var vm = this;
+                    liveApi.get_live_record_list({
+                        special_id: vm.liveInfo.special_id,
+                        page: vm.liveRecordPage,
+                        limit: vm.limit
+                    }).then(function (res) {
+                        vm.courseList = res.data.data;
+                        vm.total = res.data.count;
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+                connect: function (port, uid, room) {
+                    this.socket = new Socket({
+                        port: this.workerman.port,
+                        query: {
+                            room: this.room,
+                            uid: this.userInfo.uid
+                        },
+                        onopen: this.socketOpen,
+                        onmessage: this.socketMessage
+                    });
+                },
+                socketOpen: function () {
+                    if (this.socket.state() !== 1) {
+                        return;
+                    }
+                    this.socket.send({
+                        uid: this.userInfo.uid,
+                        room: this.room,
+                        role: 'user',
+                        type: 'handshake'
+                    });
+                },
+                socketMessage: function (data) {
+                    switch (data.type) {
+                        case 'init':
+
+                            break;
+                        case 'join_Group':
+
+                            break;
+                        case 'handshake':
+
+                            break;
+                        case 'room_user_count': // 欢迎语
+                            this.receiveWelcome(data);
+                            break;
+                        case 'message': // 消息、图片
+                            this.receiveMessage(data);
+                            break;
+                        case 'live_reward': // 礼物
+                            this.receiveGift(data);
+                            break;
+                        case 'ban': // 禁言
+                            this.receiveBan(data);
+                            break;
+                        case 'live_ing': // 开播
+                        case 'live_end': // 停播
+                            this.receiveLive(data);
+                            break;
+                    }
+                },
+                handleSelectTap(item) {
+                    this.selectTapId = item.id;
+                },
+                selectTip(item, index) {
+                    this.selectValue = item.value
+                },
+                // 展开选中得课程
+                selectCourse(item) {
+                    vm.PullUrl = item.playback_url;
+                    this.createPlayer();
+                },
+                // 接收消息
+                receiveMessage: function (data) {
+                    this.messageList.push({
+                        uid: data.userInfo.uid,
+                        avatar: data.userInfo.avatar,
+                        nickname: data.userInfo.nickname,
+                        user_type: data.user_type,
+                        type: data.m_type,
+                        content: data.m_type === 1 ? this.replace_em(data.message) : data.message
+                    });
+                    if (data.user_type === 0 || data.user_type === 1) {
+                        this.classMessageList.push({
+                            avatar: data.userInfo.avatar,
+                            nickname: data.userInfo.nickname,
+                            user_type: data.user_type,
+                            type: data.m_type,
+                            content: data.m_type === 1 ? this.replace_em(data.message) : data.message
+                        });
+                    }
+                },
+                // 接收礼物
+                receiveGift: function (data) {
+                    var gift;
+                    if (!data.recharge_status) {
+                        return this.$message('您的' + this.goldInfo.gold_name + '不足，请先去充值');
+                    }
+                    for (var i = 0; i < this.giftList.length; i++) {
+                        if (this.giftList[i].id === data.live_gift_id) {
+                            gift = this.giftList[i];
+                            break;
+                        }
+                    }
+                    this.messageList.push({
+                        uid: data.uid,
+                        avatar: data.user_avatar,
+                        nickname: data.username,
+                        user_type: data.user_type,
+                        type: 4,
+                        content: '赠送给主播',
+                        gift_image: gift.live_gift_show_img,
+                        gift_name: gift.live_gift_name,
+                        gift_num: data.live_gift_num
+                    });
+                    this.getUserInfo();
+                },
+                // 接收欢迎语
+                receiveWelcome: function (data) {
+                    this.UserSum = data.onLine_user_count;
+                    this.messageList.push({
+                        uid: this.liveInfo.uid,
+                        avatar: this.lecturer.lecturer_head,
+                        nickname: this.lecturer.lecturer_name,
+                        user_type: data.user_type,
+                        type: 1,
+                        content: data.notice_content
+                    });
+                },
+                // 接收禁言
+                receiveBan: function (data) {
+                    this.is_ban = data.value;
+                },
+                // 接收直播
+                receiveLive: function (data) {
+                    this.PullUrl = data.pull_url || '';
+                    this.liveInfo.is_play = this.PullUrl ? 1 : 0;
+                    if (!this.liveInfo.is_play) {
+                        this.live_status = 2;
+                    }
+                    if (!this.liveInfo.is_play && this.liveInfo.is_playback) {
+                        this.PullUrl = this.courseList[0].playback_url;
+                    }
+                    this.createPlayer();
+                },
+                // 发送消息
+                sendMessage: function () {
+                    if (this.is_ban) {
+                        return this.$message('您已被禁言！');
+                    }
+                    if (!this.message.trim()) {
+                        return;
+                    }
+                    if (this.socket.state() !== 1) {
+                        return;
+                    }
+                    this.socket.send({
+                        uid: this.userInfo.uid,
+                        room: this.room,
+                        ms_type: 1,
+                        type: 'send',
+                        content: this.message
+                    });
+                    this.message = '';
+                },
+                // 发送表情
+                sendEmoji: function (emoji) {
+                    this.message += emoji.type;
+                },
+                // 发送图片
+                sendPicture: function (elUpload) {
+                    var vm = this;
+                    var formData;
+                    if (this.is_ban) {
+                        return this.$message('您已被禁言！');
+                    }
+                    if (this.socket.state() !== 1) {
+                        return;
+                    }
+                    formData = new FormData();
+                    formData.append('file', elUpload.file);
+                    authApi.upload(formData).then(function (res) {
+                        vm.socket.send({
+                            uid: vm.userInfo.uid,
+                            room: vm.room,
+                            ms_type: 2,
+                            type: 'send',
+                            content: res.data.url
+                        });
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+                // 发送礼物
+                sendGift: function (gift) {
+                    var live_gift_num = this.giftRadio || this.giftInput;
+                    if (this.is_ban) {
+                        return this.$message('您已被禁言！');
+                    }
+                    if (this.socket.state() !== 1) {
+                        return;
+                    }
+                    if (parseFloat((live_gift_num * gift.live_gift_price).toFixed(2)) > this.userInfo.gold_num) {
+                        return this.$message('您的' + this.goldInfo.gold_name + '不足，请先去充值');
+                    }
+                    this.socket.send({
+                        uid: this.userInfo.uid,
+                        live_id: this.room,
+                        type: 'live_reward',
+                        live_gift_id: gift.id,
+                        live_gift_num: live_gift_num,
+                        special_id: this.liveInfo.special_id
+                    });
+                },
+                // 充值
+                chargeIcon: function () {
+                    window.location.assign(this.$router.user + '?activeName=currency');
+                },
+                // 替换表情
+                replace_em: function (str) {
+                    str = str.replace(/\</g, '&lt;');
+                    str = str.replace(/\>/g, '&gt;');
+                    str = str.replace(/\n/g, '<br/>');
+                    str = str.replace(/\[qq_([0-9]*)\]/g, "<img class='img' src='/wap/first/zsff/face/emoji1/$1.gif' />");
+                    str = str.replace(/\[em_([0-9]*)\]/g, "<img class='img' src='/wap/first/zsff/face/emoji2/$1.png' />");
+                    str = str.replace(/\[other_([0-9]*)\]/g, "<img class='img' src='/wap/first/zsff/face/emoji3/$1.png' />");
+                    return str;
+                },
+                // 聊天向下滚动
+                chatContentScroll1: function () {
+                    if (this.scrollTop1 > this.$refs.messageContainer.scrollTop && !this.$refs.messageContainer.scrollTop) {
+                        this.get_open_comment_list();
+                    }
+                },
+                // 课堂向下滚动
+                chatContentScroll2: function () {
+                    if (this.scrollTop2 > this.$refs.classMessageContainer.scrollTop && !this.$refs.classMessageContainer.scrollTop) {
+                        this.get_comment_list();
+                    }
+                },
+                // 点击讲师推荐的专题
+                goSpecial: function (special) {
+                    if (special.gfake_type) {
+                        window.location.assign(this.$router.activity_detail + '?id=' + special.id);
+                    } else {
+                        if (special.is_light) {
+                            window.location.href = this.$router.single_detail + '?id=' + special.id;
+                        } else {
+                            window.location.href = this.$router.special_detail + '?id=' + special.id;
+                        }
+                    }
+                },
+                onPopoverShow: function () {
+                    if (this.giftRadio) {
+                        this.giftRadio = '';
+                    } else {
+                        this.giftInput = 1;
+                    }
+                },
+                // 滚动到底部
+                scrollToBottom: function (ref) {
+                    this.$nextTick(function () {
+                        var chat = this.$refs[ref];
+                        var image = chat.getElementsByTagName('img');
+                        for (var i = 0; i < image.length; i++) {
+                            image[i].addEventListener('load', function () {
+                                chat.scrollTop = chat.scrollHeight - chat.offsetHeight;
+                            }, {
+                                once: true
+                            });
+                        }
+                    });
+                },
+                createPlayer: function () {
+                    this.$nextTick(function () {
+                        var vm = this;
+                        if (this.player) {
+                            this.player.dispose();
+                            this.player = null;
+                        }
+                        if (!this.PullUrl) {
+                            return;
+                        }
+                        if (this.liveInfo.is_play && !this.loading) {
+                            this.loading = this.$loading({
+                                text: '连接直播中',
+                                target: '.classroom_video_content',
+                                background: 'transparent'
+                            });
+                        }
+                        this.player = new Aliplayer({
+                            id: 'J_prismPlayer',
+                            height: '100%',
+                            autoplay: true,
+                            isLive: !!this.liveInfo.is_play,
+                            source: this.PullUrl,
+                            cover: this.liveInfo.live_image
+                        }, function () {
+                            console.log('The player is created.');
+                            if (vm.loading) {
+                                vm.loading.close();
+                                vm.loading = null;
+                            }
+                        });
+                        this.player.on('error', function (e) {
+                            if (e.paramData.error_code === 4004 && vm.liveInfo.is_play) {
+                                vm.createPlayer();
+                            } else {
+                                console.error(e.paramData.error_code + ' ' + e.paramData.error_msg);
+                            }
+                        });
+                    });
+                }
+            }
+        });
+    });
+</script>
+{/block}

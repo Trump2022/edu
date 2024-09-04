@@ -1,0 +1,37 @@
+<script>
+    (function (global, factory) {
+        Object.defineProperty(global, 'routes', {
+            get: factory
+        });
+    }(this, (function () {
+        return {
+            home: "{:url('index/index')}",
+            payment: "{:url('index/payment')}",
+            user: "{:url('my/index')}",
+            live: "{:url('live/index')}",
+            special_live: "{:url('live/special_live')}",
+            special_cate: "{:url('special/special_cate')}",
+            special_detail: "{:url('special/details')}",
+            single_detail: "{:url('special/single_details')}",
+            task_info: "{:url('special/task_info')}",
+            material_list: "{:url('material/material_list')}",
+            material_detail: "{:url('material/details')}",
+            news_list: "{:url('article/news_list')}",
+            news_detail: "{:url('article/news_detail')}",
+            teacher_list: "{:url('merchant/teacher_list')}",
+            teacher_detail: "{:url('merchant/teacher_detail')}",
+            teacher_apply: "{:url('merchant/index')}",
+            more_list: "{:url('index/more_list')}",
+            activity_list: "{:url('activity/index')}",
+            activity_detail: "{:url('activity/detail')}",
+            activity_form: "{:url('activity/form')}",
+            question_category: "{:url('topic/question_category')}",
+            problem_index: "{:url('topic/problem_index')}",
+            problem_detail: "{:url('topic/problem_detail')}",
+            problem_result: "{:url('topic/problem_result')}",
+            question_index: "{:url('topic/question_index')}",
+            question_detail: "{:url('topic/question_detail')}",
+            question_result: "{:url('topic/question_result')}"
+        };
+    })));
+</script>

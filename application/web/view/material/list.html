@@ -1,0 +1,281 @@
+{extend name="public/container"}
+{block name="title"}资料列表{/block}
+{block name="app"}
+<div v-cloak id="app">
+    <base-header ref="baseHeader" :public-data="publicData" :user-info="userInfo" @submit-search="submitSearch"></base-header>
+    <div class="layout">
+        <div class="container">
+            <!-- 课程分类开始 -->
+            <div class="courseClassificationList">
+                <div class="courseClassificationList_item">
+                    <div class="courseClassificationList_item_title">
+                        <span>一级分类：</span>
+                    </div>
+                    <div ref="itemContent1" :class="{ autoHeight: flag1 }" class="courseClassificationList_item_content">
+                        <div :class="{ on: filterData.pid === val.id }" class="content_item" v-for="(val, i) in courseClassificationList1" :key="i" @click="filterData.pid = val.id, filterData.cate_id = 0, filterData.search = '', filterData.page = 1">
+                            <span class="content_item_value">{{val.title}}</span>
+                        </div>
+                    </div>
+                    <div v-if="hasMore1" class="courseClassificationList_item_morethan" @click="handleShowMoreThan(1)">
+                        <span>更多</span>
+                        <i :class="[flag1 ? 'el-icon-arrow-up' : 'el-icon-arrow-down']"></i>
+                    </div>
+                </div>
+                <div class="courseClassificationList_item">
+                    <div class="courseClassificationList_item_title">
+                        <span>二级分类：</span>
+                    </div>
+                    <div ref="itemContent2" :class="{ autoHeight: flag2 }" class="courseClassificationList_item_content">
+                        <div :class="{ on: filterData.cate_id === val.id }" class="content_item" v-for="(val, i) in courseClassificationList2" :key="i" @click="filterData.cate_id = val.id, filterData.search = '', filterData.page = 1">
+                            <span class="content_item_value">{{val.title}}</span>
+                        </div>
+                    </div>
+                    <div v-if="hasMore2" class="courseClassificationList_item_morethan" @click="handleShowMoreThan(2)">
+                        <span>更多</span>
+                        <i :class="[flag2 ? 'el-icon-arrow-up' : 'el-icon-arrow-down']"></i>
+                    </div>
+                </div>
+                <div class="courseClassificationList_item">
+                    <div class="courseClassificationList_item_title">
+                        <span>资料性质：</span>
+                    </div>
+                    <div class="courseClassificationList_item_content">
+                        <div :class="{ on: filterData.is_pay === '' }" class="content_item" @click="filterData.is_pay = '', filterData.page = 1">
+                            <span class="content_item_value">全部</span>
+                        </div>
+                        <div :class="{ on: filterData.is_pay === 0 }" class="content_item" @click="filterData.is_pay = 0, filterData.page = 1">
+                            <span class="content_item_value">免费</span>
+                        </div>
+                        <div :class="{ on: filterData.is_pay === 1 }" class="content_item" @click="filterData.is_pay = 1, filterData.page = 1">
+                            <span class="content_item_value">付费</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="courseClassificationList_item">
+                    <div class="courseClassificationList_item_title">
+                        <span>资料排序：</span>
+                    </div>
+                    <div class="courseClassificationList_item_content">
+                        <div :class="{ on: sort == '' }" class="content_item" @click="sort = '', filterData.salesOrder = ''">
+                            <span class="content_item_value">默认</span>
+                        </div>
+                        <div :class="{ on: sort == 'salesOrder' }" class="content_item"
+                            @click="sort = 'salesOrder', filterData.salesOrder = (filterData.salesOrder == 'asc' ? 'desc' : 'asc')">
+                            <span class="content_item_value">下载量</span>
+                            <img v-if="sort != 'salesOrder'" src="{__PUBLIC_WEB_PATH}pc/images/1.png" alt="默认">
+                            <img v-else-if="filterData.salesOrder == 'asc'" src="{__PUBLIC_WEB_PATH}pc/images/2.png" alt="降序">
+                            <img v-else-if="filterData.salesOrder == 'desc'" src="{__PUBLIC_WEB_PATH}pc/images/3.png" alt="升序">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 课程分类结束 -->
+            <!-- 课程列表开始 -->
+            <div class="container_curriculum_list">
+                <div v-if="courseList.length" class="container_curriculum_list_con">
+                    <div class="container_curriculum_list_item" v-for="(item, index) in courseList" :key="index"
+                        @click="handleSelectDetils(item)">
+                        <div class="container_curriculum_list_item_image">
+                            <img class="image" :src="item.image" alt="">
+                        </div>
+                        <div class="course">
+                            <div class="course_title">
+                                <span>{{item.title}}</span>
+                            </div>
+                            <div class="course_price">
+                                <div class="course_price_content">
+                                    <div v-if="item.pay_type" class="course_price_content_value">
+                                        <span>￥</span>
+                                        <span>{{item.money}}</span>
+                                    </div>
+                                    <div v-else class="course_price_content_value">
+                                        <span class="free">免费</span>
+                                    </div>
+                                    <div class="course_price_content_vip">
+                                        <img src="{__PUBLIC_WEB_PATH}pc/images/vip_money.png" alt="">
+                                    </div>
+                                    <div class="course_price_content_truePrice">
+                                        <span>￥</span>
+                                        <span>{{item.member_money}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="upload_number" style="padding: 20px 0;">
+                                <span>{{item.sales}}</span>
+                                <span>人已下载</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <el-empty v-else image="{__PUBLIC_WEB_PATH}pc/images/empty8.png" description=" "></el-empty>
+            </div>
+            <!-- 课程列表结束 -->
+            <div class="pagination">
+                <el-pagination :page-size="filterData.limit" :total="total" :current-page.sync="filterData.page" layout="prev, pager, next" prev-text="上一页" next-text="下一页" hide-on-single-page @current-change="handleCurrentChange"></el-pagination>
+            </div>
+        </div>
+    </div>
+    <base-footer :public-data="publicData"></base-footer>
+    <base-login :public-data="publicData" :agree-content="agreeContent"></base-login>
+    <base-agree :agree-content="agreeContent"></base-agree>
+</div>
+{/block}
+{block name="vm"}
+<script>
+    require([
+        'vue',
+        'ELEMENT',
+        'components/base-header/index',
+        'components/base-footer/index',
+        'components/base-login/index',
+        'components/base-agree/index',
+        'mixins/base',
+        'api/material',
+        'scripts/util',
+        'router/index',
+        'css!styles/classification.css'
+    ], function (Vue, ELEMENT, BaseHeader, BaseFooter, BaseLogin, BaseAgree, baseMixin, materialApi, util, router) {
+        Vue.use(ELEMENT);
+        Vue.use(router);
+        var vm = new Vue({
+            el: '#app',
+            components: {
+                'base-header': BaseHeader,
+                'base-footer': BaseFooter,
+                'base-login': BaseLogin,
+                'base-agree': BaseAgree
+            },
+            mixins: [baseMixin],
+            data: {
+                courseClassificationList1: [
+                    {
+                        title: '全部',
+                        pid: 0,
+                        id: 0,
+                        children: []
+                    }
+                ],
+                childrenList: [],
+                courseList: [],
+                total: 0,
+                filterData: {
+                    page: 1,
+                    limit: 16,
+                    pid: 0,
+                    cate_id: 0,
+                    is_pay: '',
+                    salesOrder: '',
+                    search: ''
+                },
+                sort: '',
+                flag1: false,
+                flag2: false,
+                hasMore1: false,
+                hasMore2: false
+            },
+            computed: {
+                courseClassificationList2: function () {
+                    var vm = this;
+                    var courseClassificationListItem = this.courseClassificationList1.find(function (item) {
+                        return item.id === vm.filterData.pid;
+                    });
+                    var result = [
+                        {
+                            title: '全部',
+                            pid: 0,
+                            id: 0
+                        }
+                    ];
+                    if (courseClassificationListItem) {
+                        return result.concat(courseClassificationListItem.children);
+                    }
+                    return result;
+                }
+            },
+            watch: {
+                filterData: {
+                    handler: function () {
+                        this.get_material_list();
+                    },
+                    deep: true
+                },
+                courseClassificationList2: function () {
+                    this.flag2 = false;
+                    this.$nextTick(function () {
+                        this.hasMore2 = this.$refs.itemContent2.offsetHeight !== this.$refs.itemContent2.scrollHeight;
+                    });
+                },
+                'filterData.search': function (val) {
+                    if (!val) {
+                        this.$refs.baseHeader.searchValue = '';
+                    }
+                }
+            },
+            created: function () {
+                var search = util.getParmas('search');
+                this.get_material_cate();
+                if (search) {
+                    return this.filterData.search = search;
+                }
+                this.get_material_list();
+            },
+            methods: {
+                // 分类
+                get_material_cate: function () {
+                    materialApi.get_material_cate().then(function (res) {
+                        vm.courseClassificationList1[0].children = res.data.children;
+                        vm.courseClassificationList1 = vm.courseClassificationList1.concat(res.data.cateogry);
+                        vm.$nextTick(function () {
+                            this.hasMore1 = this.$refs.itemContent1.offsetHeight !== this.$refs.itemContent1.scrollHeight;
+                        });
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+                // 列表
+                get_material_list: function () {
+                    materialApi.get_material_list(this.filterData).then(function (res) {
+                        vm.courseList = res.data.data;
+                        vm.total = res.data.count;
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+                handleSelectDetils(item) {
+                    window.location.href = this.$router.material_detail + '?id=' + item.id;
+                },
+                handleShowMoreThan(type) {
+                    this.$nextTick(function () {
+                        if (type === 1) {
+                            if (this.$refs.itemContent1.scrollHeight === this.$refs.itemContent1.offsetHeight && !this.flag1) {
+                                return;
+                            }
+                            this.flag1 = !this.flag1;
+                        } else if (type === 2) {
+                            if (this.$refs.itemContent2.scrollHeight === this.$refs.itemContent2.offsetHeight && !this.flag2) {
+                                return;
+                            }
+                            this.flag2 = !this.flag2;
+                        }
+                    });
+                },
+                handleCurrentChange(val) {
+                    // console.log(`当前页: ${val}`);
+
+                },
+                // 搜索
+                submitSearch: function (value) {
+                    this.filterData.cate_id = 0;
+                    this.filterData.subject_id = 0;
+                    this.filterData.type = '';
+                    this.filterData.is_pay = '';
+                    this.filterData.salesOrder = 'desc';
+                    this.filterData.scoreOrder = 'desc';
+                    this.filterData.search = value;
+                    this.sort = '';
+                }
+            }
+        });
+    });
+</script>
+{/block}

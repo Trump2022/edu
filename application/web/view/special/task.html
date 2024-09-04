@@ -1,0 +1,361 @@
+{extend name="public/container"}
+{block name="title"}{$title}{/block}
+{block name="style"}
+<style>
+    .try-btn {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .try-btn a {
+        display: inline-block;
+        width: 150px;
+        height: 42px;
+        border-radius: 21px;
+        background-color: #2C8EFF;
+        font-size: 16px;
+        line-height: 42px;
+        text-align: center;
+        color: #FFFFFF;
+    }
+
+    .container_courseDetils img {
+      max-width: 100%;
+    }
+</style>
+{/block}
+{block name="app"}
+<div v-cloak id="app">
+    <base-header :public-data="publicData" :user-info="userInfo"></base-header>
+    <div class="layout">
+        <div class="container">
+            <el-breadcrumb separator-class="el-icon-arrow-right">
+                <el-breadcrumb-item><a :href="$router.home">首页</a></el-breadcrumb-item>
+                <el-breadcrumb-item><a :href="$router.special_cate">精品课程</a></el-breadcrumb-item>
+                <el-breadcrumb-item>课程详情</el-breadcrumb-item>
+            </el-breadcrumb>
+            <div class="container_content">
+                <div class="container_content_title">
+                    <span>{{ taskInfo.title }}</span>
+                </div>
+                <div class="container_content_message">
+                    <div class="container_content_message_viAndAu">
+                        <el-image v-if="taskInfo.type == 1 || taskInfo.light_type == 1" :src="taskInfo.image" fit="cover"></el-image>
+                        <div v-else class="container_content_message_viAndAu_viAndAuBox">
+                            <el-image v-if="taskInfo.type == 2 || taskInfo.light_type == 2" :src="taskInfo.image" fit="cover"></el-image>
+                            <div class="prism-player" id="J_prismPlayer"></div>
+                            <div v-if="taskInfo.singleProfile && taskInfo.singleProfile.is_try" v-show="tryShow" class="try">免费试看</div>
+                        </div>
+                    </div>
+                    <div v-if="task_id != 0" class="container_content_message_list">
+                        <div class="container_content_message_list_title">
+                            <div class="container_content_message_list_title_item">
+                                <span>课程目录</span>
+                            </div>
+                        </div>
+                        <div class="container_content_message_list_content" v-infinite-scroll="get_course_list" infinite-scroll-disabled="finished">
+                            <div v-for="(item, index) in courseList" :key="index" :class="{ active: task_id == item.id }" class="container_content_message_list_content_item"
+                                 @click="selectCourse(item)">
+                                <div class="container_content_message_list_content_item_label">
+                                    <img v-if="item.type == 1 || item.light_type == 1" src="{__PUBLIC_WEB_PATH}pc/images/course1.png" alt="图文">
+                                    <img v-else-if="item.type == 2 || item.light_type == 2" src="{__PUBLIC_WEB_PATH}pc/images/course2.png" alt="音频">
+                                    <img v-else-if="item.type == 3 || item.light_type == 3" src="{__PUBLIC_WEB_PATH}pc/images/course3.png" alt="视频">
+                                </div>
+                                <div class="container_content_message_list_content_item_value">
+                                    <span class="msaages">{{item.title}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="container_courseDetils">
+            <div class="container_courseDetils_title">
+                <div>课程内容</div>
+                <div></div>
+            </div>
+            <template v-if="taskInfo.type == 1 || taskInfo.light_type == 1">
+                <div v-if="taskInfo.type == 1" v-html="!isPay && taskInfo.is_try ? taskInfo.try_content : taskInfo.content"></div>
+                <div v-else v-html="!isPay && taskInfo.singleProfile.is_try ? taskInfo.singleProfile.try_content : taskInfo.content"></div>
+            </template>
+            <div v-else-if="taskInfo.type == 2 || taskInfo.light_type == 2" class="container_courseDetils_content" v-html="taskInfo.detail || taskInfo.abstract"></div>
+            <div v-else-if="taskInfo.type == 3 || taskInfo.light_type == 3" class="container_courseDetils_content" v-html="taskInfo.detail || taskInfo.abstract"></div>
+        </div>
+        <div v-if="taskInfo.type == 1 && taskInfo.is_try && !isPay" class="try-btn">
+            <a :href="$router.payment + '?type=1&id=' + special_id">已试看，去购买</a>
+        </div>
+        <div v-if="taskInfo.light_type == 1 && taskInfo.singleProfile.is_try && !isPay" class="try-btn">
+            <a :href="$router.payment + '?type=1&id=' + special_id">已试看，去购买</a>
+        </div>
+    </div>
+    <base-footer :public-data="publicData"></base-footer>
+    <base-login :public-data="publicData" :agree-content="agreeContent"></base-login>
+    <base-agree :agree-content="agreeContent"></base-agree>
+    <el-dialog title="提示" :visible.sync="dialogVisible" width="30%">
+        <span>购买后可看全部内容，是否购买？</span>
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="dialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="handleBuy">购 买</el-button>
+        </span>
+    </el-dialog>
+</div>
+{/block}
+{block name="vm"}
+<script>
+    require([
+        'vue',
+        'ELEMENT',
+        'components/base-header/index',
+        'components/base-footer/index',
+        'components/base-login/index',
+        'components/base-agree/index',
+        'mixins/base',
+        'api/special',
+        'scripts/util',
+        'router/index',
+        'css!styles/audioCourse.css'
+    ], function (Vue, ELEMENT, BaseHeader, BaseFooter, BaseLogin, BaseAgree, baseMixin, specialApi, util, router) {
+        Vue.use(ELEMENT);
+        Vue.use(router);
+        new Vue({
+            el: '#app',
+            components: {
+                'base-header': BaseHeader,
+                'base-footer': BaseFooter,
+                'base-login': BaseLogin,
+                'base-agree': BaseAgree
+            },
+            mixins: [baseMixin],
+            data: {
+                isPay: false,
+                isSourcePay: false,
+                specialInfo: {},
+                taskInfo: {},
+                task_id: '',
+                courseList: [],
+                page: 1,
+                limit: 10,
+                viewing_time: 0,
+                currentTime: 0,
+                player: null,
+                seeked: false,
+                tryShow: true,
+                special_id: 0,
+                dialogVisible: false
+            },
+            computed: {
+              taskName: function () {
+                return 'task_' + this.special_id + '_' + this.task_id
+              }
+            },
+            created: function () {
+                this.task_id = util.getParmas('task_id');
+                this.special_id = util.getParmas('specialId');
+                var viewing_time = this.getTime(this.taskName)
+                // this.viewing_time = util.getParmas('viewing_time') / 1e3;
+                this.viewing_time = viewing_time ? parseInt(viewing_time) : parseInt(util.getParmas('viewing_time') / 1000)
+                this.currentTime = Math.floor(this.viewing_time);
+                this.getTaskInfo();
+                // task_id === '0' 轻专题
+                if (this.task_id != '0') {
+                    this.get_course_list();
+                }
+            },
+            mounted: function () {
+              var vm = this;
+              window.addEventListener('beforeunload', function () {
+                if (vm.player && vm.player.getCurrentTime() !== 0) {
+                  vm.saveTime(vm.taskName, vm.player.getCurrentTime())
+                }
+              })
+            },
+            methods: {
+              getTime: function (task) {
+                return localStorage.getItem(task)
+              },
+              saveTime: function (task, currentTime) {
+                localStorage.setItem(task, currentTime)
+              },
+                handleBuy: function () {
+                    window.location.assign(this.$router.payment + '?type=1&id=' + this.special_id);
+                },
+                // 素材详情
+                getTaskInfo: function () {
+                    var vm = this;
+                    specialApi.getTaskInfo({
+                        special_id: vm.special_id,
+                        task_id: vm.task_id
+                    }).then(function (res) {
+                        var data = res.data;
+                        vm.isPay = data.isPay;
+                        vm.isSourcePay = data.isSourcePay;
+                        vm.specialInfo = data.specialInfo;
+                        vm.taskInfo = data.taskInfo;
+                        if (vm.taskInfo.type == 1 || vm.taskInfo.light_type == 1) {
+                            vm.duration = 100;
+                            vm.viewing(100);
+                            return;
+                        }
+                        if (vm.taskInfo.singleProfile && vm.taskInfo.singleProfile.videoId || vm.taskInfo.videoId) {
+                            vm.get_video_playback_credentials(vm.taskInfo.singleProfile && vm.taskInfo.singleProfile.videoId || vm.taskInfo.videoId);
+                            return;
+                        }
+                        vm.$nextTick(function () {
+                          this.createPlayer();
+                        });
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+                // 播放列表
+                get_course_list: function () {
+                    var vm = this;
+                    specialApi.get_course_list({
+                        page: vm.page++,
+                        limit: vm.limit,
+                        special_id: vm.special_id
+                    }).then(function (res) {
+                        if (Array.isArray(res.data)) {
+                            return;
+                        }
+                        var list = res.data.list;
+                        vm.courseList = vm.courseList.concat(list);
+                        vm.finished = vm.limit > list.length;
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+                // 获取playauth
+                get_video_playback_credentials: function (videoId) {
+                    var vm = this;
+                    specialApi.get_video_playback_credentials({
+                        videoId: videoId,
+                        type: 2
+                    }).then(function (res) {
+                        var request = new XMLHttpRequest();
+                        request.onreadystatechange = function () {
+                            if (request.readyState == 4 && request.status == 200) {
+                                try {
+                                    var data = JSON.parse(request.responseText);
+                                    vm.duration = data.VideoMeta.Duration;
+                                    vm.createPlayer(data.PlayAuth);
+                                } catch (error) {
+                                    vm.$message.error(error);
+                                }
+                            }
+                        };
+                        request.open('GET', res.msg, true);
+                        request.send();
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+                // 创建播放器
+                createPlayer: function (playauth) {
+                  var options = {
+                      id: 'J_prismPlayer',
+                      source: this.taskInfo.link,
+                      vid: this.taskInfo.videoId,
+                      playauth: playauth || '',
+                      height: '100%',
+                      cover: this.taskInfo.image,
+                      controlBarVisibility: this.taskInfo.type == 2 ? 'always' : 'hover',
+                      format: this.taskInfo.type == 2 ? 'mp3' : ''
+                  };
+                  if (this.taskInfo.is_light) {
+                      options.source = this.taskInfo.singleProfile.link;
+                      options.vid = this.taskInfo.singleProfile.videoId;
+                      options.controlBarVisibility = this.taskInfo.light_type == 2 ? 'always' : 'hover';
+                      options.format = this.taskInfo.light_type == 2 ? 'mp3' : '';
+                  }
+                  if (this.player) {
+                      this.player.dispose();
+                      this.player = null;
+                  }
+                  this.player = new Aliplayer(options);
+                  this.player.on('ready', this.onPlayerReady);
+                  this.player.on('canplay', this.onPlayerCanplay);
+                  this.player.on('ended', this.onPlayerEnded);
+                  this.player.on('timeupdate', this.onPlayerTimeupdate);
+                  this.player.on('hideBar', this.onPlayerHideBar);
+                  this.player.on('showBar', this.onPlayerShowBar);
+                },
+                onPlayerHideBar: function () {
+                    this.tryShow = true;
+                },
+                onPlayerShowBar: function () {
+                    this.tryShow = false;
+                },
+                onPlayerReady: function () {
+                    this.duration = this.player.getDuration();
+                    if (this.isPay || this.isSourcePay) {
+                        return;
+                    }
+                    if (this.taskInfo.is_light) {
+                        this.player.setPreviewTime(this.taskInfo.singleProfile.try_time * 60);
+                    } else {
+                        this.player.setPreviewTime(this.taskInfo.try_time * 60);
+                    }
+                },
+                onPlayerCanplay: function () {
+                    if (this.isPay || this.isSourcePay) {
+                        if (!this.seeked) {
+                            this.seeked = true;
+                            this.player.seek(this.viewing_time);
+                        }
+                    }
+                },
+                onPlayerEnded: function () {
+                    var vm = this;
+                    if (this.isPay || this.isSourcePay) {
+                        this.viewing(this.duration);
+                    } else {
+                        this.dialogVisible = true;
+                    }
+                },
+                onPlayerTimeupdate: function () {
+                    var vm = this;
+                    var currentTime = vm.player.getCurrentTime();
+                    var currentTimeInt = Math.floor(currentTime);
+                    if (currentTimeInt == vm.currentTime || currentTimeInt % 10) {
+                        return;
+                    }
+                    vm.currentTime = currentTimeInt;
+                    vm.viewing(currentTime);
+                },
+                // 点击播放列表
+                selectCourse: function (task) {
+                    var vm = this;
+                    if (vm.task_id == task.id) {
+                        return;
+                    }
+                    if (!this.isPay && task.pay_status && !task.is_try) {
+                        this.dialogVisible = true;
+                        return;
+                    }
+                    vm.task_id = task.id;
+                    vm.viewing_time = task.watch && task.watch.viewing_time / 1e3 || 0;
+                    vm.currentTime = Math.floor(vm.viewing_time);
+                    vm.seeked = false;
+                    vm.getTaskInfo();
+                },
+                // 更新播放进度
+                viewing: function (currentTime) {
+                    var vm = this;
+                    specialApi.viewing({
+                        special_id: vm.special_id,
+                        task_id: vm.task_id,
+                        total: vm.duration * 1e3,
+                        viewing_time: currentTime * 1e3,
+                        percentage: Math.floor(currentTime / vm.duration * 100)
+                    });
+                    this.saveTime(this.taskName, currentTime)
+                },
+            }
+        });
+    });
+</script>
+{/block}

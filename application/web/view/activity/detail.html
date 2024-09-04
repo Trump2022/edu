@@ -1,0 +1,189 @@
+{extend name="public/container"}
+{block name="title"}{$title}{/block}
+{block name="app"}
+<div v-cloak id="app">
+    <base-header :public-data="publicData" :user-info="userInfo"></base-header>
+    <div class="layout">
+        <div class="one">
+            <el-breadcrumb separator-class="el-icon-arrow-right">
+                <el-breadcrumb-item><a :href="$router.home">首页</a></el-breadcrumb-item>
+                <el-breadcrumb-item><a :href="$router.activity_list">活动报名</a></el-breadcrumb-item>
+                <el-breadcrumb-item>活动详情</el-breadcrumb-item>
+            </el-breadcrumb>
+            <el-row>
+                <el-col :span="12">
+                    <el-image :src="activity.image"></el-image>
+                </el-col>
+                <el-col :span="12">
+                    <div class="title">{{ activity.title }}</div>
+                    <div class="attr">
+                        <div><i class="iconfont iconbaoming"></i>报名时间：{{ activity.signup_start_time }}~{{ activity.signup_end_time }}</div>
+                        <div><i class="iconfont iconhuodongshijian"></i>活动时间：{{ activity.start_time }}~{{ activity.end_time }}</div>
+                        <div><i class="iconfont iconhuodongdizhi"></i>活动地址：{{ activity.province }}{{ activity.city }}{{ activity.district }}{{ activity.detail }}</div>
+                    </div>
+                    <div class="money">
+                        <div>价格</div>
+                        <div>￥<span>{{ activity.price }}</span></div>
+                        <div>{{ activity.count }}人已报名</div>
+                    </div>
+                    <div class="btn">
+                        <el-button v-if="activity.statu === 0" disabled>未开始报名</el-button>
+                        <template v-else-if="activity.statu === 1">
+                            <el-button v-if="activity.number > activity.count" @click="signUp">立即报名</el-button>
+                            <el-button v-else disabled>报名结束</el-button>
+                        </template>
+                        <el-button v-else-if="activity.statu === 2 || activity.statu === 3" disabled>报名结束</el-button>
+                        <el-button v-else-if="activity.statu === 4" disabled>活动结束</el-button>
+                    </div>
+                </el-col>
+            </el-row>
+        </div>
+        <div class="main">
+            <div class="detail">
+                <div class="detail-header">
+                    <div class="tabbar">
+                        <div v-for="item in tab" :key="item.value" :class="{ active: tabOn == item.value }" class="item" @click="tabOn = item.value">{{ item.title }}</div>
+                    </div>
+                    <el-popover v-if="mobileUrl" trigger="hover" width="140" popper-class="phone-popper">
+                        <div ref="qrcode" class="qrcode"></div>
+                        <div class="tip">扫一扫，手机继续学</div>
+                        <el-button slot="reference" type="text"><i class="iconfont iconshouji"></i>手机端访问</el-button>
+                    </el-popover>
+                </div>
+                <div class="detail-content">
+                    <div v-show="tabOn == 1" v-html="content"></div>
+                    <div v-show="tabOn == 2" v-html="activityRules"></div>
+                </div>
+            </div>
+            <div class="aside">
+                <div v-if="lecturer" class="lecturer">
+                    <a :href="$router.teacher_detail + '?id=' + lecturer.id">
+                        <div class="lecturer-header">
+                            <div><img :src="lecturer.lecturer_head" :alt="lecturer.lecturer_name"></div>
+                            <div>
+                                <div class="name">{{ lecturer.lecturer_name }}</div>
+                                <div class="tag-group"><span v-for="item in lecturer.label" class="tag">{{ item }}</span></div>
+                            </div>
+                        </div>
+                        <div class="lecturer-content">{{ lecturer.explain }}</div>
+                    </a>
+                </div>
+                <div v-if="activities.length" class="recommend">
+                    <div class="recommend-header">
+                        <div class="recommend-title">相关活动</div>
+                        <a :href="$router.activity_list">更多<i class="iconfont iconxiangyou"></i></a>
+                    </div>
+                    <div class="recommend-content">
+                        <a v-for="item in activities" :key="item.id" :href="$router.activity_detail + '?id=' + item.id">
+                            <img :src="item.image" :alt="item.title">
+                            <div class="recommend-name">{{ item.title }}</div>
+                            <div class="recommend-people">{{ item.count }}人已报名</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <base-footer :public-data="publicData"></base-footer>
+    <base-login :public-data="publicData" :agree-content="agreeContent"></base-login>
+    <base-agree :agree-content="agreeContent"></base-agree>
+</div>
+{/block}
+{block name="vm"}
+<script>
+    require([
+        'vue',
+        'ELEMENT',
+        'components/base-header/index',
+        'components/base-footer/index',
+        'components/base-login/index',
+        'components/base-agree/index',
+        'mixins/base',
+        'api/activity',
+        'api/home',
+        'api/auth',
+        'scripts/util',
+        'router/index',
+        'store/index',
+        'qrcode',
+        'css!styles/activity-detail.css'
+    ], function (Vue, ELEMENT, BaseHeader, BaseFooter, BaseLogin, BaseAgree, baseMixin, activityApi, homeApi, authApi, util, router, store) {
+        var isMember = {$is_member};
+        var activity = {$activity};
+        var mobileUrl = '{$mobile_url}';
+        var activityRules = '{$activity_rules}';
+        var content = '{$content}';
+        Vue.use(ELEMENT);
+        Vue.use(router);
+        new Vue({
+            el: '#app',
+            components: {
+                'base-header': BaseHeader,
+                'base-footer': BaseFooter,
+                'base-login': BaseLogin,
+                'base-agree': BaseAgree
+            },
+            mixins: [baseMixin],
+            data: {
+                tab: [
+                    {
+                        title: '活动详情',
+                        value: 1
+                    },
+                    {
+                        title: '活动规则',
+                        value: 2
+                    }
+                ],
+                tabOn: 1,
+                activity: activity,
+                activityRules: activityRules,
+                content: content,
+                isReload: true,
+                mobileUrl: mobileUrl,
+                lecturer: null,
+                activities: []
+            },
+            created: function () {
+                this.getLecturer();
+                this.relatedActivities();
+                this.get_site_service_phone(activity.mer_id);
+                this.get_kefu_id(activity.mer_id);
+            },
+            mounted: function () {
+                this.$nextTick(function () {
+                    if (this.mobileUrl) {
+                        new QRCode(this.$refs.qrcode, this.mobileUrl);
+                    }
+                });
+            },
+            methods: {
+                signUp: function () {
+                    var vm = this;
+                    homeApi.user_login().then(function () {
+                        window.location.assign(vm.$router.activity_form + '?id=' + vm.activity.id);
+                    }).catch(function (err) {
+                        store.setLoginAction(true);
+                    });
+                },
+                getLecturer: function () {
+                    var vm = this;
+                    authApi.getLecturer({
+                        mer_id: activity.mer_id
+                    }).then(function (res) {
+                        vm.lecturer = res.data;
+                    });
+                },
+                relatedActivities: function () {
+                    var vm = this;
+                    activityApi.relatedActivities({
+                        id: activity.id
+                    }).then(function (res) {
+                        vm.activities = res.data;
+                    });
+                }
+            }
+        });
+    });
+</script>
+{/block}

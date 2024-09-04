@@ -1,0 +1,43 @@
+<script>
+    require.config({
+        urlArgs: 'bust=' + (new Date()).getTime(),
+        baseUrl: '{__PUBLIC_WEB_PATH}pc',
+        map: {
+            '*': {
+                'css': 'plugins/require-css/css'
+            }
+        },
+        shim: {
+            'ELEMENT': {
+                deps: [
+                    'vue',
+                    'css!element-ui/lib/theme-chalk/index.css',
+                    'css!styles/element-ui.css'
+                ]
+            },
+            'swiper': {
+                deps: [
+                    'css!plugins/swiper/css/swiper.min.css'
+                ]
+            },
+            'qrcode': {
+                exports: 'QRCode'
+            }
+        },
+        paths: {
+            'vue': '../static/plug/vue/dist/vue.min',
+            'ELEMENT': 'element-ui/lib/index',
+            'text': 'plugins/text/text',
+            'axios': 'plugins/axios/dist/axios.min',
+            'swiper': 'plugins/swiper/js/swiper.min',
+            'qrcode': 'plugins/qrcodejs/qrcode.min',
+            'moment': '../static/plug/moment',
+            'components': 'components',
+            'vue-circle-progress': '{__PUBLIC_WEB_PATH}wap/first/zsff/js/vue-circle-progress',
+            'decimal': '../static/plug/decimal',
+        }
+    });
+    var code_url = "{$code_url}";
+    var application_switch = "{$instructor_application_switch}";
+    var is_official_account_switch = "{$is_official_account_switch}";
+</script>

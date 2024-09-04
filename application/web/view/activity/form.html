@@ -1,0 +1,416 @@
+{extend name="public/container"}
+{block name="title"}活动支付{/block}
+{block name="style"}
+<style>
+    .success-dialog .el-dialog__body>div:nth-child(2) {
+        margin-top: 30px;
+        font-size: 22px;
+        line-height: 29px;
+        text-align: center;
+        color: #2C8EFF;
+    }
+
+    .success-dialog .el-dialog__body>div:nth-child(3) {
+        margin-top: 10px;
+        font-size: 16px;
+        line-height: 21px;
+        text-align: center;
+        color: #939393;
+    }
+
+    .success-dialog .el-dialog__body>div:nth-child(4) {
+        margin-top: 26px;
+        font-size: 24px;
+        line-height: 33px;
+        text-align: center;
+        color: #FF6B00;
+    }
+
+    .success-dialog .el-button {
+        width: 150px;
+        height: 42px;
+        padding: 0;
+        border-color: #2C8EFF;
+        border-radius: 21px;
+        background-color: #2C8EFF;
+        font-size: 16px;
+        color: #FFFFFF;
+    }
+
+    .success-dialog .el-button:focus,
+    .success-dialog .el-button:hover {
+        border-color: #2C8EFF;
+        background-color: #2C8EFF;
+        color: #FFFFFF;
+    }
+
+    .member {
+        display: flex;
+        align-items: center;
+        height: 40px;
+        padding: 0 20px;
+        margin: 0 30px;
+        background-color: #FFF0E5;
+        font-size: 16px;
+        color: #333333;
+    }
+
+    .member-body {
+        flex: 1;
+        padding-left: 27px;
+        background: url("{__PUBLIC_WEB_PATH}wap/first/zsff/images/user_member2.png") left center/19px 21px no-repeat;
+        font-size: 16px;
+        line-height: 21px;
+        color: #666666;
+    }
+
+    .member .money {
+        color: #FF6B00;
+    }
+
+    .member .iconfont {
+        margin-left: 10px;
+        font-size: 12px;
+        color: #FF6B00;
+    }
+
+    .two .group {
+        margin-top: 20px;
+    }
+</style>
+{/block}
+{block name="app"}
+<div v-cloak id="app">
+    <base-header :public-data="publicData" :user-info="userInfo"></base-header>
+    <div class="layout">
+        <el-breadcrumb separator-class="el-icon-arrow-right">
+            <el-breadcrumb-item><a :href="$router.home">首页</a></el-breadcrumb-item>
+            <el-breadcrumb-item><a :href="$router.activity_list">活动报名</a></el-breadcrumb-item>
+            <el-breadcrumb-item>活动详情</el-breadcrumb-item>
+        </el-breadcrumb>
+        <div class="one">
+            <div class="activity">
+                <el-image :src="details.image"></el-image>
+                <div class="info">
+                    <div class="title">{{ details.title }}</div>
+                    <div class="attr">
+                        <div><i class="iconfont"></i>报名时间：{{ details.signup_start_time }}~{{ details.signup_end_time }}</div>
+                        <div><i class="iconfont"></i>活动时间：{{ details.start_time }}~{{ details.end_time }}</div>
+                        <div><i class="iconfont"></i>活动地址：{{ details.province }}{{ details.city }}{{ details.district }}{{ details.detail }}</div>
+                    </div>
+                </div>
+                <div class="money">￥<span>{{ payMoney }}</span></div>
+            </div>
+            <div class="userinfo">
+                <div class="title">填写资料</div>
+                <el-form :inline="true">
+                    <el-form-item v-for="item in event" :class="{ required: item.is_required }">
+                        <el-input v-if="item.event_type == 1 || item.event_type == 4" v-model="item.event_value" :placeholder="'请输入' + item.event_name"></el-input>
+                        <el-select v-else-if="item.event_type == 2 || item.event_type == 5" v-model="item.event_value" :placeholder="'请选择' + item.event_name">
+                            <el-option v-for="cell in item.eventValue" :label="cell" :value="cell"></el-option>
+                        </el-select>
+                        <el-select v-else-if="item.event_type == 3" v-model="item.event_value" :placeholder="'请选择' + item.event_name" multiple collapse-tags>
+                            <el-option v-for="cell in item.eventValue" :label="cell" :value="cell"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item class="required">
+                        <el-select v-model="priceId" placeholder="请选择参加人数">
+                            <el-option v-for="item in price" :key="item.id" :label="item.event_number + '人'" :value="item.id"></el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-form>
+            </div>
+        </div>
+        <div class="two">
+            <div class="title">支付方式</div>
+            <a v-if="userInfo && !userInfo.level && memberReduce>0" class="member" :href="$router.user + '?activeName=member'">
+                <div class="member-body">开通会员，本单可减<span class="money">{{ memberReduce }}元</span></div>
+                <div>立即开通</div>
+                <i class="iconfont iconxiangyou"></i>
+            </a>
+            <div class="group">
+                <label class="balance">
+                    <input v-model="payType" type="radio" value="yue" hidden>
+                    <div>
+                        <div>
+                            <div>余额支付</div>
+                            <div>余额：¥{{ userInfo && userInfo.now_money }}</div>
+                        </div>
+                        <i class="el-icon-check"></i>
+                    </div>
+                </label>
+                <label class="wxpay">
+                    <input v-model="payType" type="radio" value="weixin" hidden>
+                    <div>
+                        <div>微信支付</div>
+                        <i class="el-icon-check"></i>
+                    </div>
+                </label>
+                <label class="alipay">
+                    <input v-model="payType" type="radio" value="zhifubao" hidden>
+                    <div>
+                        <div>支付宝支付</div>
+                        <i class="el-icon-check"></i>
+                    </div>
+                </label>
+            </div>
+            <div class="action">
+                <div v-show="qrcodeShow" class="qrcode">
+                    <div ref="qrcode"></div>
+                    <div>请用微信扫码，支付<span>{{ payMoney }}</span>元</div>
+                </div>
+                <el-button v-show="!qrcodeShow" @click="create_order">去支付</el-button>
+            </div>
+        </div>
+    </div>
+    <base-footer :public-data="publicData"></base-footer>
+    <base-login :public-data="publicData" :agree-content="agreeContent"></base-login>
+    <base-agree :agree-content="agreeContent"></base-agree>
+    <el-dialog :visible.sync="dialogVisible" :close-on-click-modal="false" :show-close="false" width="370px" center class="success-dialog">
+        <el-image src="{__PUBLIC_WEB_PATH}pc/images/activity_success.png" fit="cover"></el-image>
+        <div>活动报名成功</div>
+        <div>请在规定时间内前往地点参加活动哦！</div>
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="successConfirm">确认</el-button>
+        </span>
+    </el-dialog>
+</div>
+{/block}
+{block name="vm"}
+<script>
+    require([
+        'vue',
+        'ELEMENT',
+        'components/base-header/index',
+        'components/base-footer/index',
+        'components/base-login/index',
+        'components/base-agree/index',
+        'mixins/base',
+        'api/activity',
+        'api/home',
+        'api/auth',
+        'scripts/util',
+        'router/index',
+        'decimal',
+        'qrcode',
+        'css!styles/activity-form.css'
+    ], function (Vue, ELEMENT, BaseHeader, BaseFooter, BaseLogin, BaseAgree, baseMixin, activityApi, homeApi, authApi, util, router, Decimal) {
+        Vue.use(ELEMENT);
+        Vue.use(router);
+        new Vue({
+            el: '#app',
+            components: {
+                'base-header': BaseHeader,
+                'base-footer': BaseFooter,
+                'base-login': BaseLogin,
+                'base-agree': BaseAgree
+            },
+            mixins: [baseMixin],
+            data: {
+                id: 0,
+                details: {
+                    image: ''
+                },
+                event: [],
+                price: [],
+                priceId: '',
+                payMoney: 0,
+                payType: 'yue',
+                qrcode: null,
+                timer: null,
+                count: 0,
+                qrcodeShow: false,
+                dialogVisible: false,
+                memberReduce: 0
+            },
+            computed: {
+                canComputeMoney: function () {
+                    return {
+                        userInfo: this.userInfo,
+                        details: this.details
+                    };
+                }
+            },
+            watch: {
+                canComputeMoney: function (value) {
+                    if (value.userInfo && value.details.price) {
+                        this.payMoney = value.userInfo.level ? value.details.member_price : value.details.price;
+                        if (!value.userInfo.level) {
+                            this.memberReduce = Decimal.sub(value.details.price, value.details.member_price);
+                        }
+                    }
+                },
+                priceId: function (value) {
+                    var result;
+                    for (var i = 0; i < this.price.length; i++) {
+                        if (this.price[i].id === value) {
+                            result = this.price[i];
+                            break;
+                        }
+                    }
+                    this.payMoney = this.userInfo.level ? result.event_mer_price : result.event_price;
+                    this.qrcodeShow = false;
+                    if (!this.userInfo.level) {
+                        this.memberReduce = Decimal.sub(result.event_price, result.event_mer_price);
+                    }
+                },
+                payType: function () {
+                    this.qrcodeShow = false;
+                },
+                qrcodeShow: function (value) {
+                    if (!value && this.timer) {
+                        clearInterval(this.timer);
+                        this.timer = null;
+                        this.count = 0;
+                    }
+                },
+                event: {
+                    handler: function () {
+                        this.qrcodeShow = false;
+                    },
+                    deep: true
+                }
+            },
+            created: function () {
+                this.id = util.getParmas('id');
+                this.activity_details();
+                this.getActivityEventData();
+                this.getActivityEventPrice();
+            },
+            methods: {
+                successConfirm: function () {
+                    window.location.assign(this.$router.user + '?activeName=activity');
+                },
+                activity_details: function () {
+                    var vm = this;
+                    activityApi.activity_details({
+                        id: this.id
+                    }).then(function (res) {
+                        vm.details = res.data;
+                    });
+                },
+                getActivityEventData: function () {
+                    var vm = this;
+                    activityApi.getActivityEventData({
+                        id: this.id
+                    }).then(function (res) {
+                        var data = res.data;
+                        data.forEach(function (item) {
+                            item.eventValue = item.event_value.split('#');
+                            item.event_value = item.event_type == 3 ? [] : '';
+                        });
+                        vm.event = data;
+                    });
+                },
+                getActivityEventPrice: function () {
+                    var vm = this;
+                    activityApi.getActivityEventPrice({
+                        id: this.id
+                    }).then(function (res) {
+                        vm.price = res.data;
+                    });
+                },
+                // 创建订单
+                create_order: function () {
+                    var vm = this;
+                    for (var i = 0, len = this.event.length; i < len; i++) {
+                        if (!this.event[i].is_required) {
+                            continue;
+                        }
+                        switch (this.event[i].event_type) {
+                            case 1:
+                                if (!this.event[i].event_value) {
+                                    this.$message('请输入' + this.event[i].event_name);
+                                    return;
+                                }
+                                break;
+                            case 2:
+                            case 3:
+                            case 5:
+                                if (!this.event[i].event_value) {
+                                    this.$message('请选择' + this.event[i].event_name);
+                                    return;
+                                }
+                                break;
+                            case 4:
+                                if (!this.event[i].event_value) {
+                                    this.$message('请输入' + this.event[i].event_name);
+                                    return;
+                                } else if (!/^(?:(?:\+|00)86)?1[3-9]\d{9}$/.test(this.event[i].event_value)) {
+                                    this.$message('请输入正确的' + this.event[i].event_name);
+                                    return;
+                                }
+                                break;
+                        }
+                    }
+                    if (!this.priceId) {
+                        this.$message('请选择参加人数');
+                    } else {
+                        this.event.forEach(function (item) {
+                            if (item.event_type == 3) {
+                                item.event_value = item.event_value.join();
+                            }
+                        });
+                        authApi.create_order({
+                            special_id: this.id,
+                            pay_type_num: 20,
+                            payType: this.payType,
+                            price_id: this.priceId,
+                            event: this.event
+                        }).then(function (res) {
+                            var data = res.data;
+                            switch (data.status) {
+                                case 'SUCCESS':
+                                    vm.dialogVisible = true;
+                                    break;
+                                case 'WECHAT_PAY':
+                                case 'ZHIFUBAO_PAY':
+                                    vm.qrcodeShow = true;
+                                    if (vm.qrcode) {
+                                        vm.qrcode.makeCode(data.result.jsConfig);
+                                    } else {
+                                        vm.qrcode = new QRCode(vm.$refs.qrcode, data.result.jsConfig);
+                                    }
+                                    vm.testing_order_state(data.result.orderId);
+                                    break;
+                                default:
+                                    vm.$message.error(res.msg);
+                                    break;
+                            }
+                        }).catch(function (err) {
+                            vm.$message.error(err.msg);
+                        });
+                    }
+                },
+                // 扫码支付回调
+                testing_order_state: function (orderId) {
+                    var vm = this;
+                    this.timer = setInterval(function () {
+                        // 最多回调12次
+                        if (vm.count < 12) {
+                            vm.count++;
+                            authApi.testing_order_state({
+                                order_id: orderId,
+                                type: 4
+                            }).then(function (res) {
+                                if (res.data == 1) {
+                                    clearInterval(vm.timer);
+                                    vm.timer = null;
+                                    vm.count = 0;
+                                    vm.dialogVisible = true;
+                                }
+                            }).catch(function (err) {
+                                vm.$message.error(err.msg);
+                            });
+                        } else {
+                            clearInterval(vm.timer);
+                            vm.timer = null;
+                            vm.count = 0;
+                        }
+                    }, 5000);
+                }
+            }
+        });
+    });
+</script>
+{/block}

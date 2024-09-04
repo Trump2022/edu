@@ -1,0 +1,422 @@
+{extend name="public/container" /}
+{block name="title"}{$title}{/block}
+{block name="style"}
+<style>
+    .question-list .el-breadcrumb {
+        width: 1200px;
+        margin: 30px auto 24px;
+    }
+
+    .question-list .category {
+        width: 1200px;
+        border-radius: 4px;
+        margin: 0 auto;
+        background-color: #FFFFFF;
+    }
+
+    .question-list .question {
+        width: 1200px;
+        margin: 25px auto 50px;
+    }
+
+    .question-list .question .list {
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        margin: 0 -20px -20px 0;
+    }
+
+    .question-list .question .list .item {
+        width: 285px;
+        border-radius: 8px;
+        margin: 0 20px 20px 0;
+        background-color: #FFFFFF;
+        transition: 0.3s;
+    }
+
+    .question-list .question .list .item:hover {
+        box-shadow: 0 2px 16px rgba(79, 109, 143, 0.12);
+        transform: translateY(-5px);
+    }
+
+    .question-list .question .list .item .image {
+        display: block;
+        width: 285px;
+        height: 160px;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .question-list .question .list .item .title {
+        padding: 15px 20px 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        font-size: 18px;
+        line-height: 24px;
+        color: #282828;
+    }
+
+    .question-list .question .list .item .money {
+        padding: 12px 20px 0;
+        font-size: 14px;
+        color: #FF6B00;
+    }
+
+    .question-list .question .list .item .money .number {
+        font-size: 22px;
+        line-height: 29px;
+    }
+
+    .question-list .question .list .item .free {
+        padding: 12px 20px 3px;
+        font-size: 20px;
+        line-height: 26px;
+        color: #FF6B00;
+    }
+
+    .question-list .question .list .item .people {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 20px 16px;
+        font-size: 14px;
+        line-height: 19px;
+        color: #999999;
+    }
+
+    .question-list .question .list .item .button {
+        width: 70px;
+        height: 26px;
+        border-radius: 18px;
+        background-color: #2C8EFF;
+        text-align: center;
+        font-size: 14px;
+        line-height: 26px;
+        color: #FFFFFF;
+    }
+
+    .question-list .question .list .item .button .iconfont {
+        margin-right: 6px;
+        font-size: 14px;
+    }
+
+    .question-list .question .problem-list .item {
+        position: relative;
+        width: 390px;
+        height: 200px;
+        padding-bottom: 89px;
+        border-radius: 8px;
+        margin: 0 15px 15px 0;
+        background-color: #FFFFFF;
+        transition: 0.3s;
+    }
+
+    .question-list .question .problem-list {
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        margin: 0 -15px -15px 0;
+    }
+
+    .question-list .question .problem-list .item:hover {
+        box-shadow: 0 2px 16px rgba(79, 109, 143, 0.12);
+        transform: translateY(-5px);
+    }
+
+    .question-list .question .problem-list .item .title {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        padding: 20px 20px 0;
+        overflow: hidden;
+        font-size: 18px;
+        line-height: 27px;
+        color: #282828;
+    }
+
+    .question-list .question .problem-list .item .money {
+        padding: 12px 20px 0;
+        font-size: 14px;
+        color: #FF6B00;
+    }
+
+    .question-list .question .problem-list .item .money .number {
+        font-size: 22px;
+        line-height: 29px;
+    }
+
+    .question-list .question .problem-list .item .free {
+        padding: 12px 20px 3px;
+        font-size: 20px;
+        line-height: 26px;
+        color: #FF6B00;
+    }
+
+    .question-list .question .problem-list .item .people {
+        padding: 18px 20px 0;
+        font-size: 14px;
+        line-height: 19px;
+        color: #999999;
+    }
+
+    .question-list .question .problem-list .item .people .number {
+        margin-right: 13px;
+        color: #FF6B00;
+    }
+
+    .question-list .question .problem-list .item .button {
+        position: absolute;
+        bottom: 29px;
+        left: 20px;
+        width: 92px;
+        height: 30px;
+        border-radius: 15px;
+        background-color: #2C8EFF;
+        text-align: center;
+        font-size: 14px;
+        line-height: 30px;
+        color: #FFFFFF;
+    }
+
+    .question-list .question .problem-list .item .button .iconfont {
+        margin-right: 6px;
+        font-size: 14px;
+    }
+
+    .question-list .el-pagination {
+        margin: 70px 0 50px;
+    }
+</style>
+{/block}
+{block name="app"}
+<div v-cloak id="app">
+    <base-header :public-data="publicData" :user-info="userInfo"></base-header>
+    <div class="question-list">
+        <div class="courseClassificationList category" style="margin-top: 30px;">
+            <div class="courseClassificationList_item">
+                <div class="courseClassificationList_item_title">
+                    <span>一级分类：</span>
+                </div>
+                <div ref="itemContent1" :class="{ autoHeight: flag1 }" class="courseClassificationList_item_content">
+                    <div class="content_item" v-for="item in category" :key="item.id" :class="{ on: item.id === pid }" @click="handleCategory(item)">
+                        <span class="content_item_value">{{ item.title }}</span>
+                    </div>
+                </div>
+                <div v-if="hasMore1" class="courseClassificationList_item_morethan" @click="handleShowMoreThan(1)">
+                    <span>更多</span>
+                    <i :class="[flag1 ? 'el-icon-arrow-up' : 'el-icon-arrow-down']"></i>
+                </div>
+            </div>
+            <div class="courseClassificationList_item">
+                <div class="courseClassificationList_item_title">
+                    <span>二级分类：</span>
+                </div>
+                <div ref="itemContent2" :class="{ autoHeight: flag2 }" class="courseClassificationList_item_content">
+                    <div class="content_item" v-for="item in children" :key="item.id" :class="{ on: item.id === tid }" @click="handleChildren(item)">
+                        <span class="content_item_value">{{ item.title }}</span>
+                    </div>
+                </div>
+                <div v-if="hasMore2" class="courseClassificationList_item_morethan" @click="handleShowMoreThan(2)">
+                    <span>更多</span>
+                    <i :class="[flag2 ? 'el-icon-arrow-up' : 'el-icon-arrow-down']"></i>
+                </div>
+            </div>
+        </div>
+        <div class="question">
+            <template v-if="type == 1">
+                <div v-if="paper.length" class="problem-list">
+                    <a v-for="item in paper" :key="item.id" class="item" :href="$router.problem_index + '?id=' + item.id">
+                        <div class="title">{{ item.title }}</div>
+                        <div class="people">
+                            <span class="number">共{{ item.item_number }}题</span>
+                            {{ item.count }}人已答题
+                        </div>
+                        <div class="button"><i class="iconfont icon-19-lianxi"></i>练习</div>
+                    </a>
+                </div>
+            </template>
+            <template v-if="type == 2">
+                <div v-if="paper.length" class="list">
+                    <a v-for="item in paper" :key="item.id" class="item" :href="$router.question_index + '?id=' + item.id">
+                        <img :src="item.image" class="image">
+                        <div class="title">{{ item.title }}</div>
+                        <div v-if="item.pay_type" class="money">￥<span class="number">{{ item.money }}</span></div>
+                        <div v-else class="free">免费</div>
+                        <div class="people">
+                            <div>{{ item.count }}人已答题</div>
+                            <div class="button"><i class="iconfont icon-19-lianxi"></i>答题</div>
+                        </div>
+                    </a>
+                </div>
+            </template>
+            <el-pagination :page-size="limit" :total="total" :current-page.sync="page" layout="prev, pager, next" prev-text="上一页" next-text="下一页" hide-on-single-page>
+            </el-pagination>
+            <el-empty v-if="!paper.length && finished" description=" "></el-empty>
+        </div>
+    </div>
+    <base-footer :public-data="publicData"></base-footer>
+    <base-login :public-data="publicData" :agree-content="agreeContent"></base-login>
+    <base-agree :agree-content="agreeContent"></base-agree>
+</div>
+{/block}
+{block name="vm"}
+<script>
+    require([
+        'vue',
+        'ELEMENT',
+        'components/base-header/index',
+        'components/base-footer/index',
+        'components/base-login/index',
+        'components/base-agree/index',
+        'mixins/base',
+        'router/index',
+        'api/topic',
+        'css!styles/classification.css'
+    ], function (
+        Vue,
+        ELEMENT,
+        BaseHeader,
+        BaseFooter,
+        BaseLogin,
+        BaseAgree,
+        baseMixin,
+        router,
+        topicApi,
+    ) {
+        Vue.use(ELEMENT);
+        Vue.use(router);
+        var type = {$type};
+        new Vue({
+            el: '#app',
+            components: {
+                'base-header': BaseHeader,
+                'base-footer': BaseFooter,
+                'base-login': BaseLogin,
+                'base-agree': BaseAgree,
+            },
+            mixins: [baseMixin],
+            data: {
+                type: type,
+                category: [
+                    {
+                        title: '全部',
+                        pid: 0,
+                        id: 0,
+                        children: []
+                    }
+                ],
+                children: [],
+                pid: -1,
+                tid: -1,
+                page: 1,
+                limit: type == 1 ? 15 : 16,
+                search: '',
+                total: 0,
+                paper: [],
+                finished: false,
+                flag1: false,
+                flag2: false,
+                hasMore1: false,
+                hasMore2: false,
+                filterData: {}
+            },
+            computed: {
+
+            },
+            watch: {
+                category: function (value) {
+                    this.pid = value[0].id;
+                    this.children = [
+                        {
+                            title: '全部',
+                            pid: 0,
+                            id: 0
+                        }
+                    ].concat(value[0].children);
+                },
+                children: function (value) {
+                    this.$nextTick(function () {
+                        this.hasMore2 = this.$refs.itemContent2.offsetHeight !== this.$refs.itemContent2.scrollHeight;
+                    });
+                    this.tid = value[0].id;
+                    this.page = 1;
+                    this.paper = [];
+                    this.finished = false;
+                    this.getPaper();
+                },
+                page: function () {
+                    this.getPaper();
+                }
+            },
+            created: function () {
+                this.getCategory();
+            },
+            methods: {
+                // 分类
+                getCategory: function () {
+                    var vm = this;
+                    topicApi.testPaperCate({
+                        type: this.type
+                    }).then(function (res) {
+                        vm.category = vm.category.concat(res.data.cateogry);
+                        vm.category[0].children = res.data.children;
+                        vm.$nextTick(function () {
+                            this.hasMore1 = this.$refs.itemContent1.offsetHeight !== this.$refs.itemContent1.scrollHeight;
+                        });
+                    });
+                },
+                getPaper: function () {
+                    var vm = this;
+                    topicApi.practiceList(this.type, {
+                        page: this.page,
+                        limit: this.limit,
+                        pid: this.pid,
+                        tid: this.tid,
+                        search: this.search
+                    }).then(function (res) {
+                        var data = res.data;
+                        vm.total = data.count;
+                        vm.paper = data.data;
+                        vm.finished = vm.limit > vm.paper.length;
+                    });
+                },
+                handleCategory: function (category) {
+                    this.pid = category.id;
+                    this.children = [
+                        {
+                            title: '全部',
+                            pid: 0,
+                            id: 0
+                        }
+                    ].concat(category.children);
+                    this.page = 1;
+                    this.paper = [];
+                    this.finished = false;
+                    this.getPaper();
+                },
+                handleChildren: function (children) {
+                    this.tid = children.id;
+                    this.page = 1;
+                    this.paper = [];
+                    this.finished = false;
+                    this.getPaper();
+                },
+                // 更多
+                handleShowMoreThan: function (state) {
+                    if (state === 1) {
+                        if (this.$refs.itemContent1.scrollHeight === this.$refs.itemContent1.offsetHeight && !this.flag1) {
+                            return;
+                        }
+                        this.flag1 = !this.flag1;
+                    } else if (state === 2) {
+                        if (this.$refs.itemContent2.scrollHeight === this.$refs.itemContent2.offsetHeight && !this.flag2) {
+                            return;
+                        }
+                        this.flag2 = !this.flag2;
+                    }
+                },
+            }
+        });
+    });
+</script>
+{/block}

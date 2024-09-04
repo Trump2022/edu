@@ -1,0 +1,717 @@
+{extend name="public/container" /}
+{block name="title"}{$titles}{/block}
+{block name="style"}
+<style>
+    .question-detail .el-breadcrumb {
+        width: 1200px;
+        margin: 30px auto 24px;
+    }
+
+    .question-detail .main {
+        display: flex;
+        width: 1200px;
+        margin: 0 auto 40px;
+    }
+
+    .question-detail .sheet {
+        width: 290px;
+        margin-right: 20px;
+    }
+
+    .question-detail .sheet-inner {
+        position: relative;
+        width: 290px;
+    }
+
+    .question-detail .sheet-inner.fixed {
+        position: fixed;
+        top: 0;
+        z-index: 2;
+    }
+
+    .question-detail .timer {
+        padding: 22px 25px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        background-color: #FFFFFF;
+    }
+
+    .question-detail .timer-head {
+        text-align: center;
+        font-size: 14px;
+        line-height: 19px;
+        color: #282828;
+    }
+
+    .question-detail .timer-head .iconfont {
+        margin-right: 12px;
+        font-size: 15px;
+        color: #FF6B00;
+    }
+
+    .question-detail .timer-body {
+        height: 44px;
+        border-radius: 4px;
+        margin-top: 14px;
+        background-color: #F2F8FF;
+        text-align: center;
+        font-size: 24px;
+        line-height: 44px;
+        color: #2C8EFF;
+    }
+
+    .question-detail .sheet .answer {
+        border-radius: 4px;
+        margin-bottom: 20px;
+        background-color: #FFFFFF;
+    }
+
+    .question-detail .sheet .answer-head {
+        padding: 20px 0 40px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 16px;
+        line-height: 21px;
+        color: #282828;
+    }
+
+    .question-detail .sheet .answer-body {
+        height: 377px;
+        padding-left: 19px;
+        overflow: auto;
+    }
+
+    .question-detail .sheet .answer-body ul {
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+    }
+
+    .question-detail .sheet .answer-body li {
+        width: 40px;
+        height: 40px;
+        border: 1px solid #AAAAAA;
+        border-radius: 4px;
+        margin: 0 13px 14px 0;
+        background-color: #F5F5F5;
+        text-align: center;
+        font-size: 16px;
+        line-height: 40px;
+        color: #999999;
+    }
+
+    .question-detail .sheet .answer-body li.active {
+        border-color: #2C8EFF;
+        background-color: #F2F8FF;
+        color: #2C8EFF;
+    }
+
+    .question-detail .sheet .answer-body li.ok {
+        border-color: #52A452;
+        background-color: #EBF9EB;
+        color: #52A452;
+    }
+
+    .question-detail .sheet .answer-body li.no {
+        border-color: #FF6B00;
+        background-color: #FFF0E5;
+        color: #FF6B00;
+    }
+
+    .question-detail .sheet .answer-foot {
+        position: relative;
+        display: flex;
+        align-items: center;
+        padding: 12px 20px;
+    }
+
+    .question-detail .sheet .answer-foot::before {
+        content: " ";
+        position: absolute;
+        top: 0;
+        right: 20px;
+        left: 20px;
+        z-index: 2;
+        height: 1px;
+        border-top: 1px dashed #EEEEEE;
+        color: #EEEEEE;
+    }
+
+    .question-detail .sheet .answer-foot .wrap {
+        margin-right: 18px;
+        font-size: 12px;
+        line-height: 16px;
+        color: #282828;
+    }
+
+    .question-detail .sheet .answer-foot .wrap::before {
+        content: " ";
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border: 1px solid #AAAAAA;
+        border-radius: 2px;
+        margin-right: 8px;
+        background-color: #F5F5F5;
+        vertical-align: text-bottom;
+    }
+
+    .question-detail .sheet .answer-foot .wrap.wrap1::before {
+        border-color: #2C8EFF;
+        background-color: #F2F8FF;
+    }
+
+    .question-detail .sheet .answer-foot .wrap.wrap2::before {
+        border-color: #52A452;
+        background-color: #EBF9EB;
+    }
+
+    .question-detail .sheet .answer-foot .wrap.wrap3::before {
+        border-color: #FF6B00;
+        background-color: #FFF0E5;
+    }
+
+    .question-detail .sheet button {
+        width: 100%;
+        height: 42px;
+        border: none;
+        border-radius: 4px;
+        background-color: #2C8EFF;
+        font-size: 14px;
+        color: #FFFFFF;
+    }
+
+    .question-detail .paper {
+        flex: 1;
+        min-width: 0;
+        border-radius: 4px;
+        background-color: #FFFFFF;
+    }
+
+    .question-detail .paper-title {
+        padding: 25px 30px;
+        border-bottom: 1px solid #DDDDDD;
+        font-size: 16px;
+        line-height: 21px;
+        color: #282828;
+    }
+
+    .question-detail .paper-title span {
+        font-size: 12px;
+        color: #999999;
+    }
+
+    .question-detail .questions {
+        padding: 0 30px;
+    }
+
+    .question-detail .question {
+        padding: 30px 0;
+        border-bottom: 1px dashed #E2E2E2;
+    }
+
+    .question-detail .question:last-child {
+        border-bottom: none;
+    }
+
+    .question-detail .question-title {
+        display: flex;
+        margin-bottom: 28px;
+        word-break: break-all;
+        font-size: 16px;
+        line-height: 21px;
+        color: #282828;
+    }
+
+    .question-detail .question-title span {
+        display: inline-block;
+        height: 20px;
+        padding: 0 10px;
+        border-radius: 10px;
+        background-color: #F2F8FF;
+        font-size: 12px;
+        line-height: 20px;
+        color: #2C8EFF;
+    }
+
+    .question-detail .question-image {
+        width: 380px;
+        height: 266px;
+        margin-bottom: 22px;
+    }
+
+    .question-detail .question-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .question-detail .options .option {
+        display: flex;
+        margin-bottom: 22px;
+        font-size: 14px;
+        line-height: 19px;
+        color: #666666;
+    }
+
+    .question-detail .options .option:last-child {
+        margin-bottom: 0;
+    }
+
+    .question-detail .options .option label {
+        margin-right: 10px;
+    }
+
+    .question-detail .options .option input+span {
+        display: block;
+        width: 28px;
+        height: 28px;
+        border: 1px solid #BBBBBB;
+        border-radius: 50%;
+        text-align: center;
+        font-size: 14px;
+        line-height: 28px;
+        color: #999999;
+    }
+
+    .question-detail .options .option input:checked+span {
+        border-color: #2C8EFF;
+        background-color: #2C8EFF;
+        color: #FFFFFF;
+    }
+
+    .question-detail .options .option input+span.ok {
+        border-color: #52A452;
+        background-color: #52A452;
+        color: #FFFFFF;
+    }
+
+    .question-detail .options .option input+span.no {
+        border-color: #FF6B00;
+        background-color: #FF6B00;
+        color: #FFFFFF;
+    }
+
+    .question-detail .options .option div {
+        flex: 1;
+        margin-top: 5px;
+        word-break: break-all;
+        font-size: 14px;
+        line-height: 19px;
+        color: #666666;
+    }
+
+    .question-detail .images {
+        display: flex;
+        flex-wrap: wrap;
+        width: 450px;
+    }
+
+    .question-detail .images .option {
+        width: 205px;
+        margin: 0 20px 25px 0;
+    }
+
+    .question-detail .images .option img {
+        display: block;
+        width: 205px;
+        height: 144px;
+    }
+
+    .question-detail .images .option label {
+        display: block;
+        width: 28px;
+        height: 28px;
+        margin: 12px auto 0;
+    }
+
+    .question-detail .images .option input+span {
+        display: block;
+        width: 28px;
+        height: 28px;
+        border: 1px solid #BBBBBB;
+        border-radius: 50%;
+        text-align: center;
+        font-size: 14px;
+        line-height: 28px;
+        color: #999999;
+    }
+
+    .question-detail .images .option input:checked+span {
+        border-color: #2C8EFF;
+        background-color: #2C8EFF;
+        color: #FFFFFF;
+    }
+
+    .question-detail .question button {
+        height: 30px;
+        padding: 0 14px;
+        border: 1px solid #2C8EFF;
+        border-radius: 3px;
+        margin-top: 25px;
+        background-color: #2C8EFF;
+        font-size: 12px;
+        line-height: 30px;
+        color: #FFFFFF;
+    }
+
+    .question-detail .question button:disabled {
+        border-color: #AAAAAA;
+        background-color: #F5F5F5;
+        color: #999999;
+        cursor: not-allowed;
+    }
+
+    .question-detail .analysis {
+        padding: 20px;
+        margin-top: 20px;
+        background-color: rgba(255, 107, 0, 0.04);
+    }
+
+    .question-detail .analysis .upper {
+        font-size: 16px;
+        line-height: 21px;
+        color: #FF6B00;
+    }
+
+    .question-detail .analysis .upper .iconfont {
+        margin-right: 10px;
+        vertical-align: middle;
+        font-size: 22px;
+    }
+
+    .question-detail .analysis .answer,
+    .question-detail .analysis .degree {
+        margin-top: 16px;
+        font-size: 14px;
+        line-height: 19px;
+        color: #282828;
+    }
+
+    .question-detail .analysis .answer .value {
+        margin-left: 11px;
+        color: #52A452;
+    }
+
+    .question-detail .analysis .checked .value {
+        color: #2C8EFF;
+    }
+
+    .question-detail .analysis .degree .iconfont {
+        margin-left: 5px;
+        vertical-align: top;
+        font-size: 10px;
+        color: #FF6B00;
+    }
+
+    .question-detail .analysis .degree .iconfont:first-child {
+        margin-left: 11px;
+    }
+
+    .question-detail .analysis .content {
+        display: flex;
+        margin-top: 16px;
+        font-size: 14px;
+        line-height: 22px;
+        color: #676767;
+    }
+
+    .question-detail .analysis .content .value {
+        flex: 1;
+        min-width: 0;
+        margin-left: 11px;
+        word-break: break-all;
+        color: #282828;
+    }
+
+    .question-detail .analysis .content img {
+        display: block;
+        width: 100%;
+    }
+
+    .question-detail .analysis .special {
+        padding-top: 20px;
+        border-top: 1px dashed rgba(255, 107, 0, 0.3);
+        margin-top: 20px;
+        font-size: 14px;
+        line-height: 19px;
+        color: #676767;
+    }
+
+    .question-detail .analysis .special .value {
+        margin-top: 9px;
+    }
+
+    .question-detail .analysis .special .item {
+        display: inline-block;
+        max-width: 200px;
+        margin-right: 28px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        color: #282828;
+    }
+
+    .question-detail .analysis .special .item:hover {
+        color: #2C8EFF;
+    }
+
+    .question-detail .analysis.correct {
+        background-color: rgba(82, 164, 82, 0.05);
+    }
+
+    .question-detail .analysis.correct .upper {
+        color: #52A452;
+    }
+
+    .question-detail .analysis.correct .special {
+        border-color: rgba(82, 164, 82, 0.3);
+    }
+</style>
+{/block}
+{block name="app"}
+<div v-cloak id="app" class="question-detail">
+    <base-header :public-data="publicData" :user-info="userInfo"></base-header>
+    <el-breadcrumb separator-class="el-icon-arrow-right">
+        <el-breadcrumb-item><a :href="$router.home">首页</a></el-breadcrumb-item>
+        <el-breadcrumb-item><a :href="$router.question_category + '?type=1'">练习列表</a></el-breadcrumb-item>
+        <el-breadcrumb-item>{$titles}</el-breadcrumb-item>
+    </el-breadcrumb>
+    <div class="main">
+        <div ref="sheet" class="sheet">
+            <div :class="{ fixed: isFixed }" class="sheet-inner">
+                <div class="answer">
+                    <div class="answer-head">答题卡</div>
+                    <div class="answer-body">
+                        <ul>
+                            <li v-for="(question, index) in questions" :key="question.id"
+                                :class="{ active: question.is_correct, ok: question.is_correct === 2, no: question.is_correct === 1 }">{{ index + 1 }}</li>
+                        </ul>
+                    </div>
+                    <div class="answer-foot">
+                        <div class="wrap wrap2">正确</div>
+                        <div class="wrap wrap3">错误</div>
+                        <div class="wrap wrap4">未答</div>
+                    </div>
+                </div>
+                <button v-if="!isAnalysis" @click="submitPaper">提交并查看结果</button>
+            </div>
+        </div>
+        <div class="paper">
+            <div class="paper-title">
+                {$titles}<span>（共{{ paper.item_number }}题）</span></div>
+            <ul class="questions">
+                <li v-for="(question, index) in questions" :key="question.id" class="question">
+                    <div class="question-title">
+                        <div>{{ index + 1 }}.&nbsp;</div>
+                        <div>{{ question.stem }}<span>{{ question.questionType }}</span></div>
+                    </div>
+                    <div v-if="question.image" class="question-image">
+                        <img :src="question.image">
+                    </div>
+                    <ul v-if="question.is_img" class="images">
+                        <li v-for="(option, key) in question.option" :key="key" class="option">
+                            <img :src="option" alt="">
+                            <label>
+                                <input v-if="question.question_type === 2" v-model="question.user_answer" :value="key" :disabled="isAnalysis || !!question.is_correct"
+                                       type="checkbox" hidden>
+                                <input v-else v-model="question.user_answer" :value="key" type="radio" :disabled="isAnalysis || !!question.is_correct" hidden>
+                                <span>{{ key }}</span>
+                                <!-- <span
+                                      :class="{ ok: key.indexOf(question.user_answer) !== -1 && key.indexOf(question.answer) !== -1, no: key.indexOf(question.user_answer) !== -1 && key.indexOf(question.answer) === -1 }">{{ key }}</span> -->
+                            </label>
+                        </li>
+                    </ul>
+                    <ul v-else class="options">
+                        <li v-for="(option, key) in question.option" :key="key" class="option">
+                            <label>
+                                <input v-if="question.question_type === 2" v-model="question.user_answer" :value="key" :disabled="isAnalysis || !!question.is_correct"
+                                       type="checkbox" hidden>
+                                <input v-else v-model="question.user_answer" :value="key" type="radio" :disabled="isAnalysis || !!question.is_correct" hidden>
+                                <span>{{ key }}</span>
+                                <!-- <span
+                                      :class="{ ok: key.indexOf(question.user_answer) !== -1 && key.indexOf(question.answer) !== -1, no: key.indexOf(question.user_answer) !== -1 && key.indexOf(question.answer) === -1 }">{{ key }}</span> -->
+                            </label>
+                            <div>{{ option }}</div>
+                        </li>
+                    </ul>
+                    <div v-if="isAnalysis || question.is_correct" :class="{ correct: question.is_correct === 2 }" class="analysis">
+                        <div class="upper">
+                            <i :class="question.is_correct === 2 ? 'iconzhengque' : 'iconcuowu'" class="iconfont"></i>
+                            回答{{ question.is_correct === 2 ? '正确' : '错误' }}
+                        </div>
+                        <div class="answer">
+                            正确答案:<span class="value">{{ question.answer }}</span>
+                        </div>
+                        <div class="answer checked">
+                            您的答案:<span class="value">{{ question.user_answer.toString() || '未答' }}</span>
+                        </div>
+                        <div class="degree">
+                            试题难度:<i v-for="star in 5" :key="star" :class="star <= question.difficulty ? 'icondengji-shixin' : 'icondengji-kongxin'" class="iconfont"></i></div>
+                        <div class="content">
+                            <div>答案解析:</div>
+                            <div class="value" v-html="question.analysis"></div>
+                        </div>
+                        <div v-if="question.special.length" class="special">
+                            <div>关联知识点:</div>
+                            <div class="value">
+                                <a v-for="special in question.special" :key="special.id"
+                                   :href="$router[special.is_light ? 'single_detail' : 'special_detail'] + '?id=' + special.id" class="item">{{ special.title }}</a>
+                            </div>
+                        </div>
+                    </div>
+                    <button v-if="!isAnalysis && !question.is_correct" :disabled="!question.user_answer.length" @click="submitQuestion(question)">确认选项</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <base-footer :public-data="publicData"></base-footer>
+    <base-login :public-data="publicData" :agree-content="agreeContent"></base-login>
+    <base-agree :agree-content="agreeContent"></base-agree>
+</div>
+{/block}
+{block name="vm"}
+<script>
+    require([
+        'vue',
+        'ELEMENT',
+        'components/base-header/index',
+        'components/base-footer/index',
+        'components/base-login/index',
+        'components/base-agree/index',
+        'mixins/base',
+        'router/index',
+        'api/topic',
+    ], function (
+        Vue,
+        ELEMENT,
+        BaseHeader,
+        BaseFooter,
+        BaseLogin,
+        BaseAgree,
+        baseMixin,
+        router,
+        topicApi,
+    ) {
+        Vue.use(ELEMENT);
+        Vue.use(router);
+        new Vue({
+            el: '#app',
+            components: {
+                'base-header': BaseHeader,
+                'base-footer': BaseFooter,
+                'base-login': BaseLogin,
+                'base-agree': BaseAgree,
+            },
+            mixins: [baseMixin],
+            data: {
+                isAnalysis: '',
+                recordId: 0,
+                testId: 0,
+                paper: {},
+                questions: [],
+                isFixed: false
+            },
+            created: function () {
+                var vm = this;
+                var search = window.location.search.slice(1);
+                search = search.split('&');
+                var searchObj = {};
+                search.forEach(function (item) {
+                    item = item.split('=');
+                    searchObj[item[0]] = item[1];
+                });
+                this.testId = searchObj.test_id;
+                this.recordId = searchObj.record_id;
+                this.isAnalysis = searchObj.is_analysis;
+                this.getPaper();
+                this.getQuestions();
+                window.addEventListener('scroll', function () {
+                    vm.isFixed = window.scrollY >= vm.$refs.sheet.offsetTop;
+                });
+            },
+            methods: {
+                // 试卷
+                getPaper: function () {
+                    var vm = this;
+                    topicApi.testPaperDetails({
+                        id: this.testId
+                    }).then(function (res) {
+                        vm.paper = res.data;
+                    });
+                },
+                // 试题
+                getQuestions: function () {
+                    var vm = this;
+                    topicApi.testPaperQuestions({
+                        test_id: this.testId,
+                        record_id: this.recordId,
+                        type: 1
+                    }).then(function (res) {
+                        var questions = res.data;
+                        questions.forEach(function (question) {
+                            if (!Array.isArray(question.userAnswer)) {
+                                Object.assign(question, question.userAnswer);
+                            }
+                            if (Array.isArray(question.option)) {
+                                var options = {};
+                                question.option.forEach(function (option, index) {
+                                    options[String.fromCharCode(index + 65)] = option;
+                                });
+                                question.option = options;
+                            }
+                            if (question.is_correct === undefined) {
+                                question.is_correct = 0;
+                            }
+                            if (question.user_answer === undefined) {
+                                question.user_answer = '';
+                            }
+                            switch (question.question_type) {
+                                case 1:
+                                    question.questionType = '单选题';
+                                    break;
+                                case 2:
+                                    question.questionType = '多选题';
+                                    question.user_answer = question.user_answer ? question.user_answer.split(',') : [];
+                                    break;
+                                default:
+                                    question.questionType = '判断题';
+                                    break;
+                            }
+                        });
+                        vm.questions = questions;
+                    });
+                },
+                submitQuestion: function (question) {
+                    var vm = this;
+                    var data = {
+                        test_id: this.testId,
+                        e_id: this.recordId,
+                        questions_id: question.questions_id,
+                        user_answer: question.user_answer,
+                        answer: question.answer,
+                        score: question.score,
+                        type: 1,
+                    };
+                    if (question.question_type === 2) {
+                        data.user_answer.sort();
+                        data.user_answer = data.user_answer.toString();
+                    }
+                    data.is_correct = data.user_answer === data.answer ? 2 : 1;
+                    topicApi.submitQuestions(data).then(function (res) {
+                        question.is_correct = data.is_correct;
+                    });
+                },
+                submitPaper: function () {
+                    var vm = this;
+                    topicApi.submitTestPaper({
+                        examination_id: this.recordId
+                    }).then(function () {
+                        window.location.replace(vm.$router.problem_result + '?test_id=' + vm.testId + '&record_id=' + vm.recordId);
+                    });
+                }
+            }
+        });
+    });
+</script>
+{/block}

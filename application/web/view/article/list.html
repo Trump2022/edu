@@ -1,0 +1,140 @@
+{extend name="public/container"}
+{block name="title"}新闻列表{/block}
+{block name="app"}
+<div v-cloak id="app" class="news-list">
+    <base-header :public-data="publicData" :user-info="userInfo"></base-header>
+    <div class="container">
+        <div class="main">
+            <el-tabs v-model="active" @tab-click="tabClick">
+                <el-tab-pane v-for="item in articleCate" :key="item.id" :label="item.title" :name="'' + item.id"></el-tab-pane>
+            </el-tabs>
+            <div v-if="articleList.length" class="tabs-content">
+                <a v-for="item in articleList" :key="item.id" :href="$router.news_detail + '?id=' + item.id">
+                    <el-image :src="item.image_input" fit="cover"></el-image>
+                    <div>
+                        <div class="title">{{ item.title }}</div>
+                        <div class="info">
+                            <div>{{ item.synopsis }}</div>
+                        </div>
+                        <div><span><i class="el-icon-view"></i>{{ item.visit }}</span><span><i class="el-icon-time"></i>{{ item.add_time }}</span></div>
+                    </div>
+                </a>
+            </div>
+            <el-empty v-else image="{__PUBLIC_WEB_PATH}pc/images/empty9.png" description=" " :image-size="274"></el-empty>
+            <el-pagination :page-size="limit" :total="count" :current-page="page" layout="prev, pager, next" prev-text="上一页" next-text="下一页" hide-on-single-page @current-change="currentChange"></el-pagination>
+        </div>
+        <div class="aside">
+            <el-carousel v-if="newsData.length" height="154px">
+                <el-carousel-item v-for="item in newsData" :key="item.id">
+                    <a :href="item.url">
+                        <el-image :src="item.img" fit="cover"></el-image>
+                    </a>
+                </el-carousel-item>
+            </el-carousel>
+            <div v-if="articleUnifiendList.length" class="latest">
+                <div>最新资讯</div>
+                <div>
+                    <a v-for="(item, index) in articleUnifiendList" :key="item.id" :href="$router.news_detail + '?id=' + item.id">
+                        <span>{{ index + 1 }}</span>{{ item.title }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <base-footer :public-data="publicData"></base-footer>
+    <base-login :public-data="publicData" :agree-content="agreeContent"></base-login>
+    <base-agree :agree-content="agreeContent"></base-agree>
+</div>
+{/block}
+{block name="vm"}
+<script>
+    require([
+        'vue',
+        'ELEMENT',
+        'components/base-header/index',
+        'components/base-footer/index',
+        'components/base-login/index',
+        'components/base-agree/index',
+        'mixins/base',
+        'api/article',
+        'api/auth',
+        'router/index'
+    ], function (Vue, ELEMENT, BaseHeader, BaseFooter, BaseLogin, BaseAgree, baseMixin, articleApi, authApi, router) {
+        Vue.use(ELEMENT);
+        Vue.use(router);
+        var vm = new Vue({
+            el: '#app',
+            components: {
+                'base-header': BaseHeader,
+                'base-footer': BaseFooter,
+                'base-login': BaseLogin,
+                'base-agree': BaseAgree
+            },
+            mixins: [baseMixin],
+            data: {
+                active: '0',
+                articleCate: [],
+                articleList: [],
+                newsData: [],
+                articleUnifiendList: [],
+                page: 1,
+                limit: 10,
+                search: '',
+                count: 0
+            },
+            created: function () {
+                this.get_article_cate();
+                this.get_article_list();
+                this.news_data();
+                this.get_article_unifiend_list();
+            },
+            methods: {
+                get_article_cate: function () {
+                    articleApi.get_article_cate().then(function (res) {
+                        vm.articleCate = res.data;
+                        vm.articleCate.unshift({
+                            id: 0,
+                            title: '全部'
+                        });
+                    });
+                },
+                get_article_list: function () {
+                    articleApi.get_article_list({
+                        page: this.page,
+                        limit: this.limit,
+                        cid: this.active,
+                        search: this.search
+                    }).then(function (res) {
+                        var data = res.data;
+                        vm.count = data.count;
+                        vm.articleList = data.data;
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+                news_data: function () {
+                    articleApi.news_data().then(function (res) {
+                        vm.newsData = res.data.pc_news_list_rotation_chart;
+                    });
+                },
+                get_article_unifiend_list: function () {
+                    authApi.get_article_unifiend_list({
+                        limit: 9,
+                        type: 2
+                    }).then(function (res) {
+                        vm.articleUnifiendList = res.data;
+                    });
+                },
+                tabClick: function () {
+                    this.page = 1;
+                    this.get_article_list();
+                },
+                currentChange: function (val) {
+                    this.page = val;
+                    this.get_article_list();
+                }
+            }
+        });
+    });
+</script>
+{/block}

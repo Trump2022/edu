@@ -1,0 +1,255 @@
+{extend name="public/container"}
+{block name="title"}{$title}{/block}
+{block name="app"}
+<div v-cloak id="app" class="material-details">
+    <base-header :public-data="publicData" :user-info="userInfo"></base-header>
+    <div class="detail">
+        <div class="detail-inner">
+            <el-breadcrumb separator-class="el-icon-arrow-right">
+                <el-breadcrumb-item><a :href="$router.home">首页</a></el-breadcrumb-item>
+                <el-breadcrumb-item><a :href="$router.material_list">资料下载</a></el-breadcrumb-item>
+                <el-breadcrumb-item>资料详情</el-breadcrumb-item>
+            </el-breadcrumb>
+            <el-row :gutter="30">
+                <el-col :span="12">
+                    <el-image :src="details.image" fit="cover"></el-image>
+                </el-col>
+                <el-col :span="12">
+                    <div class="title-favor">
+                        <div class="title">{{ details.title }}</div>
+                    </div>
+                    <div class="money-sale">
+                        <div>价格：</div>
+                        <div class="money-group">
+                            <template v-if="details.pay_type">
+                                <div class="money">￥<span>{{ details.money }}</span></div>
+                                <div class="vip">￥{{ details.member_money }}</div>
+                            </template>
+                            <div v-else class="money free">免费</div>
+                        </div>
+                        <div class="sale">{{ details.ficti + details.sales }}人已下载</div>
+                    </div>
+                    <div class="button-bottom">
+                        <div>
+                            <div class="collect" @click="collect">
+                                <i :class="['iconfont', details.collect ? 'iconshoucang2' : 'iconshoucang11']"></i><span>{{ details.collect ? '已收藏' : '收藏' }}</span>
+                            </div>
+                            <el-popover v-if="mobileUrl" trigger="hover" width="140" popper-class="phone-popper">
+                                <div ref="qrcode" class="qrcode"></div>
+                                <div class="tip">扫一扫，手机继续学</div>
+                                <el-button slot="reference" type="text"><i class="iconfont iconshouji"></i><span>手机端访问</span></el-button>
+                            </el-popover>
+                        </div>
+                        <el-button v-if="!details.pay_type || isPay || (!details.member_pay_type && isMember)" class="download" @click="download">立即下载</el-button>
+                        <el-button v-else class="buy" @click="buy">立即购买</el-button>
+                    </div>
+                </el-col>
+            </el-row>
+        </div>
+    </div>
+    <div class="main">
+        <div class="left">
+            <div class="title">素材详情</div>
+            <div class="content" v-html="details.abstract"></div>
+        </div>
+        <div class="right">
+            <div v-if="lecturer" class="lecturer">
+                <a :href="$router.teacher_detail + '?id=' + lecturer.id">
+                    <div class="lecturer-hd">
+                        <div><img :src="lecturer.lecturer_head" :alt="lecturer.lecturer_name"></div>
+                        <div>
+                            <div class="title">{{ lecturer.lecturer_name }}</div>
+                            <div class="tag-group"><span v-for="item in lecturer.label" class="tag">{{ item }}</span></div>
+                        </div>
+                    </div>
+                    <div class="lecturer-bd">{{ lecturer.explain }}</div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <base-footer :public-data="publicData"></base-footer>
+    <base-login :public-data="publicData" :agree-content="agreeContent"></base-login>
+    <base-agree :agree-content="agreeContent"></base-agree>
+    <!-- 网盘下载弹窗 -->
+    <el-dialog :visible.sync="diskVisible" width="560px" custom-class="disk-dialog">
+        <el-tabs v-model="activeName">
+            <el-tab-pane v-if="type != 2" label="直接下载" name="first">
+                <div class="title">{{ details.title }}</div>
+                <div class="button-wrap">
+                    <el-button @click="down">立即下载</el-button>
+                </div>
+            </el-tab-pane>
+            <el-tab-pane v-if="type != 1" label="网盘下载" name="second">
+                <div class="tip">复制下方链接及提取码到网盘下载</div>
+                <div class="link-pwd">
+                    <div>链接：<a :href="network_disk_link" target="_blank" @click="user_download" @copy="user_download">{{ network_disk_link }}</a></div>
+                    <div>提取码：{{ network_disk_pwd }}</div>
+                </div>
+            </el-tab-pane>
+        </el-tabs>
+    </el-dialog>
+</div>
+{/block}
+{block name="vm"}
+<script>
+    require([
+        'vue',
+        'ELEMENT',
+        'components/base-header/index',
+        'components/base-footer/index',
+        'components/base-login/index',
+        'components/base-agree/index',
+        'api/home',
+        'api/material',
+        'api/auth',
+        'scripts/util',
+        'mixins/base',
+        'router/index',
+        'store/index',
+        'qrcode'
+    ], function (Vue, ELEMENT, BaseHeader, BaseFooter, BaseLogin, BaseAgree, homeApi, materialApi, authApi, util, baseMixin, router, store) {
+        var data = {$data};
+        var siteUrl = '{$site_url}';
+        var isMember = {$is_member};
+        var isPay = '{$isPay}';
+        var mobileUrl = '{$mobile_url}';
+        Vue.use(ELEMENT);
+        Vue.use(router);
+        new Vue({
+            el: '#app',
+            components: {
+                'base-header': BaseHeader,
+                'base-footer': BaseFooter,
+                'base-login': BaseLogin,
+                'base-agree': BaseAgree
+            },
+            mixins: [baseMixin],
+            data: {
+                details: data,
+                type: 0,
+                link: '',
+                network_disk_link: '',
+                network_disk_pwd: '',
+                diskVisible: false,
+                activeName: 'first',
+                isReload: true,
+                mobileUrl: mobileUrl,
+                isMember: isMember,
+                isPay: isPay,
+                lecturer: null
+            },
+            computed: {
+                isDownloadLink: function () {
+                    return this.isLogin && (this.isPay || (!this.details.member_pay_type && this.isMember));
+                }
+            },
+            watch: {
+                type: function (value) {
+                    if (value == 2) {
+                        this.activeName = 'second';
+                    }
+                },
+                isDownloadLink: {
+                    handler: function (value) {
+                        if (value) {
+                            this.get_data_download_link();
+                        }
+                    },
+                    immediate: true
+                }
+            },
+            created: function () {
+                this.getLecturer();
+                this.get_site_service_phone(this.details.mer_id);
+                this.get_kefu_id(this.details.mer_id);
+            },
+            mounted: function () {
+                this.$nextTick(function () {
+                    if (this.mobileUrl) {
+                        new QRCode(this.$refs.qrcode, this.mobileUrl);
+                    }
+                });
+            },
+            methods: {
+                // 下载链接
+                get_data_download_link: function () {
+                    var vm = this;
+                    materialApi.get_data_download_link({
+                        id: this.details.id,
+                        isPay: true
+                    }).then(function (res) {
+                        var data = res.data;
+                        vm.type = data.type;
+                        vm.link = data.link;
+                        vm.network_disk_link = data.network_disk_link;
+                        vm.network_disk_pwd = data.network_disk_pwd;
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+                // 收藏
+                collect: function () {
+                    var vm = this;
+                    homeApi.user_login().then(function () {
+                        materialApi.collect({
+                            id: vm.details.id
+                        }).then(function (res) {
+                            vm.details.collect = !vm.details.collect;
+                            vm.$message.success(vm.details.collect ? '收藏成功' : '取消收藏成功');
+                        }).catch(function (err) {
+                            vm.$message.error(err.msg);
+                        });
+                    }).catch(function (err) {
+                        store.setLoginAction(true);
+                    });
+                },
+                // 下载
+                download: function () {
+                    var vm = this;
+                    homeApi.user_login().then(function () {
+                        vm.diskVisible = true;
+                    }).catch(function (err) {
+                        store.setLoginAction(true);
+                    });
+                },
+                // 直接下载
+                down: function () {
+                    var aEl = document.createElement('a');
+                    aEl.href = this.link;
+                    aEl.download = this.details.title + this.link.slice(this.link.lastIndexOf('.'));
+                    aEl.click();
+                    this.user_download();
+                },
+                // 购买
+                buy: function () {
+                    var vm = this;
+                    homeApi.user_login().then(function () {
+                        window.location.assign(vm.$router.payment + '?type=0&id=' + vm.details.id);
+                    }).catch(function (err) {
+                        store.setLoginAction(true);
+                    });
+                },
+                // 下载记录
+                user_download: function () {
+                    var vm = this;
+                    materialApi.user_download({
+                        id: this.details.id
+                    }).then(function () {
+                        vm.details.sales++;
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+                getLecturer: function () {
+                    var vm = this;
+                    authApi.getLecturer({
+                        mer_id: this.details.mer_id
+                    }).then(function (res) {
+                        vm.lecturer = res.data;
+                    });
+                }
+            }
+        });
+    });
+</script>
+{/block}

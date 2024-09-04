@@ -1,0 +1,309 @@
+{extend name="public/container" /}
+{block name="title"}{$titles}{/block}
+{block name="style"}
+<style>
+    .question-index .paper {
+        width: 900px;
+        padding: 80px 0 20px;
+        border-top: 10px solid #2C8EFF;
+        border-radius: 4px;
+        margin: 70px auto 0;
+        background-color: #FFFFFF;
+        box-shadow: 0 3px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .question-index .paper .title {
+        text-align: center;
+        font-size: 24px;
+        line-height: 31px;
+        color: #282828;
+    }
+
+    .question-index .paper .attribute {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 31px;
+    }
+
+    .question-index .paper .attribute .item {
+        margin-left: 50px;
+        font-size: 14px;
+        line-height: 19px;
+        color: #999999;
+    }
+
+    .question-index .paper .attribute .item:first-child {
+        margin-left: 0;
+    }
+
+    .question-index .paper .attribute .number,
+    .question-index .paper .attribute .difficulty {
+        color: #666666;
+    }
+
+    .question-index .paper .attribute .number span {
+        margin-left: 10px;
+        color: #2C8EFF;
+    }
+
+    .question-index .paper .attribute .difficulty .iconfont {
+        margin-left: 5px;
+        font-size: 14px;
+        color: #FFF0E5;
+    }
+
+    .question-index .paper .attribute .difficulty .iconfont:first-child {
+        margin-left: 10px;
+    }
+
+    .question-index .paper .attribute .difficulty .icondengji-shixin {
+        color: #FF6B00;
+    }
+
+    .question-index .paper .summary {
+        position: relative;
+        padding: 48px 120px 0;
+        margin-top: 37px;
+    }
+
+    .question-index .paper .summary::before {
+        content: " ";
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 50px;
+        height: 3px;
+        background-color: rgba(255, 107, 0, 0.3);
+        transform: translateX(-50%);
+    }
+
+    .question-index .paper .summary-head {
+        font-size: 14px;
+        line-height: 19px;
+        color: #282828;
+    }
+
+    .question-index .paper .summary-body {
+        margin-top: 9px;
+        font-size: 12px;
+        line-height: 16px;
+        color: #666666;
+    }
+
+    .question-index .paper .notice {
+        padding: 0 120px;
+        margin-top: 30px;
+    }
+
+    .question-index .paper .notice-head {
+        font-size: 14px;
+        line-height: 19px;
+        color: #282828;
+    }
+
+    .question-index .paper .notice-body {
+        margin-top: 9px;
+        font-size: 12px;
+        line-height: 20px;
+        color: #666666;
+    }
+
+    .question-index .paper .button {
+        display: block;
+        width: 660px;
+        height: 60px;
+        border: none;
+        border-radius: 30px;
+        margin: 34px auto 0;
+        background-color: #2C8EFF;
+        font-size: 16px;
+        color: #FFFFFF;
+    }
+
+    .question-index .paper .button div {
+        display: inline-block;
+    }
+
+    .question-index .paper .back {
+        padding: 20px 0;
+        text-align: center;
+    }
+
+    .question-index .paper .back a {
+        display: inline-block;
+        font-size: 14px;
+        line-height: 19px;
+        color: #2C8EFF;
+    }
+
+    .question-index .paper .back .iconfont {
+        margin-left: 5px;
+        vertical-align: top;
+        font-size: 9px;
+    }
+</style>
+{/block}
+{block name="app"}
+<div v-cloak id="app" class="question-index">
+    <base-header :public-data="publicData" :user-info="userInfo"></base-header>
+    <div class="paper">
+        <div class="title">{{ paper.title }}</div>
+        <div class="attribute">
+            <div class="item number">试题数<span>共{{ paper.item_number }}题</span></div>
+            <div class="item difficulty">试题难度<i v-for="item in 5" :key="item" :class="item <= paper.difficulty ? 'icondengji-shixin' : 'icondengji-kongxin'" class="iconfont"></i>
+            </div>
+            <div class="item">{{ paper.answer + paper.fake_sales }}人已答题</div>
+        </div>
+        <div class="summary">
+            <div class="summary-head">题型介绍</div>
+            <div class="summary-body">单项选择题（选项中只有1个正确答案)；多项选择题（选项中至少有2个正确答案)；判断题（选项中只有1个正确答案)。</div>
+        </div>
+        <div class="notice">
+            <div class="notice-head">考前必读</div>
+            <div class="notice-body">
+                <div>1.答题者准备好后，可点击“开始做题”按钮开始考试；</div>
+                <div>2.做题前可看题目后的标签，明白此题是单选、多选还是判断；</div>
+                <div>3.答题卡可查看该题是‘已答’或‘未答’状态；</div>
+                <div>4.作答完所有的题目点击“提交并查看结果”按钮，即可查看自己的考试结果。</div>
+            </div>
+        </div>
+        <button class="button" @click="handleAnswer">{{ status ? (status == 1 ? '继续' : '再次') : '开始' }}答题</button>
+        <div class="back">
+            <a :href="$router.question_category + '?type=1'">返回试题列表<i class="iconfont iconxiangyou"></i></a>
+        </div>
+    </div>
+    <base-login :public-data="publicData" :agree-content="agreeContent"></base-login>
+    <base-agree :agree-content="agreeContent"></base-agree>
+</div>
+{/block}
+{block name="vm"}
+<script>
+    require([
+        'vue',
+        'ELEMENT',
+        'components/base-header/index',
+        'components/base-footer/index',
+        'components/base-login/index',
+        'components/base-agree/index',
+        'mixins/base',
+        'router/index',
+        'store/index',
+        'api/topic',
+        'api/home',
+    ], function (
+        Vue,
+        ELEMENT,
+        BaseHeader,
+        BaseFooter,
+        BaseLogin,
+        BaseAgree,
+        baseMixin,
+        router,
+        store,
+        topicApi,
+        homeApi,
+    ) {
+        var id = {$id};
+        Vue.use(ELEMENT);
+        Vue.use(router);
+        new Vue({
+            el: '#app',
+            components: {
+                'base-header': BaseHeader,
+                'base-footer': BaseFooter,
+                'base-login': BaseLogin,
+                'base-agree': BaseAgree,
+            },
+            mixins: [baseMixin],
+            data: {
+                paper: {
+                    item_number: 0
+                },
+                status: 0,
+            },
+            watch: {
+                userInfo: function (value) {
+                    if (value) {
+                        this.getStatus();
+                    }
+                }
+            },
+            created: function () {
+                this.getPaper();
+            },
+            methods: {
+                getPaper: function () {
+                    var vm = this;
+                    topicApi.testPaperDetails({
+                        id: id
+                    }).then(function (res) {
+                        vm.paper = res.data;
+                    });
+                },
+                getStatus: function () {
+                    var vm = this;
+                    topicApi.situationRecord({
+                        id: id
+                    }).then(function (res) {
+                        vm.status = res.data;
+                    });
+                },
+                // 开始答题
+                getAnswer: function () {
+                    var vm = this;
+                    topicApi.userAnswer({
+                        test_id: id
+                    }).then(function (res) {
+                        vm.record_id = res.data;
+                        vm.goProblem();
+                    });
+                },
+                // 再次答题
+                getAnswerAgain: function () {
+                    var vm = this;
+                    topicApi.takeTheTestAgain({
+                        test_id: id
+                    }).then(function (res) {
+                        vm.record_id = res.data;
+                        vm.goProblem();
+                    });
+                },
+                // 继续答题
+                getAnswerContinue: function () {
+                    var vm = this;
+                    topicApi.continueAnswer({
+                        test_id: id
+                    }).then(function (res) {
+                        vm.record_id = res.data;
+                        vm.goProblem();
+                    });
+                },
+                // 答题
+                handleAnswer: function () {
+                    var vm = this;
+                    homeApi.user_login().then(function () {
+                        switch (vm.status) {
+                            case 1:
+                                vm.getAnswerAgain();
+                                break;
+                            case 2:
+                                vm.getAnswerContinue();
+                                break;
+                            default:
+                                vm.getAnswer();
+                                break;
+                        }
+                    }).catch(function () {
+                        store.setLoginAction(true);
+                    });
+                },
+                // 去试题内容
+                goProblem: function () {
+                    window.location.assign(this.$router.problem_detail + '?test_id=' + id + '&record_id=' + this.record_id);
+                }
+            }
+        });
+    });
+</script>
+{/block}

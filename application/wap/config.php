@@ -9,8 +9,12 @@
 // | Author: CRMEB Team <admin@crmeb.com>
 // +----------------------------------------------------------------------
 
+use think\Env;
 
 return [
+    // 应用调试模式
+    'app_debug' => Env::get('app_debug', false),
+
     // 默认控制器名
     'default_controller' => 'Index',
     // 默认操作名

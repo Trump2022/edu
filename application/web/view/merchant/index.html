@@ -1,0 +1,370 @@
+{extend name="public/container" /}
+{block name="title"}申请讲师{/block}
+{block name="app"}
+<div v-cloak id="app" class="apply-lecture">
+    <base-header :public-data="publicData" :user-info="userInfo"></base-header>
+    <el-form :model="formData" :rules="formRule" :disabled="applyStatus === 1" ref="form" label-width="90px" :inline-message="true">
+        <el-form-item label="姓名：" prop="merchant_name">
+            <el-input v-model="formData.merchant_name" placeholder="请输入姓名"></el-input>
+        </el-form-item>
+        <el-form-item label="手机：" prop="link_tel">
+            <div style="display: inline-block;vertical-align: top;">
+                <el-input v-model="formData.link_tel" placeholder="请输入手机号"></el-input>
+                <div style="margin-top: 4px;font-size: 12px;line-height: 1;color: #F56C6C;">注：成为讲师后可使用该手机号用短信登录讲师后台</div>
+            </div>
+        </el-form-item>
+        <el-form-item v-if="applyStatus !== 1" label="验证码：" prop="code">
+            <el-input v-model="formData.code" placeholder="请输入验证码">
+                <el-button :disabled="count" slot="append" id="getCode">{{ count ? '重新获取(' + count + 's)' : '获取验证码' }}</el-button>
+            </el-input>
+        </el-form-item>
+        <el-form-item label="头像：" prop="merchant_head">
+            <el-upload :show-file-list="false" action="/web/auth_api/upload" class="avatar-uploader" :on-success="avatarSuccess" :before-upload="beforeUpload">
+                <img v-if="formData.merchant_head" :src="formData.merchant_head" class="avatar">
+                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+            </el-upload>
+        </el-form-item>
+        <el-form-item label="领域：" prop="label">
+            <el-tag v-for="label in formData.label" :key="label" :closable="applyStatus !== 1" @close="labelClose(label)">{{ label }}</el-tag>
+            <el-input v-if="inputVisible" v-model="labelValue" ref="labelInput" size="small" maxlength="6" @blur="inputConfirm" @keyup.enter.native="inputConfirm"></el-input>
+            <el-button v-else-if="formData.label.length < 3" size="small" @click="showInput">添加领域</el-button>
+        </el-form-item>
+        <el-form-item label="地区：" prop="province">
+            <el-cascader v-model="division" :options="options" :props="{ value: 'n', label: 'n', children: 'c' }" @change="cascaderChange"></el-cascader>
+        </el-form-item>
+        <el-form-item label="地址：" prop="address">
+            <el-input v-model="formData.address" placeholder="请输入地址"></el-input>
+        </el-form-item>
+        <el-form-item label="简介：" prop="explain">
+            <el-input v-model="formData.explain" placeholder="请输入说明"></el-input>
+        </el-form-item>
+        <el-form-item label="介绍：" prop="introduction">
+            <el-input v-model="formData.introduction" :autosize="{ minRows: 5 }" type="textarea" placeholder="请输入介绍"></el-input>
+        </el-form-item>
+        <el-form-item label="证书：">
+            <div class="honor-tip">请上传所获得的荣誉证书及相关资质证书<span>(图片格式支持JPG、PNG、JPEG，最多上传4张)</span></div>
+            <el-upload action="/web/auth_api/upload" class="honor-uploader" accept="image/jpg,image/jpeg,image/png" list-type="picture-card" :limit="4" :file-list="charter" :on-remove="handleRemove"
+                       :on-success="charterSuccess" :before-upload="beforeUpload" :on-exceed="handleExceed">
+                <i class="el-icon-plus avatar-uploader-icon"></i>
+            </el-upload>
+        </el-form-item>
+        <el-form-item v-if="applyStatus !== 1">
+            <el-checkbox v-model="agree">已阅读并同意</el-checkbox>
+            <el-button type="text" @click="agreeOpen">《{{ agreeContent && agreeContent.title }}》</el-button>
+        </el-form-item>
+        <el-form-item v-if="applyStatus !== 1">
+            <el-button type="primary" @click="submitForm('form')">提交申请</el-button>
+        </el-form-item>
+    </el-form>
+    <div id="captcha"></div>
+    <base-footer :public-data="publicData"></base-footer>
+    <base-agree :agree-content="agreeContent"></base-agree>
+</div>
+{/block}
+{block name="vm"}
+<script>
+    require([
+        'vue',
+        'ELEMENT',
+        'components/base-header/index',
+        'components/base-footer/index',
+        'components/base-agree/index',
+        'mixins/base',
+        '../static/plug/ydui/province_city_area',
+        'router/index',
+        'api/merchant',
+        'api/auth',
+        'store/index',
+        'css!styles/apply-lecturer.css',
+    ], function (Vue, ELEMENT, BaseHeader, BaseFooter, BaseAgree, baseMixin, district, router, merchantApi, authApi, store) {
+        Vue.use(ELEMENT);
+        Vue.use(router);
+        var checkPhone = function (rule, value, callback) {
+            if (!/^1[3456789]\d{9}$/.test(value)) {
+                return callback(new Error('请输入正确的手机号'));
+            }
+            callback();
+        };
+        var COUNT = 60;
+        new Vue({
+            el: '#app',
+            components: {
+                'base-header': BaseHeader,
+                'base-footer': BaseFooter,
+                'base-agree': BaseAgree,
+            },
+            mixins: [baseMixin],
+            data: {
+                formData: {
+                    merchant_name: '',
+                    link_tel: '',
+                    code: '',
+                    merchant_head: '',
+                    label: [],
+                    province: '',
+                    city: '',
+                    district: '',
+                    address: '',
+                    explain: '',
+                    introduction: '',
+                    charter: []
+                },
+                formRule: {
+                    merchant_name: [
+                        {
+                            required: true,
+                            message: '请输入姓名',
+                            trigger: 'blur'
+                        }
+                    ],
+                    link_tel: [
+                        {
+                            required: true,
+                            message: '请输入手机号',
+                            trigger: 'blur'
+                        },
+                        {
+                            validator: checkPhone,
+                            trigger: 'blur'
+                        }
+                    ],
+                    code: [
+                        {
+                            required: true,
+                            message: '请输入验证码',
+                            trigger: 'blur'
+                        }
+                    ],
+                    merchant_head: [
+                        {
+                            required: true,
+                            message: '请上传头像',
+                            trigger: 'blur'
+                        }
+                    ],
+                    label: [
+                        {
+                            required: true,
+                            message: '请添加领域',
+                            trigger: 'blur'
+                        }
+                    ],
+                    province: [
+                        {
+                            required: true,
+                            message: '请选择地区',
+                            trigger: 'blur'
+                        }
+                    ],
+                    address: [
+                        {
+                            required: true,
+                            message: '请输入地址',
+                            trigger: 'blur'
+                        }
+                    ],
+                    explain: [
+                        {
+                            required: true,
+                            message: '请输入简介',
+                            trigger: 'blur'
+                        }
+                    ],
+                    introduction: [
+                        {
+                            required: true,
+                            message: '请输入介绍',
+                            trigger: 'blur'
+                        }
+                    ]
+                },
+                options: district,
+                inputVisible: false,
+                labelValue: '',
+                division: [],
+                charter: [],
+                applyStatus: null,
+                count: 0,
+                agreeContent: null,
+                agree: false
+            },
+            created: function () {
+                this.is_apply();
+                this.lecturer_agree();
+            },
+            mounted: function () {
+                this.$nextTick(function () {
+                    var vm = this;
+                    $('#captcha').slideVerify({
+                        baseUrl: '/web/auth_api',
+                        mode: 'pop',
+                        containerId: 'getCode',
+                        beforeCheck: function () {
+                            var flag = true;
+                            return flag
+                        },
+                        ready: function () { },
+                        success: function (params) {
+                            vm.getCode(params.captchaVerification);
+                        },
+                        error: function () { },
+                        beforeShow: function () {
+                            var flag = true;
+                            if (!vm.formData.link_tel) {
+                                vm.$message.warning('请输入手机号');
+                                flag = false;
+                            } else if (!/^1[3456789]\d{9}$/.test(vm.formData.link_tel)) {
+                                vm.$message.warning('手机号错误');
+                                flag = false;
+                            }
+                            return flag;
+                        }
+                    });
+                });
+            },
+            methods: {
+                // 选择地区
+                cascaderChange: function (data) {
+                    this.formData.province = data[0];
+                    this.formData.city = data[1];
+                    this.formData.district = data[2];
+                },
+                avatarSuccess: function (res) {
+                    if (res.code === 200) {
+                        this.formData.merchant_head = res.data.url;
+                    }
+                },
+                charterSuccess: function (res) {
+                    if (res.code === 200) {
+                        this.formData.charter.push(res.data.url);
+                    }
+                },
+                showInput: function () {
+                    this.inputVisible = true;
+                    this.$nextTick(function () {
+                        this.$refs.labelInput.$refs.input.focus();
+                    });
+                },
+                inputConfirm: function () {
+                    var labelValue = this.labelValue.trim();
+                    if (labelValue) {
+                        if (this.formData.label.indexOf(labelValue) === -1) {
+                            this.formData.label.push(labelValue);
+                        }
+                    }
+                    this.inputVisible = false;
+                    this.labelValue = '';
+                },
+                labelClose: function (label) {
+                    this.formData.label.splice(this.formData.label.indexOf(label), 1);
+                },
+                // 提交申请
+                submitForm: function (name) {
+                    var vm = this;
+                    this.$refs[name].validate(function (valid) {
+                        if (valid) {
+                            if (!vm.agree) {
+                                return vm.$message.error('请勾选' + vm.agreeContent.title);
+                            }
+                            merchantApi.apply(vm.formData).then(function (res) {
+                                vm.$message.success(res.msg);
+                                window.location.assign(vm.$router.home);
+                            }).catch(function (res) {
+                                vm.$message.error(res.msg);
+                            });
+                        } else {
+                            return false;
+                        }
+                    });
+                },
+                // 验证上传图片格式
+                beforeUpload: function (file) {
+                    var isImage = ['image/jpg', 'image/jpeg', 'image/png'].indexOf(file.type) !== -1;
+                    if (!isImage) {
+                        this.$message.error('请上传JPG、PNG、JPEG格式的图片');
+                    }
+                    return isImage;
+                },
+                // 申请状态
+                is_apply: function () {
+                    var vm = this;
+                    merchantApi.is_apply().then(function (res) {
+                        if (res.data) {
+                            vm.applyStatus = res.data.status;
+                            if (res.data.status !== null) {
+                                if (res.data.status !== 2) {
+                                    vm.apply_data();
+                                }
+                            }
+                        }
+                    });
+                },
+                // 申请信息
+                apply_data: function () {
+                    var vm = this;
+                    merchantApi.apply_data().then(function (res) {
+                        var data = res.data;
+                        vm.formData = data;
+                        vm.division = [data.province, data.city, data.district];
+                        vm.charter = data.charter.map(function (item) {
+                            return {
+                                name: item,
+                                url: item
+                            };
+                        });
+                    });
+                },
+                // 删除证书
+                handleRemove: function (file, fileList) {
+                    this.formData.charter.splice(this.formData.charter.indexOf(file.url), 1);
+                },
+                // 超出上传数量
+                handleExceed: function (files, fileList) {
+                    this.$message.warning('最多上传4张');
+                },
+                // 获取验证码
+                getCode: function (captchaVerification) {
+                    var vm = this;
+                    if (!this.formData.link_tel) {
+                        return this.$message.warning('请输入手机号');
+                    }
+                    if (!/^1[3456789]\d{9}$/.test(this.formData.link_tel)) {
+                        return this.$message.warning('手机号错误');
+                    }
+                    var timer = setInterval(function () {
+                        vm.count--;
+                        if (!vm.count) {
+                            clearInterval(timer);
+                            timer = null;
+                        }
+                    }, 1e3);
+                    this.count = COUNT;
+                    authApi.code({
+                        phone: this.formData.link_tel,
+                        captchaVerification: captchaVerification,
+                        captchaType: 'blockPuzzle'
+                    }).then(function (res) {
+                        vm.$message.success(res.msg);
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                        clearInterval(timer);
+                        vm.timer = null;
+                        vm.count = 0;
+                    });
+                },
+                // 入驻协议
+                lecturer_agree: function () {
+                    var vm = this;
+                    merchantApi.lecturer_agree().then(function (res) {
+                        vm.agreeContent = res.data;
+                    });
+                },
+                // 显示协议弹窗
+                agreeOpen: function () {
+                    store.setAgreeAction(true);
+                }
+            }
+        });
+    });
+</script>
+{/block}

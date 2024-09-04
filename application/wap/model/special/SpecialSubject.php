@@ -12,6 +12,10 @@
 namespace app\wap\model\special;
 
 use basic\ModelBasic;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
+use think\exception\DbException;
+use think\model\relation\HasMany;
 use traits\ModelTrait;
 
 /**专题分类
@@ -23,7 +27,7 @@ class SpecialSubject extends ModelBasic
     use ModelTrait;
 
     /**获取二级分类
-     * @return \think\model\relation\HasMany
+     * @return HasMany
      */
     public function children()
     {
@@ -32,10 +36,10 @@ class SpecialSubject extends ModelBasic
 
     /**获取全部分类
      * @param int $type
-     * @return array|false|\PDOStatement|string|\think\Collection
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @return array
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public static function wapSpecialCategoryAll($type = 0)
     {

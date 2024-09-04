@@ -35,7 +35,8 @@
         "intervention/image": "^2.5",
         "topthink/think-queue": "1.1.*",
         "topthink/think-installer": "~1.0",
-        "fastknife/ajcaptcha": "^1.1"
+        "fastknife/ajcaptcha": "^1.1",
+      "ext-pdo": "*"
     },
     "extra": {
         "think-path": "thinkphp"

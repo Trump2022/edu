@@ -1,0 +1,52 @@
+{extend name="public/container"}
+{block name="title"}{$title}{/block}
+{block name="app"}
+<div v-cloak id="app" class="news-detail">
+    <base-header :public-data="publicData" :user-info="userInfo"></base-header>
+    <div class="main">
+        <div class="title">{{ articleDetails.title }}</div>
+        <div class="view-time">
+            <span><i class="el-icon-view"></i>浏览量 {{ articleDetails.visit }}</span>
+            <span><i class="el-icon-time"></i>时间 {{ articleDetails.add_time }}</span>
+        </div>
+        <div class="content" v-html="articleDetails.content"></div>
+    </div>
+    <base-footer :public-data="publicData"></base-footer>
+    <base-login :public-data="publicData" :agree-content="agreeContent"></base-login>
+    <base-agree :agree-content="agreeContent"></base-agree>
+</div>
+{/block}
+{block name="vm"}
+<script>
+    require([
+        'vue',
+        'ELEMENT',
+        'components/base-header/index',
+        'components/base-footer/index',
+        'components/base-login/index',
+        'components/base-agree/index',
+        'mixins/base',
+        'api/article',
+        'scripts/util',
+        'router/index'
+    ], function (Vue, ELEMENT, BaseHeader, BaseFooter, BaseLogin, BaseAgree, baseMixin, articleApi, util, router) {
+        var id = {$id};
+        var article = {$article};
+        Vue.use(ELEMENT);
+        Vue.use(router);
+        var vm = new Vue({
+            el: '#app',
+            components: {
+                'base-header': BaseHeader,
+                'base-footer': BaseFooter,
+                'base-login': BaseLogin,
+                'base-agree': BaseAgree
+            },
+            mixins: [baseMixin],
+            data: {
+                articleDetails: article
+            }
+        });
+    });
+</script>
+{/block}

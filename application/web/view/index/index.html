@@ -1,0 +1,197 @@
+{extend name="public/container"}
+{block name="title"}{$title}{/block}
+{block name="app"}
+<div v-cloak id="app" class="home">
+    <base-header :public-data="publicData" :user-info="userInfo"></base-header>
+    <!-- 轮播图 -->
+    <el-carousel height="450px">
+        <el-carousel-item v-for="item in bannerList" :key="item.id">
+            <a :href="item.url">
+                <el-image :src="item.pic" fit="cover">
+                    <div slot="error" class="image-slot">
+                        <i class="el-icon-picture-outline"></i>
+                    </div>
+                </el-image>
+            </a>
+        </el-carousel-item>
+    </el-carousel>
+    <div class="main">
+        <!-- 广告位 -->
+        <el-row :gutter="20" class="advert-push1">
+            <el-col v-for="item in advertList" :key="item.id" :span="8">
+                <a :href="item.url">
+                    <el-image :src="item.banner" fit="cover">
+                        <div slot="error" class="image-slot">
+                            <i class="el-icon-picture-outline"></i>
+                        </div>
+                    </el-image>
+                </a>
+            </el-col>
+        </el-row>
+        <component v-for="item in contentRecommend" :key="item.id" :recommend="item" :article-list="articleList" :rank-list="rankList" :good-list="goodList" :new-list="newList"
+                   :is="'recommend' + item.type">
+        </component>
+        <el-row class="advert-push2">
+            <el-col :span="24">
+                <a :href="advertLink">
+                    <el-image :src="advert" fit="cover"></el-image>
+                </a>
+            </el-col>
+        </el-row>
+    </div>
+    <base-footer :public-data="publicData"></base-footer>
+    <base-login :public-data="publicData" :agree-content="agreeContent"></base-login>
+    <base-agree :agree-content="agreeContent"></base-agree>
+</div>
+{/block}
+{block name="vm"}
+<script>
+    require([
+        'vue',
+        'ELEMENT',
+        'components/base-header/index',
+        'components/base-footer/index',
+        'components/base-login/index',
+        'components/base-agree/index',
+        'components/home/recommend0/index',
+        'components/home/recommend1/index',
+        'components/home/recommend2/index',
+        'components/home/recommend3/index',
+        'components/home/recommend4/index',
+        'components/home/recommend5/index',
+        'components/home/recommend7/index',
+        'components/home/recommend8/index',
+        'swiper',
+        'api/home',
+        'mixins/base',
+        'router/index',
+    ], function (
+        Vue,
+        ELEMENT,
+        BaseHeader,
+        BaseFooter,
+        BaseLogin,
+        BaseAgree,
+        Recommend0,
+        Recommend1,
+        Recommend2,
+        Recommend3,
+        Recommend4,
+        Recommend5,
+        Recommend7,
+        Recommend8,
+        Swiper,
+        homeApi,
+        baseMixin,
+        router
+    ) {
+        Vue.use(ELEMENT);
+        Vue.use(router);
+        var vm = new Vue({
+            el: '#app',
+            components: {
+                'base-header': BaseHeader,
+                'base-footer': BaseFooter,
+                'base-login': BaseLogin,
+                'base-agree': BaseAgree,
+                'recommend0': Recommend0,
+                'recommend1': Recommend1,
+                'recommend2': Recommend2,
+                'recommend3': Recommend3,
+                'recommend4': Recommend4,
+                'recommend5': Recommend5,
+                'recommend7': Recommend7,
+                'recommend8': Recommend8
+            },
+            mixins: [baseMixin],
+            data: {
+                bannerList: [],
+                advertList: [],
+                advert: '',
+                advertLink: '',
+                contentRecommend: [],
+                rankList: [],
+                newList: [],
+                articleList: [],
+                articleNewList: [],
+                goodList: [],
+                automatic_recommend: '',
+                news_recommend: ''
+            },
+            watch: {
+                'publicData.site_name': function () {
+                    document.title = this.publicData.site_name;
+                }
+            },
+            created: function () {
+                this.index_data();
+                this.get_content_recommend();
+            },
+            methods: {
+                getHotSearch: function () {
+                    homeApi.hotSearch().then(function (res) {
+                        vm.hotSearch = res.data;
+                    });
+                },
+                index_data: function () {
+                    homeApi.index_data().then(function (res) {
+                        var data = res.data;
+                        vm.bannerList = data.pc_rotation_diagram;
+                        vm.advertList = data.pc_home_page_advertisement;
+                        vm.advert = data.pc_home_bottom_img;
+                        vm.advertLink = data.pc_home_bottom_figure_link;
+                        vm.automatic_recommend = data.pc_automatic_recommend;
+                        vm.news_recommend = data.pc_news_recommend;
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+                get_content_recommend: function () {
+                    homeApi.get_content_recommend().then(function (res) {
+                        var recommend = res.data.recommend;
+                        recommend.forEach(function (item) {
+                            if (item.type == 4) {
+                                vm.getArticleList({
+                                    type: 2,
+                                    limit: 9
+                                });
+                            } else if (item.type == 5) {
+                                vm.getCourseRanking();
+                                vm.getNewCourseFirst();
+                                vm.get_good_class_recommend();
+                            }
+                        });
+                        vm.contentRecommend = res.data.recommend;
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+                // 课程排行
+                getCourseRanking: function () {
+                    homeApi.courseRanking().then(function (res) {
+                        vm.rankList = res.data;
+                    });
+                },
+                // 好课推荐
+                get_good_class_recommend: function (params) {
+                    homeApi.get_good_class_recommend().then(function (res) {
+                        vm.goodList = res.data;
+                    });
+                },
+                // 新课首推
+                getNewCourseFirst: function () {
+                    homeApi.newCourseFirst().then(function (res) {
+                        vm.newList = res.data;
+                    });
+                },
+                // 最新资讯
+                getArticleList: function (params) {
+                    homeApi.articleList(params).then(function (res) {
+                        vm.articleList = res.data;
+                    });
+                }
+            }
+        });
+    });
+</script>
+{/block}
