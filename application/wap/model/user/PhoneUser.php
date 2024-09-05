@@ -43,7 +43,6 @@ class PhoneUser extends ModelBasic
      */
     public static function UserLogIn($phone, $request)
     {
-        $isfollow = false;
         self::startTrans();
         try {
             $name = '__login_phone_number';
@@ -108,7 +107,7 @@ class PhoneUser extends ModelBasic
      * @param $request
      * @return bool
      */
-    public static function userRegister($account, $pwd, $type, $request)
+    public static function userRegister($account, $pwd, $type, $request): bool
     {
         self::beginTrans();
         try {
@@ -128,7 +127,7 @@ class PhoneUser extends ModelBasic
                 } else {
                     return false;
                 }
-            } else if ($type == 1) {
+            } else if ($type == 1 || $type == 3) {
                 $userinfo = User::where(['phone' => $account])->find();
                 if ($userinfo && !$userinfo->status) return self::setErrorInfo('账户已被禁止登录');
                 if (!$userinfo) $userinfo = User::set([
