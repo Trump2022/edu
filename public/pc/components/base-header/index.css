@@ -109,6 +109,7 @@
     align-items: center;
     padding: 17px 0;
 	justify-content: flex-end;
+	margin-bottom: -35px;
 }
 
 .base-header .logo-search .el-image {

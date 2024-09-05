@@ -28,7 +28,7 @@
   </div>
   <div ref="sidebar" class="sidebar">
       <div class="button-group">
-          <el-button v-if="publicData && (publicData.sitePhone || publicData.customer_service === '2')" class="service-button" @click="goPage">
+          <!-- <el-button v-if="publicData && (publicData.sitePhone || publicData.customer_service === '2')" class="service-button" @click="goPage">
               咨询<br>客服
           </el-button>
           <el-popover v-if="publicData && publicData.site_service_phone" trigger="hover" width="200" placement="left" popper-class="phone-popover" effect="light">
@@ -48,7 +48,7 @@
               <el-button slot="reference">
                   关注<br>公众号
               </el-button>
-          </el-popover>
+          </el-popover> -->
       </div>
       <el-backtop v-if="(publicData && (publicData.sitePhone || publicData.customer_service === '2')) || (publicData && publicData.site_service_phone) || (code_url && is_official_account_switch!=0)" :style="{top: 'calc(50% + '+(sidebarHeight/2)+'px)', bottom: 'auto', right: 'auto'}">
           <i class="el-icon-arrow-up"></i>
