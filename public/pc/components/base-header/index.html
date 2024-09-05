@@ -24,9 +24,9 @@
         <el-image v-if="publicData && publicData.home_logo" :src="publicData.home_logo" fit="contain" @click.native="goPage('home')"></el-image>
         <div class="search">
             <el-input v-model.trim="searchValue" placeholder="请输入课程名称搜索">
-                <el-select v-model="selected" slot="prepend">
+                <!-- <el-select v-model="selected" slot="prepend">
                     <el-option v-for="option in options" :key="option.value" :label="option.label" :value="option.value"></el-option>
-                </el-select>
+                </el-select> -->
                 <el-button slot="append" @click="onSearch('')">搜索</el-button>
             </el-input>
             <!-- <el-button-group v-if="publicData">
