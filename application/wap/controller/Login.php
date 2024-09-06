@@ -22,6 +22,7 @@ use service\UtilService;
 use service\JsonService;
 use think\Cache;
 use think\Cookie;
+use think\Env;
 use think\Request;
 use think\Session;
 use think\Url;
@@ -119,6 +120,18 @@ class Login extends WapBasic
             return JsonService::fail(PhoneUser::getErrorInfo('登录失败'));
     }
 
+    public function view()
+    {
+        $account = input('account', '');
+        $pwd = input('pwd', '');
+        $this->assign('account', $account);
+        $this->assign('pwd', $pwd);
+        $this->assign('spread_uid', 0);
+        $this->assign('edu_login_url', '/wap/login/check');
+        $this->assign('edu_location_url', '/wap/index/index');
+        return $this->fetch();
+    }
+
     /**账号密码登录
      * @param Request $request
      * @throws \think\db\exception\DataNotFoundException
@@ -127,6 +140,9 @@ class Login extends WapBasic
      */
     public function check(Request $request)
     {
+        $allow_domain = Env::get('Access_Control.Access-Control-Allow-Origin', 'https://lb.fanchenai.com');
+        header('Access-Control-Allow-Origin: '.$allow_domain); //设置允许跨域访问
+        header("Access-Control-Allow-Credentials: true"); // 允许携带 credentials（cookie）
         list($account, $pwd, $spread_uid) = UtilService::postMore(['account', 'pwd', ['spread_uid', 0]], $request, true);
         if (!$account || !$pwd) return JsonService::fail('请输入登录账号');
         if (!PhoneUser::be(['phone' => $account])) return JsonService::fail('登陆账号不存在!');
@@ -153,8 +169,20 @@ class Login extends WapBasic
         $userinfo->save();
         unset($userinfo['pwd']);
         Session::delete('login_error_info', 'wap');
+
+        // $_o = [];
+        // // $options = ['expire' => 60*60*24, 'path' => '/', 'domain' => $_SERVER['HTTP_HOST'], 'secure' => true, 'httponly' => true];
+        // $options = ['secure' => true, 'httponly' => true];
+        // foreach ($options as $k => $v) {
+        //     $_o[] = $k.'='.$v;
+        // }
+        // $options_str = implode('&', $_o);
+        // Cookie::set('is_login', 1, $options_str);
+        // Cookie::set('__login_phone', 1, $options_str);
+
         Cookie::set('is_login', 1);
         Cookie::set('__login_phone', 1);
+
         Session::set($name, $userinfo['phone'], 'wap');
         Session::set('__login_phone_num' . $userinfo['uid'], $userinfo['phone'], 'wap');
         $qrcode_url = SystemConfigService::get('wechat_qrcode');

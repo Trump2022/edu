@@ -253,7 +253,7 @@ class Controller
             SmsCode::setCodeInvalid($account, $code);
         }
         $msg = $type == 1 || $type == 3 ? '注册' : '找回密码';
-        if (($info = PhoneUser::userRegister($account, $pwd, $type, $request)) !== false)
+        if ((PhoneUser::userRegister($account, $pwd, $type, $request)) !== false)
             return JsonService::successful($msg . '成功');
         else
             return JsonService::fail(PhoneUser::getErrorInfo(PhoneUser::getErrorInfo($msg . '失败')));

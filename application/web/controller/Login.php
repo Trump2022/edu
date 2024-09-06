@@ -22,9 +22,13 @@ use service\WechatService;
 use service\UtilService;
 use service\JsonService;
 use think\Cookie;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
+use think\exception\DbException;
 use think\Request;
 use think\Session;
 use think\Url;
+use think\Env;
 
 /**pc端登录控制器
  * Class Login
@@ -54,14 +58,36 @@ class Login extends WapBasic
             return JsonService::fail(PhoneUser::getErrorInfo('登录失败'));
     }
 
+    /**
+     * @return mixed
+     * @descr: I am on my way to future,where you are there.
+     * @date : 9/6/24 10:13 AM
+     * @author: Trump
+     */
+    public function view()
+    {
+        $account = input('account', '');
+        $pwd = input('pwd', '');
+        $this->assign('account', $account);
+        $this->assign('pwd', $pwd);
+        $this->assign('edu_login_url', '/web/login/check');
+        $this->assign('edu_location_url', '/web/index/index');
+        return $this->fetch();
+    }
+
     /**账号密码登录
      * @param Request $request
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @return null
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function check(Request $request)
     {
+        $allow_domain = Env::get('Access_Control.Access-Control-Allow-Origin', 'https://lb.fanchenai.com');
+        header('Access-Control-Allow-Origin: '.$allow_domain); //设置允许跨域访问
+        header("Access-Control-Allow-Credentials: true"); // 允许携带 credentials（cookie）
+
         list($account, $pwd) = UtilService::postMore(['account', 'pwd'], $request, true);
         if (!$account || !$pwd) return JsonService::fail('请输入登录账号');
         if (!PhoneUser::be(['phone' => $account])) return JsonService::fail('登陆账号不存在!');
@@ -88,8 +114,41 @@ class Login extends WapBasic
         $userinfo->save();
         unset($userinfo['pwd']);
         Session::delete('login_error_info', 'web');
-        Cookie::set('is_login', 1);
-        Cookie::set('__login_phone', 1);
+
+        // $_o = [];
+        // // $options = ['expire' => 60*60*24, 'path' => '/', 'domain' => $_SERVER['HTTP_HOST'], 'secure' => true, 'httponly' => true];
+        // $options = ['secure' => true, 'httponly' => true];
+        // foreach ($options as $k => $v) {
+        //     $_o[] = $k.'='.$v;
+        // }
+        // $options_str = implode('&', $_o);
+        // Cookie::set('is_login', 1, $options_str);
+        // Cookie::set('__login_phone', 1, $options_str);
+
+        // setcookie(Cookie::prefix().'is_login', 1, time() + (86400 * 7), "/", $_SERVER['HTTP_HOST'], true, true); // Secure 和 HttpOnly
+        // setcookie(Cookie::prefix().'__login_phone', 1, time() + (86400 * 7), "/", $_SERVER['HTTP_HOST'], true, true); // Secure 和 HttpOnly
+
+        setcookie(Cookie::prefix().'is_login', 1, [
+            'expires' => time() + 86400,  // 1天后过期
+            'path' => '/',
+            'domain' => $_SERVER['HTTP_HOST'],    // 确保是目标域名
+            'secure' => true,             // 仅在 HTTPS 中有效
+            'httponly' => true,           // 仅通过 HTTP 传输，防止 JavaScript 访问
+            'samesite' => 'None'          // 允许跨域传输
+        ]);
+
+        setcookie(Cookie::prefix().'__login_phone', 1, [
+            'expires' => time() + 86400,  // 1天后过期
+            'path' => '/',
+            'domain' => $_SERVER['HTTP_HOST'],    // 确保是目标域名
+            'secure' => true,             // 仅在 HTTPS 中有效
+            'httponly' => true,           // 仅通过 HTTP 传输，防止 JavaScript 访问
+            'samesite' => 'None'          // 允许跨域传输
+        ]);
+
+        // Cookie::set('is_login', 1);
+        // Cookie::set('__login_phone', 1);
+
         Session::set($name, $userinfo['phone'], 'web');
         Session::set('__login_phone_num' . $userinfo['uid'], $userinfo['phone'], 'web');
         return JsonService::successful('登录成功', $userinfo);
