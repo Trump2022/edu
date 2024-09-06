@@ -120,6 +120,12 @@ class Login extends WapBasic
             return JsonService::fail(PhoneUser::getErrorInfo('登录失败'));
     }
 
+    /**
+     * @return mixed
+     * @descr: I am on my way to future,where you are there.
+     * @date : 9/6/24 10:45 AM
+     * @author: Trump
+     */
     public function view()
     {
         $account = input('account', '');
@@ -179,6 +185,24 @@ class Login extends WapBasic
         // $options_str = implode('&', $_o);
         // Cookie::set('is_login', 1, $options_str);
         // Cookie::set('__login_phone', 1, $options_str);
+
+        setcookie(Cookie::prefix().'is_login', 1, [
+            'expires' => time() + 86400,  // 1天后过期
+            'path' => '/',
+            'domain' => $_SERVER['HTTP_HOST'],    // 确保是目标域名
+            'secure' => true,             // 仅在 HTTPS 中有效
+            'httponly' => true,           // 仅通过 HTTP 传输，防止 JavaScript 访问
+            'samesite' => 'None'          // 允许跨域传输
+        ]);
+
+        setcookie(Cookie::prefix().'__login_phone', 1, [
+            'expires' => time() + 86400,  // 1天后过期
+            'path' => '/',
+            'domain' => $_SERVER['HTTP_HOST'],    // 确保是目标域名
+            'secure' => true,             // 仅在 HTTPS 中有效
+            'httponly' => true,           // 仅通过 HTTP 传输，防止 JavaScript 访问
+            'samesite' => 'None'          // 允许跨域传输
+        ]);
 
         Cookie::set('is_login', 1);
         Cookie::set('__login_phone', 1);
