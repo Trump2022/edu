@@ -22,6 +22,7 @@ use service\JsonService;
 use service\SystemConfigService;
 use service\UploadService as Upload;
 use app\web\model\recommend\WebRecommendRelation;
+use think\Env;
 use think\Url;
 
 /**首页控制器
@@ -54,6 +55,7 @@ class Index extends AuthController
      */
     public function index()
     {
+        var_dump(Env::get('workerman.workerman_chat', '20014'));
         $this->assign([
             'title' => SystemConfigService::get('site_name')
         ]);
