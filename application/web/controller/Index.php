@@ -56,6 +56,7 @@ class Index extends AuthController
     public function index()
     {
         var_dump(Env::get('workerman.workerman_chat', '20014'));
+        var_dump(Env::get('Access_Control.CRM-Allow-Domain', ''));
         $this->assign([
             'title' => SystemConfigService::get('site_name')
         ]);
