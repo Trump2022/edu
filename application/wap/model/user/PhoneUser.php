@@ -137,6 +137,7 @@ class PhoneUser extends ModelBasic
                     'account' => $account,
                     'phone' => $account,
                     'is_h5user' => 1,
+                    'is_crm_user' => $type == 3 ? 1 : 0,
                 ]);
                 if (!$userinfo) return self::setErrorInfo('用户信息写入失败', true);
                 $user = self::where('phone', $account)->find();

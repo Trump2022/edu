@@ -96,4 +96,64 @@ class PhoneUser extends ModelBasic
             return self::setErrorInfo($e->getMessage());
         }
     }
+
+    /**用户注册账号、找回密码
+     * @param $account
+     * @param $pwd
+     * @param $type
+     * @param $request
+     * @return bool
+     */
+    public static function userRegister($account, $pwd, $type, $request): bool
+    {
+        self::beginTrans();
+        try {
+            if ($type == 2) {
+                $user = self::where('phone', $account)->find();
+                if (!$user) return self::setErrorInfo('您需要先注册h5或pc账号', true);
+                $userinfo = User::where(['phone' => $account])->find();
+                if (!$userinfo) return self::setErrorInfo('您要找回的账号不存在', true);
+                if (!$userinfo->status) return self::setErrorInfo('账户已被禁止登录');
+                if ($user['pwd'] == $pwd || $userinfo['pwd'] == $pwd) return self::setErrorInfo('新密码和旧密码重复', true);
+                $res1 = User::where(['phone' => $account])->update(['pwd' => $pwd]);
+                $res2 = self::where(['phone' => $account])->update(['pwd' => $pwd]);
+                $res = $res1 && $res2;
+                self::checkTrans($res);
+                if ($res) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else if ($type == 1 || $type == 3) {
+                $userinfo = User::where(['phone' => $account])->find();
+                if ($userinfo && !$userinfo->status) return self::setErrorInfo('账户已被禁止登录');
+                if (!$userinfo) $userinfo = User::set([
+                    'nickname' => $account,
+                    'pwd' => $pwd,
+                    'avatar' => '/system/images/user_log.jpg',
+                    'account' => $account,
+                    'phone' => $account,
+                    'is_h5user' => 2,
+                    'is_crm_user' => $type == 3 ? 1 : 0,
+                ]);
+                if (!$userinfo) return self::setErrorInfo('用户信息写入失败', true);
+                $user = self::where('phone', $account)->find();
+                if ($user) return self::setErrorInfo('账号已被使用', true);
+                $user = self::set([
+                    'phone' => $account,
+                    'avatar' => '/system/images/user_log.jpg',
+                    'nickname' => $account,
+                    'uid' => $userinfo['uid'],
+                    'add_ip' => $request->ip(),
+                    'add_time' => time(),
+                    'pwd' => $pwd,
+                ]);
+                if (!$user) return self::setErrorInfo('手机用户信息写入失败', true);
+                self::commitTrans();
+                return true;
+            }
+        } catch (\Exception $e) {
+            return self::setErrorInfo($e->getMessage());
+        }
+    }
 }
