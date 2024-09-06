@@ -1,6 +1,8 @@
 .base-header {
     border-bottom: 1px solid #F9F9F9;
-    background-color: #fff;
+    /* background-color: #fff; */
+	width: 1200px;
+	margin: 0 auto;
 }
 
 .base-header>div:not(:first-child) {
@@ -106,6 +108,8 @@
     -ms-flex-align: center;
     align-items: center;
     padding: 17px 0;
+	justify-content: flex-end;
+	margin-bottom: -35px;
 }
 
 .base-header .logo-search .el-image {

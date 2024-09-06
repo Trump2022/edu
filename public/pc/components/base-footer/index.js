@@ -24,7 +24,7 @@ define([
         mounted: function () {
             this.$nextTick(function () {
                 if (code_url) {
-                    this.code_url = code_url;
+                    // this.code_url = code_url;
                 }
             });
         },

@@ -50,9 +50,12 @@
               </el-button>
           </el-popover>
       </div>
-      <el-backtop v-if="(publicData && (publicData.sitePhone || publicData.customer_service === '2')) || (publicData && publicData.site_service_phone) || (code_url && is_official_account_switch!=0)" :style="{top: 'calc(50% + '+(sidebarHeight/2)+'px)', bottom: 'auto', right: 'auto'}">
+      <!-- <el-backtop v-if="(publicData && (publicData.sitePhone || publicData.customer_service === '2')) || (publicData && publicData.site_service_phone) || (code_url && is_official_account_switch!=0)" :style="{top: 'calc(50% + '+(sidebarHeight/2)+'px)', bottom: 'auto', right: 'auto'}">
           <i class="el-icon-arrow-up"></i>
-      </el-backtop>
+      </el-backtop> -->
+	  <el-backtop :style="{top: 'calc(50% + '+(sidebarHeight/2)+'px)', bottom: 'auto', right: '120px'}">
+	      <i class="el-icon-arrow-up"></i>
+	  </el-backtop>
   </div>
   <iframe v-if="publicData && !publicData.sitePhone && publicData.customer_service === '2'" :class="{ active: serviceActive }" :src="publicData.serviceSrc"></iframe>
 </div>
