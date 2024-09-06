@@ -275,21 +275,21 @@ return [
             //监听ip
             'ip' => '0.0.0.0',
             //监听端口
-            'port' => Env::get('workerman.workerman_chat', '20014')
+            'port' => Env::get('WorkerMan.workerman_chat', '20014')
         ],
         //内部通讯
         'channel' => [
             //通讯ip
             'ip' => '127.0.0.1',
             //通讯端口
-            'port' => Env::get('workerman.workerman_channel', '20015')
+            'port' => Env::get('WorkerMan.workerman_channel', '20015')
         ],
         //Register
         'text' => [
             //通讯ip
             'ip' => '0.0.0.0',
             //通讯端口
-            'port' => Env::get('workerman.workerman_text', '20015')
+            'port' => Env::get('WorkerMan.workerman_text', '20015')
         ],
     ],
 
