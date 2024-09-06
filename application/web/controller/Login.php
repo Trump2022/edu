@@ -84,7 +84,7 @@ class Login extends WapBasic
      */
     public function check(Request $request)
     {
-        $allow_domain = Env::get('Access_Control.Access-Control-Allow-Origin', 'https://lb.fanchenai.com');
+        $allow_domain = Env::get('AccessControl.Access-Control-Allow-Origin', 'https://lb.fanchenai.com');
         header('Access-Control-Allow-Origin: '.$allow_domain); //设置允许跨域访问
         header("Access-Control-Allow-Credentials: true"); // 允许携带 credentials（cookie）
 
