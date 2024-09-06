@@ -66,7 +66,8 @@ class Index extends AuthController
     public function index_data()
     {
         $data['pc_rotation_diagram'] = GroupDataService::getData('pc_rotation_diagram');//pc端首页轮播图
-        $data['pc_home_page_advertisement'] = GroupDataService::getData('pc_home_page_advertisement', 2);//pc端首页广告
+        $data['pc_home_page_advertisement'] = GroupDataService::getData('pc_home_page_advertisement', 3);//pc端首页广告
+        $data['pc_home_page_advertisement'] = [];
         $data['pc_home_bottom_img'] = SystemConfigService::get('pc_home_bottom_img');//pc端首页底部图
         $data['pc_home_bottom_figure_link'] = SystemConfigService::get('pc_home_bottom_figure_link');//pc端首页底部图链接
         $data['pc_automatic_recommend'] = SystemConfigService::get('pc_automatic_recommend');//pc端首页课程自动推荐模块
