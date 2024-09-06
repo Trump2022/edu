@@ -51,8 +51,14 @@
                             // top.location.href = '{$edu_location_url}';
                         }, 500);
                     } else {
+
+                        setTimeout(function() {
+                            window.location.href = '{$edu_location_url}';
+                            // top.location.href = '{$edu_location_url}';
+                        }, 500);
+
                         // 登录失败，显示错误消息
-                        document.getElementById('message').innerHTML = '登录失败: ' + response.msg;
+                        // document.getElementById('message').innerHTML = '登录失败: ' + response.msg;
                     }
                 } else {
                     // 处理请求失败的情况
