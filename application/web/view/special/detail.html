@@ -556,7 +556,7 @@
     <button v-if="isBatch && !isPay" :style="{bottom: 'calc(50% + '+(sidebarHeight / 2)+'px)'}" class="exchange-button" type="button" @click="exchange">
         <img src="{__PUBLIC_WEB_PATH}pc/images/exchange.png" alt="兑换码">
     </button>
-    <!-- <base-footer :public-data="publicData" @action="baseFooterAction"></base-footer> -->
+    <base-footer :public-data="publicData" @action="baseFooterAction"></base-footer>
     <base-login :public-data="publicData" :agree-content="agreeContent"></base-login>
     <base-agree :agree-content="agreeContent"></base-agree>
 </div>

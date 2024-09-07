@@ -1,5 +1,5 @@
 <div class="base-footer">
-  <div v-if="publicData" class="footer">
+ <!-- <div v-if="publicData" class="footer">
       <el-row v-if="publicData.pc_end_bottom_display && publicData.pc_end_bottom_display.length">
           <el-col v-for="item in publicData.pc_end_bottom_display" :key="item.id" :span="6">
               <div>
@@ -25,7 +25,7 @@
           </el-link>
         </el-col>
       </el-row>
-  </div>
+  </div> -->
   <div ref="sidebar" class="sidebar">
       <div class="button-group">
           <el-button v-if="publicData && (publicData.sitePhone || publicData.customer_service === '2')" class="service-button" @click="goPage">
