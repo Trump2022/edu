@@ -119,3 +119,7 @@
 .recommend3 .el-row a > div:last-child > div:nth-child(2) span {
     font-size: 22px;
 }
+
+.logo-search .search {
+    width: 450px;
+}
