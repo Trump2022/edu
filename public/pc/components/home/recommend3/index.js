@@ -15,6 +15,7 @@ define([
             return {
 				searchValue: '',
 				currentURL: window.location.pathname,
+				selected: 1
 			};
         },
         methods: {
