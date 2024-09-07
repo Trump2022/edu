@@ -133,9 +133,11 @@ class PhoneUser extends ModelBasic
                 if ($userinfo && !$userinfo->status) {
                     return self::setErrorInfo('账户已被禁止登录');
                 }
+
+                $nickname = $nickname ?: $account;
                 if (!$userinfo) {
                     $userinfo = User::set([
-                        'nickname' => $nickname ?: $account,
+                        'nickname' => $nickname,
                         'pwd' => $pwd,
                         'avatar' => '/system/images/user_log.jpg',
                         'account' => $account,
@@ -143,27 +145,36 @@ class PhoneUser extends ModelBasic
                         'is_h5user' => 1,
                         'is_crm_user' => $type == 3 ? 1 : 0,
                     ]);
+                } else {
+                    if ($type == 3) {
+                        //修改密码和昵称
+                        $upData = [];
+                        $userinfo['pwd'] = $pwd;
+                        if ($nickname != $userinfo['nickname'] || ! $userinfo['nickname']) {
+                            $userinfo['nickname'] = $nickname;
+                            $upData['nickname'] = $nickname;
+                        }
+                        $userinfo->save();
+
+                        if ($upData) {
+                            self::where('phone', $account)->update($upData);
+                        }
+
+                        self::commitTrans();
+                        return true;
+                    }
                 }
                 if (!$userinfo) {
                     return self::setErrorInfo('用户信息写入失败', true);
                 }
                 $user = self::where('phone', $account)->find();
                 if ($user) {
-                    if ($type == 3) {
-                        //修改密码和昵称
-                        $upData = ['pwd' => $pwd];
-                        if ( ! $user['nickname']) {
-                            $upData['nickname'] = $nickname ?: $account;
-                        }
-                        $user->allowField(true)->save($upData);
-                    }
-
                     return self::setErrorInfo('账号已被使用', true);
                 }
                 $user = self::set([
                     'phone' => $account,
                     'avatar' => '/system/images/user_log.jpg',
-                    'nickname' => $nickname ?: $account,
+                    'nickname' => $nickname,
                     'uid' => $userinfo['uid'],
                     'add_ip' => $request->ip(),
                     'add_time' => time(),
