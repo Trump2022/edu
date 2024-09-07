@@ -155,7 +155,7 @@ class PhoneUser extends ModelBasic
                         //昵称
                         $upData = [];
                         $user = self::where('phone', $account)->find();
-                        if ($nickname != $userinfo['nickname'] || ! $user['nickname']) {
+                        if ($nickname != $user['nickname'] || ! $user['nickname']) {
                             $upData['nickname'] = $nickname;
                         }
                         if ($upData) {
