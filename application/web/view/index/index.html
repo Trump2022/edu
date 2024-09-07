@@ -17,7 +17,7 @@
     <!-- <base-header :public-data="publicData" :user-info="userInfo"></base-header> -->
     <div class="main">
         <!-- 广告位 -->
-        <el-row :gutter="20" class="advert-push1">
+        <el-row :gutter="20" class="advert-push1" v-if="advertList && advertList.length">
             <el-col v-for="item in advertList" :key="item.id" :span="8">
                 <a :href="item.url">
                     <el-image :src="item.banner" fit="cover">
