@@ -101,10 +101,11 @@ class PhoneUser extends ModelBasic
      * @param $account
      * @param $pwd
      * @param $type
+     * @param $nickname
      * @param $request
      * @return bool
      */
-    public static function userRegister($account, $pwd, $type, $request): bool
+    public static function userRegister($account, $pwd, $type, $nickname, $request): bool
     {
         self::beginTrans();
         try {
@@ -126,23 +127,31 @@ class PhoneUser extends ModelBasic
                 }
             } else if ($type == 1 || $type == 3) {
                 $userinfo = User::where(['phone' => $account])->find();
-                if ($userinfo && !$userinfo->status) return self::setErrorInfo('账户已被禁止登录');
-                if (!$userinfo) $userinfo = User::set([
-                    'nickname' => $account,
-                    'pwd' => $pwd,
-                    'avatar' => '/system/images/user_log.jpg',
-                    'account' => $account,
-                    'phone' => $account,
-                    'is_h5user' => 2,
-                    'is_crm_user' => $type == 3 ? 1 : 0,
-                ]);
-                if (!$userinfo) return self::setErrorInfo('用户信息写入失败', true);
+                if ($userinfo && !$userinfo->status) {
+                    return self::setErrorInfo('账户已被禁止登录');
+                }
+                if (!$userinfo) {
+                    $userinfo = User::set([
+                        'nickname' => $nickname ?: $account,
+                        'pwd' => $pwd,
+                        'avatar' => '/system/images/user_log.jpg',
+                        'account' => $account,
+                        'phone' => $account,
+                        'is_h5user' => 2,
+                        'is_crm_user' => $type == 3 ? 1 : 0,
+                    ]);
+                }
+                if (!$userinfo) {
+                    return self::setErrorInfo('用户信息写入失败', true);
+                }
                 $user = self::where('phone', $account)->find();
-                if ($user) return self::setErrorInfo('账号已被使用', true);
+                if ($user) {
+                    return self::setErrorInfo('账号已被使用', true);
+                }
                 $user = self::set([
                     'phone' => $account,
                     'avatar' => '/system/images/user_log.jpg',
-                    'nickname' => $account,
+                    'nickname' => $nickname ?: $account,
                     'uid' => $userinfo['uid'],
                     'add_ip' => $request->ip(),
                     'add_time' => time(),

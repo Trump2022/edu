@@ -235,11 +235,12 @@ class Login extends WapBasic
      */
     public function register(Request $request)
     {
-        list($account, $pwd, $code, $type) = UtilService::postMore([
+        list($account, $pwd, $code, $type, $nickname) = UtilService::postMore([
             ['account', ''],
             ['pwd', ''],
             ['code', ''],
             ['type', 1],//1-常规注册,2-找回密码,3-来自领播用户的注册
+            ['nickname', ''],
         ], $request, true);
         if (!$code) return JsonService::fail('请输入验证码');
         if (!$account || !$pwd) return JsonService::fail('参数有误！');
@@ -249,7 +250,7 @@ class Login extends WapBasic
             SmsCode::setCodeInvalid($account, $code);
         }
         $msg = $type == 1 || $type == 3 ? '注册' : '找回密码';
-        if ((PhoneUser::userRegister($account, $pwd, $type, $request)) !== false)
+        if ((PhoneUser::userRegister($account, $pwd, $type, $nickname, $request)) !== false)
             return JsonService::successful($msg . '成功');
         else
             return JsonService::fail(PhoneUser::getErrorInfo(PhoneUser::getErrorInfo($msg . '失败')));
