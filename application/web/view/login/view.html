@@ -44,13 +44,12 @@
 
                         // 跳转到指定地址，并携带登录时的 cookie
                         setTimeout(function() {
-                            // var u = '{$edu_location_url}';
-                            // alert(u);
                             window.location.href = '{$edu_location_url}';
                             // top.location.href = '{$edu_location_url}';
                         }, 500);
                     } else {
 
+                        //不强制登录, 没登录成功也跳转
                         setTimeout(function() {
                             window.location.href = '{$edu_location_url}';
                             // top.location.href = '{$edu_location_url}';
