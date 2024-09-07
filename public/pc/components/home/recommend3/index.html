@@ -10,7 +10,7 @@
 		            <!-- <el-select v-model="selected" slot="prepend">
 		                <el-option v-for="option in options" :key="option.value" :label="option.label" :value="option.value"></el-option>
 		            </el-select> -->
-		            <el-button slot="append" @click="onSearch('')">搜索</el-button>
+		            <el-button slot="append" icon="el-icon-search" @click="onSearch('')"></el-button>
 		        </el-input>
 		        <!-- <el-button-group v-if="publicData">
 		            <el-button v-for="(item, index) in publicData.host_search" :key="index" type="text" @click="onSearch(item)">{{ item }}</el-button>
