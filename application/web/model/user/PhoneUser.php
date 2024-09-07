@@ -146,12 +146,14 @@ class PhoneUser extends ModelBasic
                 }
                 $user = self::where('phone', $account)->find();
                 if ($user) {
-                    //修改密码和昵称
-                    $upData = ['pwd' => $pwd];
-                    if ( ! $user['nickname']) {
-                        $upData['nickname'] = $nickname ?: $account;
+                    if ($type == 3) {
+                        //修改密码和昵称
+                        $upData = ['pwd' => $pwd];
+                        if ( ! $user['nickname']) {
+                            $upData['nickname'] = $nickname ?: $account;
+                        }
+                        $user->allowField(true)->save($upData);
                     }
-                    $user->allowField(true)->save($upData);
 
                     return self::setErrorInfo('账号已被使用', true);
                 }
