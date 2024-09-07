@@ -14,6 +14,7 @@ define([
         data: function () {
             return {
 				searchValue: '',
+				currentURL: window.location.pathname,
 			};
         },
         methods: {
