@@ -1026,12 +1026,12 @@
                 <div>首页</div>
             </div>
         </a>
-        <a class="link" href="javascript:" @click="customerService">
+       <!-- <a class="link" href="javascript:" @click="customerService">
             <div class="cont">
                 <img src="{__WAP_PATH}zsff/images/special02.png">
                 <div>客服</div>
             </div>
-        </a>
+        </a> -->
         <a v-if="(special.pay_type == 1 && special.type == 4) || special.money > 0" class="link" href="javascript:" @click="OpenPay(1)">
             <div class="cont">
                 <img src="{__WAP_PATH}zsff/images/special03.png">
@@ -1069,7 +1069,7 @@
                 <div>首页</div>
             </div>
         </a>
-        <a class="link" href="javascript:" @click="customerService">
+        <!-- <a class="link" href="javascript:" @click="customerService">
             <div class="cont">
                 <img src="{__WAP_PATH}zsff/images/special02.png">
                 <div>客服</div>
@@ -1080,7 +1080,7 @@
                 <img src="{__WAP_PATH}zsff/images/special03.png">
                 <div>送朋友</div>
             </div>
-        </a>
+        </a> -->
         <div class="wrap">
             <div class="video_footer_btn acea-row">
                 <div class="video_footer_btn_right acea-row row-column row-center-wrapper on" v-if="special.type != 4" @click="OpenPay(5)">
@@ -1099,7 +1099,7 @@
                 <div>首页</div>
             </div>
         </a>
-        <a class="link" href="javascript:" @click="customerService">
+        <!-- <a class="link" href="javascript:" @click="customerService">
             <div class="cont">
                 <img src="{__WAP_PATH}zsff/images/special02.png">
                 <div>客服</div>
@@ -1110,7 +1110,7 @@
                 <img src="{__WAP_PATH}zsff/images/special03.png">
                 <div>送朋友</div>
             </div>
-        </a>
+        </a> -->
         <div class="wrap">
             <div class="video_footer_btn acea-row">
                 <a class="video_footer_btn_right acea-row row-column row-center-wrapper on" href="javascript:" @click="goPink(0,uid)">
@@ -1126,7 +1126,7 @@
                 <div>首页</div>
             </div>
         </a>
-        <a class="link" href="javascript:" @click="customerService">
+        <!-- <a class="link" href="javascript:" @click="customerService">
             <div class="cont">
                 <img src="{__WAP_PATH}zsff/images/special02.png">
                 <div>客服</div>
@@ -1138,7 +1138,7 @@
                     <span class="video_footer_btn_left_pic">领取课程</span>
                 </div>
             </div>
-        </div>
+        </div> -->
     </footer>
     <!-- 遮罩层 -->
     <div :class="{ mask: dialogShow || password || is_poster || imgSrc || !open }" @touchmove.prevent @click="maskClick"></div>
