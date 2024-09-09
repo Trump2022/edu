@@ -28,9 +28,20 @@
                 </a>
             </el-col>
         </el-row>
-        <component v-for="item in contentRecommend" :key="item.id" :recommend="item" :article-list="articleList" :rank-list="rankList" :good-list="goodList" :new-list="newList"
+        <!-- <component v-for="item in contentRecommend" :key="item.id" :recommend="item" :article-list="articleList" :rank-list="rankList" :good-list="goodList" :new-list="newList"
                    :is="'recommend' + item.type">
-        </component>
+        </component> -->
+		<div v-for="item in contentRecommend" :key="item.id">
+			<div v-if="item.show_count <= 2" >
+				<class2 :recommend="item" :article-list="articleList" :rank-list="rankList" :good-list="goodList" :new-list="newList"></class2>
+			</div>
+			<div v-else>
+				<class4 :recommend="item" :article-list="articleList" :rank-list="rankList" :good-list="goodList" :new-list="newList"></class4>
+			</div>
+		</div>
+		<!-- <component v-for="item in contentRecommend" :key="item.id" :recommend="item" :article-list="articleList" :rank-list="rankList" :good-list="goodList" :new-list="newList"
+		           :is="'class' + item.show_count">
+		</component> -->
         <el-row class="advert-push2">
             <el-col :span="24">
                 <a :href="advertLink">
@@ -61,6 +72,8 @@
         'components/home/recommend5/index',
         'components/home/recommend7/index',
         'components/home/recommend8/index',
+        'components/home/class2/index',
+        'components/home/class4/index',
         'swiper',
         'api/home',
         'mixins/base',
@@ -80,6 +93,8 @@
         Recommend5,
         Recommend7,
         Recommend8,
+		class2,
+		class4,
         Swiper,
         homeApi,
         baseMixin,
