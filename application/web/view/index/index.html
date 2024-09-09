@@ -32,6 +32,7 @@
                    :is="'recommend' + item.type">
         </component> -->
 		<div v-for="item in contentRecommend" :key="item.id">
+			item.show_count:{{item.show_count}}
 			<div v-if="item.show_count <= 2" >
 				<class2 :recommend="item" :article-list="articleList" :rank-list="rankList" :good-list="goodList" :new-list="newList"></class2>
 			</div>
