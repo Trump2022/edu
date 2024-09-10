@@ -28008,12 +28008,11 @@ UE.ui = baidu.editor.ui = {};
                                 if (dialog) {
                                     switch (cmd) {
                                         case "wordimage":
-											console.log('测试选择图片');
-                                            // var images = editor.execCommand("wordimage");
-                                            // if (images && images.length) {
-                                            //     dialog.render();
-                                            //     dialog.open();
-                                            // }
+                                            var images = editor.execCommand("wordimage");
+                                            if (images && images.length) {
+                                                dialog.render();
+                                                dialog.open();
+                                            }
                                             break;
                                         case "scrawl":
                                             if (editor.queryCommandState("scrawl") != -1) {
@@ -28872,6 +28871,7 @@ UE.ui = baidu.editor.ui = {};
                     }
                 });
                 editor.addListener('selectionchange', function (t, causeByUi) {
+					console.log('触发图片');
                     if (!causeByUi) return;
                     var html = '', str = "",
                         img = editor.selection.getRange().getClosedNode(),
@@ -29041,8 +29041,7 @@ UE.ui = baidu.editor.ui = {};
                 '</div>';
         },
         showWordImageDialog:function () {
-            // this._dialogs['wordimageDialog'].open();
-			console.log('open');
+            this._dialogs['wordimageDialog'].open();
         },
         renderToolbarBoxHtml:function () {
             var buff = [];
