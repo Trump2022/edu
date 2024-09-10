@@ -879,7 +879,7 @@
 											obj.upload(index, file)
 											return false
 										});
-										return false
+										// return false
 									},
 									done: function(res, index) {
 										console.log('fileType====>', fileType)
