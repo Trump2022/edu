@@ -850,9 +850,7 @@
                     });
 					let loadFinish = false
                     //实例化编辑器
-                    UE.registerUI('选择图片', function (editor, uiName) {
-						console.log('editor=====>', editor)
-						console.log('uiName=====>', uiName)
+                    UE.registerUI('选择图片/视频', function (editor, uiName) {
                         var btn = new UE.ui.Button({
                             name: uiName,
                             title: uiName,
@@ -862,7 +860,6 @@
 								let fileType = ''
 								if(loadFinish) return
 								loadFinish = true
-								console.log('this======>', this)
 								layui.upload.render({
 									elem: '#' + this.id,
 									url: "https://up-z2.qiniup.com/",
