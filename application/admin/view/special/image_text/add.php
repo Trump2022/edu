@@ -947,7 +947,7 @@
 										},
 										done: function(res, index) {
 											console.log('res====>', res);
-											self.setContent(self.QNToken.domain + '/' res.key);
+											self.setContent(self.QNToken.domain + '/' + res.key);
 										}
 									})
 								}
