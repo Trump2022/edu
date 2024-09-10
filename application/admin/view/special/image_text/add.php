@@ -488,7 +488,6 @@
 						url: '/admin/setting.system_bucket/get_crm_domain',
 						success: function (res) {
 							res = JSON.parse(res)
-						    console.log('res=====>', res)
 							that.get_qiniu_token(res.count.crm_doamin)
 						},
 					})
@@ -499,7 +498,7 @@
 					$.ajax({
 						url: domain + '/api/qiniu/token',
 						success: function (res) {
-						    console.log('token=====>', res)
+							that.QNToken = res.data
 						},
 					})
 				},
@@ -875,8 +874,9 @@
                             name: uiName,
                             title: uiName,
                             cssRules: 'background-position: -380px 0;',
-                            onclick: function () {
+                            onclick: function (d) {
                                 // ossUpload.createFrame(uiName, {fodder: editor.key}, {w: 800, h: 550});
+								console.log('d=====>', d)
                             }
                         });
                         return btn;
