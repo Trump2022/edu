@@ -468,7 +468,8 @@
                 },
                 videoWidth: 0,
                 uploader: null,
-                tabIndex: 0
+                tabIndex: 0,
+				QNToken: {}
             },
             watch: {
                 'formData.validity': function (v) {
@@ -487,6 +488,17 @@
 						url: '/admin/setting.system_bucket/get_crm_domain',
 						success: function (res) {
 						    console.log('res=====>', res)
+							that.get_qiniu_token(res.get_qiniu_token.crm_doamin)
+						},
+					})
+				},
+				//获取空间token配置
+				get_qiniu_token: function (domain) {
+				    var that = this;
+					$.ajax({
+						url: '/api/qiniu/token',
+						success: function (res) {
+						    console.log('token=====>', res)
 						},
 					})
 				},
