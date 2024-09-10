@@ -869,7 +869,6 @@
                         layui.table.resize('table');
                         that.tabIndex = data.index;
                     });
-					console.log('layui======>', layui)
                     //实例化编辑器
                     UE.registerUI('选择图片', function (editor, uiName) {
                         var btn = new UE.ui.Button({
@@ -878,9 +877,7 @@
                             cssRules: 'background-position: -380px 0;',
                             onclick: function (d) {
                                 // ossUpload.createFrame(uiName, {fodder: editor.key}, {w: 800, h: 550});
-								console.log('d=====>', d)
-								console.log('d=====>', this)
-								console.log('self======>', self)
+								let fileType = ''
 								layui.upload.render({
 									elem: '#' + this.id,
 									url: "https://up-z2.qiniup.com/",
@@ -895,16 +892,23 @@
 												...self.QNToken,
 												key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`
 											}
-											console.log('file======>', file)
+											fileType = file.type.split('/')[0]
+											if(fileType !== 'image' || fileType !== 'video') {
+												return layList.msg('请选择图片或视频！');
+											}
 											obj.upload(index, file)
 											return false
 										});
 										return false
 									},
 									done: function(res, index) {
-										console.log('res====>', res);
 										const link = self.QNToken.domain + '/' + res.key
-										self.ue.setContent('<img src="' + link + '" _src="' + link + '" />', true);
+										if(fileType === 'image') {
+											self.ue.setContent('<img src="' + link + '" _src="' + link + '" />', true);
+										}
+										if(fileType === 'video') {
+											self.ue.setContent('<div><video style="width: 100%" src="' + link + '" class="video-ue" controls="controls"><source src="' + link + '"></source></video></div><span style="color:white">.</span>', true);
+										}
 									}
 								})
 							}
