@@ -13,6 +13,7 @@
 namespace app\admin\controller\setting;
 
 use service\JsonService as Json;
+use think\Env;
 use think\Request;
 use think\Url;
 use app\admin\controller\AuthController;
@@ -172,6 +173,11 @@ class SystemBucket extends AuthController
         } else {
             return Json::fail('设置存储空间失败');
         }
+    }
+
+    public function get_crm_domain()
+    {
+        return \service\JsonService::successlayui(['crm_doamin' => Env::get('crm.domain', '')]);
     }
 
 }
