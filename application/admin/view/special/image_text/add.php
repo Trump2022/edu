@@ -861,6 +861,7 @@
                 window.insertEditor = function (list) {
                     that.ue.execCommand('insertimage', list);
                 };
+				const self = this
 
                 this.$nextTick(function () {
                     layList.form.render();
@@ -869,7 +870,6 @@
                         that.tabIndex = data.index;
                     });
 					console.log('layui======>', layui)
-					const self = this
                     //实例化编辑器
                     UE.registerUI('选择图片', function (editor, uiName) {
                         var btn = new UE.ui.Button({
@@ -888,10 +888,10 @@
 									accept: 'file',
 									number: 1,
 									choose: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
-										let that = this
+										let _that = this
 										obj.preview(function(index, file, result){
 											let time=new Date();
-											that.data = {
+											_that.data = {
 												...self.QNtoken,
 												key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`
 											}
