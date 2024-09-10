@@ -148,7 +148,7 @@
                 <el-breadcrumb-item><a :href="$router.home">首页</a></el-breadcrumb-item>
                 <el-breadcrumb-item v-if="from == 'live'"><a :href="$router.special_live">直播课</a></el-breadcrumb-item>
                 <el-breadcrumb-item v-else-if="from == 'special_cate'"><a :href="$router.special_cate">所有课程</a></el-breadcrumb-item>
-                <el-breadcrumb-item v-else><a :href="$router.more_list + '?type=' + type + '&recommend_id=' + recommend_id">精品课程</a></el-breadcrumb-item>
+                <el-breadcrumb-item v-else><a :href="$router.more_list + '?type=' + type + '&recommend_id=' + recommend_id + '&name=' + title">{{title}}</a></el-breadcrumb-item>
                 <el-breadcrumb-item>课程详情</el-breadcrumb-item>
             </el-breadcrumb>
             <div class="container_content">
@@ -515,7 +515,8 @@
                 mobileUrl: mobileUrl,
                 sidebarHeight: 0,
                 problemList: [],
-                questionList: []
+                questionList: [],
+				title: ''
             },
             watch: {
                 selectValue: {
@@ -530,6 +531,7 @@
             created: function () {
                 this.from = util.getParmas('from');
                 this.type = util.getParmas('type');
+                this.title = util.getParmas('name');
                 this.recommend_id = util.getParmas('recommend_id');
                 this.special_data_download();
                 this.recommended_courses();

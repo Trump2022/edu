@@ -5,7 +5,7 @@
     </div>
     <el-row :gutter="20">
         <el-col v-for="item in recommend.list" :key="item.id" :span="6">
-            <a :href="(item.is_light ? $router.single_detail : $router.special_detail) + '?id=' + item.id + '&from=more_list&type=' + recommend.type + '&recommend_id=' + recommend.id">
+            <a :href="(item.is_light ? $router.single_detail : $router.special_detail) + '?id=' + item.id + '&from=more_list&type=' + recommend.type + '&recommend_id=' + recommend.id + '&name=' + recommend.title">
                 <el-image :src="item.image" fit="cover">
                     <div slot="error" class="image-slot">
                         <i class="el-icon-picture-outline"></i>
