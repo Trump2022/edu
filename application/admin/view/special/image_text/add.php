@@ -497,7 +497,7 @@
 				get_qiniu_token: function (domain) {
 				    var that = this;
 					$.ajax({
-						url: '/api/qiniu/token',
+						url: domain + '/api/qiniu/token',
 						success: function (res) {
 						    console.log('token=====>', res)
 						},
