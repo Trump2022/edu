@@ -28008,11 +28008,12 @@ UE.ui = baidu.editor.ui = {};
                                 if (dialog) {
                                     switch (cmd) {
                                         case "wordimage":
-                                            var images = editor.execCommand("wordimage");
-                                            if (images && images.length) {
-                                                dialog.render();
-                                                dialog.open();
-                                            }
+											console.log('测试选择图片');
+                                            // var images = editor.execCommand("wordimage");
+                                            // if (images && images.length) {
+                                            //     dialog.render();
+                                            //     dialog.open();
+                                            // }
                                             break;
                                         case "scrawl":
                                             if (editor.queryCommandState("scrawl") != -1) {
