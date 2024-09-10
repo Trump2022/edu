@@ -848,6 +848,7 @@
                         layui.table.resize('table');
                         that.tabIndex = data.index;
                     });
+					let loadFinish = false
                     //实例化编辑器
                     UE.registerUI('选择图片', function (editor, uiName) {
 						console.log('editor=====>', editor)
@@ -859,6 +860,8 @@
                             onclick: function (d) {
                                 // ossUpload.createFrame(uiName, {fodder: editor.key}, {w: 800, h: 550});
 								let fileType = ''
+								if(loadFinish) return
+								loadFinish = true
 								console.log('this======>', this)
 								layui.upload.render({
 									elem: '#' + this.id,
