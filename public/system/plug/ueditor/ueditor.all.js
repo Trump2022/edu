@@ -25784,26 +25784,26 @@ UE.ui = baidu.editor.ui = {};
             }
         },
         Stateful_onMouseOver: function (evt, el){
-            // var rel = evt.relatedTarget;
-            // if (!uiUtils.contains(el, rel) && el !== rel) {
-            //     this.Stateful_onMouseEnter(evt, el);
-            // }
+            var rel = evt.relatedTarget;
+            if (!uiUtils.contains(el, rel) && el !== rel) {
+                this.Stateful_onMouseEnter(evt, el);
+            }
         },
         Stateful_onMouseOut: function (evt, el){
-            // var rel = evt.relatedTarget;
-            // if (!uiUtils.contains(el, rel) && el !== rel) {
-            //     this.Stateful_onMouseLeave(evt, el);
-            // }
+            var rel = evt.relatedTarget;
+            if (!uiUtils.contains(el, rel) && el !== rel) {
+                this.Stateful_onMouseLeave(evt, el);
+            }
         },
         Stateful_onMouseDown: function (evt, el){
-            // if (!this.isDisabled()) {
-            //     this.addState('active');
-            // }
+            if (!this.isDisabled()) {
+                this.addState('active');
+            }
         },
         Stateful_onMouseUp: function (evt, el){
-            // if (!this.isDisabled()) {
-            //     this.removeState('active');
-            // }
+            if (!this.isDisabled()) {
+                this.removeState('active');
+            }
         },
         Stateful_postRender: function (){
             if (this.disabled && !this.hasState('disabled')) {
@@ -25888,6 +25888,7 @@ UE.ui = baidu.editor.ui = {};
             }
         },
         getHtmlTpl: function (){
+			return '';
             return '<div id="##" class="edui-box %%">' +
                 '<div id="##_state" stateful>' +
                  '<div class="%%-wrap"><div id="##_body" unselectable="on" ' + (this.title ? 'title="' + this.title + '"' : '') +
