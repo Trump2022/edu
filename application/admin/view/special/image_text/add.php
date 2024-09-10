@@ -903,7 +903,7 @@
 									},
 									done: function(res, index) {
 										console.log('res====>', res);
-										const link = self.QNToken.domain + '/' res.key
+										const link = self.QNToken.domain + '/' + res.key
 										self.ue.setContent('<img src="' + link + '" _src="' + link + '" />', true);
 									}
 								})
