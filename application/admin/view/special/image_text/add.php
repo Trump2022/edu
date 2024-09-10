@@ -877,6 +877,7 @@
                             onclick: function (d) {
                                 // ossUpload.createFrame(uiName, {fodder: editor.key}, {w: 800, h: 550});
 								console.log('d=====>', d)
+								console.log('d=====>', this)
                             }
                         });
                         return btn;
