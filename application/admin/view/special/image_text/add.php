@@ -892,7 +892,7 @@
 										obj.preview(function(index, file, result){
 											let time=new Date();
 											that.data = {
-												...self.QNtoken.data,
+												...self.QNtoken,
 												key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`
 											}
 											console.log('触发上传')
