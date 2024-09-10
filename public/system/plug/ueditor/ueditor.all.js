@@ -25784,26 +25784,26 @@ UE.ui = baidu.editor.ui = {};
             }
         },
         Stateful_onMouseOver: function (evt, el){
-            var rel = evt.relatedTarget;
-            if (!uiUtils.contains(el, rel) && el !== rel) {
-                this.Stateful_onMouseEnter(evt, el);
-            }
+            // var rel = evt.relatedTarget;
+            // if (!uiUtils.contains(el, rel) && el !== rel) {
+            //     this.Stateful_onMouseEnter(evt, el);
+            // }
         },
         Stateful_onMouseOut: function (evt, el){
-            var rel = evt.relatedTarget;
-            if (!uiUtils.contains(el, rel) && el !== rel) {
-                this.Stateful_onMouseLeave(evt, el);
-            }
+            // var rel = evt.relatedTarget;
+            // if (!uiUtils.contains(el, rel) && el !== rel) {
+            //     this.Stateful_onMouseLeave(evt, el);
+            // }
         },
         Stateful_onMouseDown: function (evt, el){
-            if (!this.isDisabled()) {
-                this.addState('active');
-            }
+            // if (!this.isDisabled()) {
+            //     this.addState('active');
+            // }
         },
         Stateful_onMouseUp: function (evt, el){
-            if (!this.isDisabled()) {
-                this.removeState('active');
-            }
+            // if (!this.isDisabled()) {
+            //     this.removeState('active');
+            // }
         },
         Stateful_postRender: function (){
             if (this.disabled && !this.hasState('disabled')) {
