@@ -621,9 +621,12 @@
                             return $h.U({c: 'special', a: 'special_cate', q: {cate_id: item.grade_id}});
                         }
                         return $h.U({
-                            c: 'index',
-                            a: 'unified_list',
-                            q: {type: item.type, title: item.title, recommend_id: item.id}
+                            // c: 'index',
+                            c: 'special',
+                            // a: 'unified_list',
+                            a: 'special_cate',
+                            // q: {type: item.type, title: item.title, recommend_id: item.id}
+                            q: {cate_id: item.grade_id}
                         });
                     }
                 },
