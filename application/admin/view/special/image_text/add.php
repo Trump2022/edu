@@ -488,6 +488,7 @@
 						url: '/admin/setting.system_bucket/get_crm_domain',
 						success: function (res) {
 						    console.log('res=====>', res)
+							res = JSON.parse(res)
 							that.get_qiniu_token(res.get_qiniu_token.crm_doamin)
 						},
 					})
