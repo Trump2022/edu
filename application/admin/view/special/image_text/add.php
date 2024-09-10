@@ -889,13 +889,13 @@
 									number: 1,
 									choose: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
 										let _that = this
-										console.log('obj======>', obj)
 										obj.preview(function(index, file, result){
 											let time=new Date();
 											_that.data = {
 												...self.QNToken,
 												key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`
 											}
+											console.log('file======>', file)
 											obj.upload(index, file)
 											return false
 										});
