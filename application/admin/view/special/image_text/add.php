@@ -857,6 +857,7 @@
                             onclick: function (d) {
                                 // ossUpload.createFrame(uiName, {fodder: editor.key}, {w: 800, h: 550});
 								let fileType = ''
+								console.log('this======>', this)
 								layui.upload.render({
 									elem: '#' + this.id,
 									url: "https://up-z2.qiniup.com/",
