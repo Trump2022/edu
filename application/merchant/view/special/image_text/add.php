@@ -865,7 +865,7 @@
                             title: uiName,
                             cssRules: 'background-position: -380px 0;',
                             onclick: function () {
-                                ossUpload.createFrame(uiName, {fodder: editor.key}, {w: 800, h: 550});
+                                // ossUpload.createFrame(uiName, {fodder: editor.key}, {w: 800, h: 550});
                             }
                         });
                         return btn;

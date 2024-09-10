@@ -28871,7 +28871,6 @@ UE.ui = baidu.editor.ui = {};
                     }
                 });
                 editor.addListener('selectionchange', function (t, causeByUi) {
-					console.log('触发图片');
                     if (!causeByUi) return;
                     var html = '', str = "",
                         img = editor.selection.getRange().getClosedNode(),
