@@ -29041,7 +29041,8 @@ UE.ui = baidu.editor.ui = {};
                 '</div>';
         },
         showWordImageDialog:function () {
-            this._dialogs['wordimageDialog'].open();
+            // this._dialogs['wordimageDialog'].open();
+			console.log('open');
         },
         renderToolbarBoxHtml:function () {
             var buff = [];
