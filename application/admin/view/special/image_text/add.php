@@ -869,6 +869,7 @@
                         that.tabIndex = data.index;
                     });
 					console.log('layui======>', layui)
+					const self = this
                     //实例化编辑器
                     UE.registerUI('选择图片', function (editor, uiName) {
                         var btn = new UE.ui.Button({
@@ -891,7 +892,7 @@
 										obj.preview(function(index, file, result){
 											let time=new Date();
 											that.data = {
-												...QNtoken.data,
+												...self.QNtoken.data,
 												key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`
 											}
 											console.log('触发上传')
