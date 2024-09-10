@@ -880,7 +880,7 @@
                                 // ossUpload.createFrame(uiName, {fodder: editor.key}, {w: 800, h: 550});
 								console.log('d=====>', d)
 								console.log('d=====>', this)
-								console.log('layui======>', layui)
+								console.log('self======>', self)
 								layui.upload.render({
 									elem: '#' + this.id,
 									url: "https://up-z2.qiniup.com/",
@@ -892,7 +892,7 @@
 										obj.preview(function(index, file, result){
 											let time=new Date();
 											_that.data = {
-												...self.QNtoken,
+												...self.QNToken,
 												key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`
 											}
 											console.log('触发上传')
