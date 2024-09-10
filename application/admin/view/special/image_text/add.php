@@ -879,6 +879,7 @@
                                 // ossUpload.createFrame(uiName, {fodder: editor.key}, {w: 800, h: 550});
 								console.log('d=====>', d)
 								console.log('d=====>', this)
+								console.log('layui======>', layui)
 								layui.upload({
 									elem: '#' + this.id,
 									url: "https://up-z2.qiniup.com/",
