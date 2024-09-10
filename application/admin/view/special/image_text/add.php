@@ -480,6 +480,17 @@
                 }
             },
             methods: {
+				//获取空间域名
+				get_crm_domain: function () {
+				    var that = this;
+				    layList.baseGet(layList.U({a: '/admin/setting.system_bucket/get_crm_domain'}), function (res) {
+				        // that.$set(that, 'subject_list', res.data);
+				        // that.$nextTick(function () {
+				        //     layList.form.render('select');
+				        // })
+						console.log('res=====>', res)
+				    });
+				},
                 onSortBlur: function () {
                     var val = parseInt(this.formData.sort);
                     if (isNaN(val)) {
@@ -860,6 +871,8 @@
                     });
                     that.ue = UE.getEditor('editor');
                 });
+				//获取空间域名
+				that.get_crm_domain()
                 //获取科目
                 that.get_subject_list();
                 //获取已添加的素材
