@@ -489,7 +489,7 @@
 						success: function (res) {
 							res = JSON.parse(res)
 						    console.log('res=====>', res)
-							that.get_qiniu_token(res.get_qiniu_token.crm_doamin)
+							that.get_qiniu_token(res.count.crm_doamin)
 						},
 					})
 				},
