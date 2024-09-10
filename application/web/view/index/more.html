@@ -2,7 +2,7 @@
 {block name="title"}精品课程{/block}
 {block name="app"}
 <div v-cloak id="app">
-    <base-header ref="baseHeader" :public-data="publicData" :user-info="userInfo"></base-header>
+    <!-- <base-header ref="baseHeader" :public-data="publicData" :user-info="userInfo"></base-header> -->
 <div class="layout">
     <div class="container">
         <el-breadcrumb separator-class="el-icon-arrow-right">
@@ -86,12 +86,14 @@
                 recommend_id: '',
                 type: '',
                 unifiendList: [],
-                total: 0
+                total: 0,
+				title: '课程'
             },
             created: function () {
                 this.recommend_id = util.getParmas('recommend_id');
                 this.type = util.getParmas('type');
                 this.get_unifiend_list();
+				console.log('this.$router====>', this.$router);
             },
             methods: {
                 // 课程列表
