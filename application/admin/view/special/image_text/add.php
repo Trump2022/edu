@@ -880,7 +880,7 @@
 								console.log('d=====>', d)
 								console.log('d=====>', this)
 								console.log('layui======>', layui)
-								layui.upload({
+								layui.upload.render({
 									elem: '#' + this.id,
 									url: "https://up-z2.qiniup.com/",
 									auto: false,
