@@ -850,6 +850,8 @@
                     });
                     //实例化编辑器
                     UE.registerUI('选择图片', function (editor, uiName) {
+						console.log('editor=====>', editor)
+						console.log('uiName=====>', uiName)
                         var btn = new UE.ui.Button({
                             name: uiName,
                             title: uiName,
