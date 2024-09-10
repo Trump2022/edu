@@ -944,10 +944,14 @@
 										});
 										// layer.load(); //上传loading
 										return false
-									},
-								})
-                            }
-                        });
+										},
+										done: function(res, index) {
+											console.log('res====>', res);
+											self.setContent(self.QNToken.domain + '/' res.key);
+										}
+									})
+								}
+							});
                         return btn;
                     });
                     that.ue = UE.getEditor('editor');
