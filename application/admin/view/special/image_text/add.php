@@ -174,27 +174,27 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="layui-form-item">
-                                <label class="layui-form-label">插入视频：</label>
-                                <div class="layui-input-block">
-                                    <input type="text" name="title" v-model="link" style="width:300px;display:inline-block;margin-right: 10px;" autocomplete="off"
-                                           placeholder="请输入视频链接" class="layui-input">
-                                    <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" @click="uploadVideo">确认添加
-                                    </button>
-                                    <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" id="ossupload">上传视频
-                                    </button>
-                                    <div class="layui-form-mid layui-word-aux" style="float: none;display: inline-block;">输入链接将视为添加视频直接添加,请确保视频链接的正确性
-                                    </div>
-                                </div>
-                                <input type="file" name="video" v-show="" ref="video">
-                                <div class="layui-input-block" style="width: 50%;margin-top: 20px" v-show="is_video">
-                                    <div class="layui-progress" style="margin-bottom: 10px">
-                                        <div class="layui-progress-bar layui-bg-blue" :style="'width:'+videoWidth+'%'"></div>
-                                    </div>
-                                    <button type="button" class="layui-btn layui-btn-sm layui-btn-danger" @click="cancelUpload">取消
-                                    </button>
-                                </div>
-                            </div>
+                            // <div class="layui-form-item">
+                            //     <label class="layui-form-label">插入视频：</label>
+                            //     <div class="layui-input-block">
+                            //         <input type="text" name="title" v-model="link" style="width:300px;display:inline-block;margin-right: 10px;" autocomplete="off"
+                            //                placeholder="请输入视频链接" class="layui-input">
+                            //         <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" @click="uploadVideo">确认添加
+                            //         </button>
+                            //         <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" id="ossupload">上传视频
+                            //         </button>
+                            //         <div class="layui-form-mid layui-word-aux" style="float: none;display: inline-block;">输入链接将视为添加视频直接添加,请确保视频链接的正确性
+                            //         </div>
+                            //     </div>
+                            //     <input type="file" name="video" v-show="" ref="video">
+                            //     <div class="layui-input-block" style="width: 50%;margin-top: 20px" v-show="is_video">
+                            //         <div class="layui-progress" style="margin-bottom: 10px">
+                            //             <div class="layui-progress-bar layui-bg-blue" :style="'width:'+videoWidth+'%'"></div>
+                            //         </div>
+                            //         <button type="button" class="layui-btn layui-btn-sm layui-btn-danger" @click="cancelUpload">取消
+                            //         </button>
+                            //     </div>
+                            // </div>
                             <div class="layui-form-item required">
                                 <label class="layui-form-label">专题详情：</label>
                                 <div class="layui-input-block">
@@ -889,69 +889,26 @@
 									number: 1,
 									choose: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
 										let _that = this
+										console.log('obj======>', obj)
 										obj.preview(function(index, file, result){
 											let time=new Date();
 											_that.data = {
 												...self.QNToken,
 												key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`
 											}
-											console.log('触发上传')
-											// curId = index
-											// curUploadFileName = file.name
-											// let type = file.type.split('/')[0]
-											// if(type == 'image') {
-											// 	dom = `
-											// 		<div class="upload-box">
-											// 			<img src="${result}" alt="" class="image">
-											// 			<div class="upload-file-name ${curId}">
-											// 				<div class="layui-progress" lay-filter="demo${curId}">
-											// 					<div class="layui-progress-bar" style="background-color: #e83839;"></div>
-											// 				</div></div>
-											// 			<img src="/theme/admin/img/training/detele-icon.png" alt="" class="delete-file delete-${curId}" data-el="${el}" />
-											// 		</div>
-											// 	`
-											// } else if(type == 'video') {
-											// 	dom = `
-											// 		<div class="upload-box">
-											// 			<video src="${result}" controls alt="" class="image"></video>
-											// 			<div class="upload-file-name ${curId}">
-											// 				<div class="layui-progress" lay-filter="demo${curId}">
-											// 					<div class="layui-progress-bar" style="background-color: #e83839;"></div>
-											// 				</div></div>
-											// 			<img src="/theme/admin/img/training/detele-icon.png" alt="" class="delete-file delete-${curId}" data-el="${el}" />
-											// 		</div>
-											// 	`
-											// } else {
-											// 	dom = `
-											// 		<div class="upload-box">
-											// 			<div style="width:100px; height: 100px;border: 1px solid #E6E6E6; background-color: #FAFAFA;display: flex;align-items: center;justify-content: center;">
-											// 				<img src="/theme/admin/img/training/${fileType(file.name.split('.').pop())}.png" alt="" class="file-icon" />
-											// 			</div>
-											// 			<div class="upload-file-name ${curId}">
-											// 				<div class="layui-progress" lay-filter="demo${curId}">
-											// 					<div class="layui-progress-bar" style="background-color: #e83839;"></div>
-											// 				</div></div>
-											// 			<img src="/theme/admin/img/training/detele-icon.png" alt="" class="delete-file delete-${curId}" data-el="${el}" />
-											// 		</div>
-											// 	`
-											// }
-											
-											// $('#' + el).before(dom)
-											// $('.' + el).find('.upload-tips').hide()
-											// $('.' + el).find('.upload-box').css('margin-bottom', '0')
 											obj.upload(index, file)
 											return false
 										});
-										// layer.load(); //上传loading
 										return false
-										},
-										done: function(res, index) {
-											console.log('res====>', res);
-											self.setContent(self.QNToken.domain + '/' + res.key);
-										}
-									})
-								}
-							});
+									},
+									done: function(res, index) {
+										console.log('res====>', res);
+										const link = self.QNToken.domain + '/' res.key
+										self.ue.setContent('<img src="' + link + '" _src="' + link + '" />', true);
+									}
+								})
+							}
+						});
                         return btn;
                     });
                     that.ue = UE.getEditor('editor');
