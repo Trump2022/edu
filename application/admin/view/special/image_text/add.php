@@ -868,6 +868,7 @@
                         layui.table.resize('table');
                         that.tabIndex = data.index;
                     });
+					console.log('layui======>', layui)
                     //实例化编辑器
                     UE.registerUI('选择图片', function (editor, uiName) {
                         var btn = new UE.ui.Button({
