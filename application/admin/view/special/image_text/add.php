@@ -865,6 +865,7 @@
 									number: 1,
 									choose: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
 										let _that = this
+										console.log('触发选择')
 										obj.preview(function(index, file, result){
 											let time=new Date();
 											_that.data = {
@@ -881,6 +882,7 @@
 										return false
 									},
 									done: function(res, index) {
+										console.log('fileType====>', fileType)
 										const link = self.QNToken.domain + '/' + res.key
 										if(fileType === 'image') {
 											self.ue.setContent('<img src="' + link + '" _src="' + link + '" />', true);
