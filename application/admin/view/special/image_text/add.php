@@ -483,13 +483,12 @@
 				//获取空间域名
 				get_crm_domain: function () {
 				    var that = this;
-				    layList.baseGet(layList.U({a: '/admin/setting.system_bucket/get_crm_domain'}), function (res) {
-				        // that.$set(that, 'subject_list', res.data);
-				        // that.$nextTick(function () {
-				        //     layList.form.render('select');
-				        // })
-						console.log('res=====>', res)
-				    });
+					$.ajax({
+						url: '/admin/setting.system_bucket/get_crm_domain',
+						success: function (res) {
+						    console.log('res=====>', res)
+						},
+					})
 				},
                 onSortBlur: function () {
                     var val = parseInt(this.formData.sort);
