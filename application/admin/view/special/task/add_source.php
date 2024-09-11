@@ -260,7 +260,6 @@
     <div class="prism-player" id="J_prismPlayer"></div>
 </div>
 <script type="text/javascript" src="{__ADMIN_PATH}js/layuiList.js"></script>
-<script type="text/javascript" src="{__ADMIN_PATH}js/spark-md5.js"></script>
 {/block}
 {block name='script'}
 <script>
@@ -904,11 +903,10 @@
 							let _that = this
 							obj.preview(async function(index, file, result){
 								let time=new Date();
-								const md5 = await self.getFileMd5(file)
-								console.log('md5====>'. md5)
+								const randomString = generateRandomString(16);
 								_that.data = {
 									...self.QNToken,
-									key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`
+									key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${randomString}.${file.name.split('.').pop()}`
 								}
 								// fileType = file.type.split('/')[0]
 								// if(fileType !== 'video') {
@@ -926,16 +924,15 @@
 						}
 					})
 				},
-				getFileMd5: function(file) {
-				    return new Promise((resolve, reject) => {
-						let fileReader = new FileReader()
-						fileReader.onload = function (event) {
-							let fileMd5 = SparkMD5.ArrayBuffer.hash(event.target.result)
-							resolve(fileMd5)
-						}
-						fileReader.readAsArrayBuffer(file)
-				    })
+				generateRandomString: function(length) {
+				    const characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+				    let result = '';
+				    for (let i = 0; i < length; i++) {
+				        result += characters.charAt(Math.floor(Math.random() * characters.length));
+				    }
+				    return result;
 				},
+				
 				//获取空间域名
 				get_crm_domain: function () {
 				    var that = this;
