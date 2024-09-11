@@ -260,6 +260,7 @@
     <div class="prism-player" id="J_prismPlayer"></div>
 </div>
 <script type="text/javascript" src="{__ADMIN_PATH}js/layuiList.js"></script>
+<script type="text/javascript" src="{__ADMIN_PATH}js/spark-md5.js"></script>
 {/block}
 {block name='script'}
 <script>
@@ -901,8 +902,10 @@
 						number: 1,
 						choose: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
 							let _that = this
-							obj.preview(function(index, file, result){
+							obj.preview(async function(index, file, result){
 								let time=new Date();
+								const md5 = await self.getFileMd5(file)
+								console.log('md5====>'. md5)
 								_that.data = {
 									...self.QNToken,
 									key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`
@@ -923,6 +926,16 @@
 						}
 					})
 				},
+				getFileMd5: function(file) {
+				    return new Promise((resolve, reject) => {
+						let fileReader = new FileReader()
+						fileReader.onload = function (event) {
+							let fileMd5 = SparkMD5.ArrayBuffer.hash(event.target.result)
+							resolve(fileMd5)
+						}
+						fileReader.readAsArrayBuffer(file)
+				    })
+				}
 				//获取空间域名
 				get_crm_domain: function () {
 				    var that = this;
