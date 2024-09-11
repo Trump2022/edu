@@ -46,10 +46,6 @@
     .edui-default .edui-for-image .edui-icon {
         background-position: -380px 0px;
     }
-	
-	.edui-default .edui-for-图片/视频 .edui-icon {
-	    background-position: -380px 0px;
-	}
 </style>
 <script type="text/javascript" charset="utf-8" src="{__ADMIN_PATH}plug/ueditor/third-party/zeroclipboard/ZeroClipboard.js"></script>
 <script type="text/javascript" charset="utf-8" src="{__ADMIN_PATH}plug/ueditor/ueditor.config.js?456"></script>
@@ -848,7 +844,7 @@
                     });
 					let loadFinish = false
                     //实例化编辑器
-                    UE.registerUI('图片/视频', function (editor, uiName) {
+                    UE.registerUI('选择图片', function (editor, uiName) {
                         var btn = new UE.ui.Button({
                             name: uiName,
                             title: uiName,
