@@ -850,14 +850,13 @@
                     });
 					let loadFinish = false
                     //实例化编辑器
-                    UE.registerUI('图片/视频', function (editor, uiName) {
+                    UE.registerUI('选择图片', function (editor, uiName) {
                         var btn = new UE.ui.Button({
                             name: uiName,
                             title: uiName,
                             cssRules: 'background-position: -380px 0;',
                             onclick: function (d) {
                                 ossUpload.createFrame(uiName, {fodder: editor.key}, {w: 800, h: 550});
-								return false
 								if(loadFinish) return
 								loadFinish = true
 								let fileType = ''
