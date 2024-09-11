@@ -935,7 +935,7 @@
 						}
 						fileReader.readAsArrayBuffer(file)
 				    })
-				}
+				},
 				//获取空间域名
 				get_crm_domain: function () {
 				    var that = this;
