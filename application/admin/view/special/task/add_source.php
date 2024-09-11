@@ -972,10 +972,10 @@
 									done: function(res, index) {
 										const link = self.QNToken.domain + '/' + res.key
 										if(fileType === 'image') {
-											self[fodder].setContent('<img src="' + link + '" _src="' + link + '" />', true);
+											editor.setContent('<img src="' + link + '" _src="' + link + '" />', true);
 										}
 										if(fileType === 'video') {
-											self[fodder].setContent('<div><video style="width: 100%" src="' + link + '" class="video-ue" controls="controls"><source src="' + link + '"></source></video></div><span style="color:white">.</span>', true);
+											editor.setContent('<div><video style="width: 100%" src="' + link + '" class="video-ue" controls="controls"><source src="' + link + '"></source></video></div><span style="color:white">.</span>', true);
 										}
 									}
 								})
