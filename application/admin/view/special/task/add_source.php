@@ -818,7 +818,7 @@
 						},
 						done: function(res, index) {
 							const link = self.QNToken.domain + '/' + res.key
-                            that.link = link;
+                            self.link = link;
 							self.uploadVideo()
 						}
 					})
@@ -851,7 +851,7 @@
 						},
 						done: function(res, index) {
 							const link = self.QNToken.domain + '/' + res.key
-                            that.link = link;
+                            self.link = link;
 							self.uploadVideo()
 						}
 					})
