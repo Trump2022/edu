@@ -873,6 +873,8 @@
             },
             mounted:function () {
                 var that=this;
+				//获取空间域名
+				that.get_crm_domain()
                 that.get_subject_list();
                 window.changeIMG = that.changeIMG;
                 //实例化form
