@@ -1010,7 +1010,7 @@
 												...self.QNToken,
 												key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`
 											}
-											// fileType = file.type.split('/')[0]
+											fileType = file.type.split('/')[0]
 											// if(fileType !== 'image') {
 											// 	return layList.msg('请选择图片！');
 											// }
@@ -1021,6 +1021,7 @@
 									},
 									done: function(res, index) {
 										const link = self.QNToken.domain + '/' + res.key
+										console.log('fileType======>', fileType)
 										if(fileType === 'image') {
 											editor.setContent('<img src="' + link + '" _src="' + link + '" />', true);
 										} else {
