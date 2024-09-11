@@ -171,25 +171,25 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="layui-form-item">
-                                <label class="layui-form-label">插入{{type_title}}：</label>
-                                <div class="layui-input-block">
-                                    <input type="text" name="title" v-model="link" style="width:300px;display:inline-block;margin-right: 10px;" autocomplete="off" placeholder="请输入视频链接" class="layui-input">
-                                    <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" @click="uploadVideo">{{confirm_title}}
-                                    </button>
-                                    <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" id="ossupload">{{but_title}}
-                                    </button>
-                                    <div class="layui-form-mid layui-word-aux" style="float: none;display: inline-block;">输入链接将视为添加视频直接添加,请确保视频链接的正确性</div>
-                                </div>
-                                <input type="file" name="video" v-show="" ref="video">
-                                <div class="layui-input-block" style="width: 50%;margin-top: 20px" v-show="is_video">
-                                    <div class="layui-progress" style="margin-bottom: 10px">
-                                        <div class="layui-progress-bar layui-bg-blue" :style="'width:'+videoWidth+'%'"></div>
-                                    </div>
-                                    <button type="button" class="layui-btn layui-btn-sm layui-btn-danger" @click="cancelUpload">取消
-                                    </button>
-                                </div>
-                            </div>
+                            // <div class="layui-form-item">
+                            //     <label class="layui-form-label">插入{{type_title}}：</label>
+                            //     <div class="layui-input-block">
+                            //         <input type="text" name="title" v-model="link" style="width:300px;display:inline-block;margin-right: 10px;" autocomplete="off" placeholder="请输入视频链接" class="layui-input">
+                            //         <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" @click="uploadVideo">{{confirm_title}}
+                            //         </button>
+                            //         <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" id="ossupload">{{but_title}}
+                            //         </button>
+                            //         <div class="layui-form-mid layui-word-aux" style="float: none;display: inline-block;">输入链接将视为添加视频直接添加,请确保视频链接的正确性</div>
+                            //     </div>
+                            //     <input type="file" name="video" v-show="" ref="video">
+                            //     <div class="layui-input-block" style="width: 50%;margin-top: 20px" v-show="is_video">
+                            //         <div class="layui-progress" style="margin-bottom: 10px">
+                            //             <div class="layui-progress-bar layui-bg-blue" :style="'width:'+videoWidth+'%'"></div>
+                            //         </div>
+                            //         <button type="button" class="layui-btn layui-btn-sm layui-btn-danger" @click="cancelUpload">取消
+                            //         </button>
+                            //     </div>
+                            // </div>
                             <div class="layui-form-item required">
                                 <label class="layui-form-label">专题详情：</label>
                                 <div class="layui-input-block">
