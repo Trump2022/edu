@@ -841,7 +841,7 @@
 									key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`
 								}
 								fileType = file.type.split('/')[0]
-								if(fileType !== 'audio') {
+								if(fileType !== 'video') {
 									return layList.msg('请选择视频！');
 								}
 								obj.upload(index, file)
