@@ -262,7 +262,7 @@
     <div ref="content" class="content" v-html="isPay || isSourcePay ? taskInfo.content : taskInfo.try_content" @scroll="handleScroll"></div>
 	<div v-if="taskInfo.type == 1 && taskInfo.link">
 		<!-- <embed :src="taskInfo.link" type="application/pdf" width="100%" height="500px" /> -->
-		<canvas id="the-canvas"></canvas>  
+		<iframe :src="`{__WAP_PATH}zsff/js/web/viewer.html?file=${taskInfo.link}`"></iframe>  
 	</div>
   </div>
   <div v-if="!isPay && !isSourcePay" style="height: 1.28rem;"></div>
@@ -315,7 +315,6 @@
     'axios',
     'components/pay-dialog/index',
     '{__WAP_PATH}zsff/js/quick.js',
-	'{__WAP_PATH}zsff/js/pdf.js'
   ], function (Vue, $h, axios, PayDialog) {
     var specialId = {$specialId};
     var taskId = {$task_id};
@@ -377,78 +376,6 @@
         });
       },
       methods: {
-		  loadPDF: function(url) {
-			  console.log('url', url)
-			  PDFJS.workerSrc = '{__WAP_PATH}zsff/js/pdf.worker.js';   //引入主要文件
-			  console.log('pdf', PDFJS)
-			  var pdfDoc = null,  
-				  pageNum = 1,  
-				  pageRendering = false,  
-				  pageNumPending = null,  
-				  scale = 0.8,  
-				  canvas = document.getElementById('the-canvas'),  
-				  ctx = canvas.getContext('2d');  
-				  
-			  function renderPage(num) {  
-				  pageRendering = true;  
-				  pdfDoc.getPage(num).then(function(page) {  
-				  var viewport = page.getViewport(scale);  
-				  canvas.height = viewport.height;  
-				  canvas.width = viewport.width;  
-				  
-				  var renderContext = {  
-					  canvasContext: ctx,  
-					  viewport: viewport  
-				  };  
-				  var renderTask = page.render(renderContext);  
-				  
-				  renderTask.promise.then(function() {  
-					  pageRendering = false;  
-					  if (pageNumPending !== null) {  
-					  // New page rendering is pending  
-					  renderPage(pageNumPending);  
-					  pageNumPending = null;  
-					  }  
-				  });  
-				  });  
-				  
-				  document.getElementById('page_num').textContent = pageNum;  
-			  }  
-				  
-			  function queueRenderPage(num) {  
-				  if (pageRendering) {  
-				  pageNumPending = num;  
-				  } else {  
-				  renderPage(num);  
-				  }  
-			  }  
-				  
-			  function onPrevPage() {  
-				  if (pageNum <= 1) {  
-				  return;  
-				  }  
-				  pageNum--;  
-				  queueRenderPage(pageNum);  
-			  }  
-			  document.getElementById('prev').addEventListener('click', onPrevPage);  
-				  
-			  function onNextPage() {  
-				  if (pageNum >= pdfDoc.numPages) {  
-				  return;  
-				  }  
-				  pageNum++;  
-				  queueRenderPage(pageNum);  
-			  }  
-			  document.getElementById('next').addEventListener('click', onNextPage);  
-				console.log('url=======>', url)
-			  PDFJS.getDocument(url).then(function(pdfDoc_) {  
-				  console.log('pdfDoc_=======>', pdfDoc_)
-				  pdfDoc = pdfDoc_;  
-				  document.getElementById('page_count').textContent = pdfDoc.numPages;  
-				  
-				  renderPage(pageNum);  
-			  });  
-		  },
         // 获取图文信息
         getTaskInfo: function () {
           var vm = this;
@@ -465,11 +392,6 @@
               vm.linkUrl = data.link_url;
               vm.specialInfo = data.specialInfo;
               vm.taskInfo = data.taskInfo;
-			  console.log('vm.taskInfo=====>', vm.taskInfo)
-			  if(vm.taskInfo.type == 1 && vm.taskInfo.link) {
-				  console.log('vm.link=====>', vm.taskInfo.link)
-				  vm.loadPDF(vm.taskInfo.link)
-			  }
               if (isWechat) {
                 mapleWx($jssdk(), function () {
                   this.onMenuShareAll({
