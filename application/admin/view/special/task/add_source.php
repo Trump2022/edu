@@ -204,20 +204,20 @@
                     </div>
                     <div class="layui-form-mid layui-word-aux" style="margin-left: 0;">输入链接将视为添加音频直接添加,请确保音频链接的正确性</div>
                 </div>
-				<div class="layui-form-item"  v-show="source_type==4">
-				    <label class="layui-form-label">素材链接：</label>
-				    <div class="layui-input-block">
-				        <input type="text" name="title" v-model.trim="link" style="width:50%;display:inline-block;margin-right: 10px;" autocomplete="off" placeholder="请输入PDF链接" class="layui-input">
-				        <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" @click="confirmAdd" v-show="is_upload==false">确认添加</button>
-				        <button v-show="is_upload==false && !is_video" type="button" class="layui-btn layui-btn-normal layui-btn-sm ossupload">
-				          <div id="ossupload_pdf">上传PDF</div>
-				        </button>
-				        <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" v-show="is_upload" @click="delVideo()">删除</button>
-				        <button v-show="link" type="button" class="layui-btn layui-btn-warm layui-btn-sm" @click="previewSource">预览</button>
-				    </div>
-				    <div class="layui-form-mid layui-word-aux" style="margin-left: 0;">输入链接将视为添加PDF直接添加,请确保PDF链接的正确性</div>
-				</div>
-                <div class="layui-form-item" v-if="source_type != 1 && source_type != 4">
+				// <div class="layui-form-item"  v-show="source_type==4">
+				//     <label class="layui-form-label">素材链接：</label>
+				//     <div class="layui-input-block">
+				//         <input type="text" name="title" v-model.trim="link" style="width:50%;display:inline-block;margin-right: 10px;" autocomplete="off" placeholder="请输入PDF链接" class="layui-input">
+				//         <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" @click="confirmAdd" v-show="is_upload==false">确认添加</button>
+				//         <button v-show="is_upload==false && !is_video" type="button" class="layui-btn layui-btn-normal layui-btn-sm ossupload">
+				//           <div id="ossupload_pdf">上传PDF</div>
+				//         </button>
+				//         <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" v-show="is_upload" @click="delVideo()">删除</button>
+				//         <button v-show="link" type="button" class="layui-btn layui-btn-warm layui-btn-sm" @click="previewSource">预览</button>
+				//     </div>
+				//     <div class="layui-form-mid layui-word-aux" style="margin-left: 0;">输入链接将视为添加PDF直接添加,请确保PDF链接的正确性</div>
+				// </div>
+                <div class="layui-form-item">
                     <label class="layui-form-label">试{{ source_type == 2 ? '听' :  '看' }}：</label>
                     <div class="layui-input-block">
                         <input :checked="formData.is_try" type="checkbox" name="is_try" lay-skin="switch" lay-text="开启|关闭" lay-filter="isTry">
@@ -1013,8 +1013,8 @@
 									elem: '#' + this.id,
 									url: "https://up-z2.qiniup.com/",
 									auto: false,
-									accept: 'image',
-									acceptMime: 'image/*',
+									accept: 'file',
+									acceptMime: 'image/*, application/pdf',
 									number: 1,
 									choose: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
 										let _that = this
@@ -1024,10 +1024,10 @@
 												...self.QNToken,
 												key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`
 											}
-											fileType = file.type.split('/')[0]
-											if(fileType !== 'image') {
-												return layList.msg('请选择图片！');
-											}
+											// fileType = file.type.split('/')[0]
+											// if(fileType !== 'image') {
+											// 	return layList.msg('请选择图片！');
+											// }
 											obj.upload(index, file)
 											return false
 										});
@@ -1037,9 +1037,8 @@
 										const link = self.QNToken.domain + '/' + res.key
 										if(fileType === 'image') {
 											editor.setContent('<img src="' + link + '" _src="' + link + '" />', true);
-										}
-										if(fileType === 'video') {
-											editor.setContent('<div><video style="width: 100%" src="' + link + '" class="video-ue" controls="controls"><source src="' + link + '"></source></video></div><span style="color:white">.</span>', true);
+										} else {
+											editor.setContent('<embed src="' + link + '" _src="' + link + '" />', true);
 										}
 									}
 								})
