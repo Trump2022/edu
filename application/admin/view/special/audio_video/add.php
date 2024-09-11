@@ -836,6 +836,7 @@
                 window.insertEditor = function (list) {
                     that.ue.execCommand('insertimage', list);
                 };
+				const self = this
                 this.$nextTick(function () {
                     layList.form.render();
                     layui.element.on('tab(tab)', function (data) {

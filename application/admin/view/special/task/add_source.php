@@ -922,12 +922,14 @@
                     that.playbackAddress(that.formData.videoId);
                 }
 
+				const self = this
                 this.$nextTick(function () {
                     var form = layList.form;
                     form.render();
                     form.on('switch(isTry)', function (data) {
                         that.formData.is_try = data.elem.checked ? 1 : 0;
                     });
+					let loadFinish = false
                     //实例化编辑器
                     UE.registerUI('选择图片', function (editor, uiName) {
                         var btn = new UE.ui.Button({
@@ -935,7 +937,45 @@
                             title: uiName,
                             cssRules: 'background-position: -380px 0;',
                             onclick: function() {
-                                ossUpload.createFrame(uiName, { fodder: editor.key }, { w: 800, h: 550 });
+                                // ossUpload.createFrame(uiName, { fodder: editor.key }, { w: 800, h: 550 });
+								if(loadFinish) return
+								loadFinish = true
+								let fileType = ''
+								layui.upload.render({
+									elem: '#' + this.id,
+									url: "https://up-z2.qiniup.com/",
+									auto: false,
+									accept: 'images',
+									acceptMime: 'images/*',
+									number: 1,
+									choose: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+										let _that = this
+										console.log('触发选择')
+										obj.preview(function(index, file, result){
+											let time=new Date();
+											_that.data = {
+												...self.QNToken,
+												key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`
+											}
+											fileType = file.type.split('/')[0]
+											if(fileType !== 'image') {
+												return layList.msg('请选择图片！');
+											}
+											obj.upload(index, file)
+											return false
+										});
+										// return false
+									},
+									done: function(res, index) {
+										const link = self.QNToken.domain + '/' + res.key
+										if(fileType === 'image') {
+											self.ue.setContent('<img src="' + link + '" _src="' + link + '" />', true);
+										}
+										if(fileType === 'video') {
+											self.ue.setContent('<div><video style="width: 100%" src="' + link + '" class="video-ue" controls="controls"><source src="' + link + '"></source></video></div><span style="color:white">.</span>', true);
+										}
+									}
+								})
                             }
                         });
                         return btn;
