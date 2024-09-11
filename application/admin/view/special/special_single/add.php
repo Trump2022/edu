@@ -508,6 +508,7 @@
                 tabIndex: 0,
 				isLoadUploadAudioBtn: false,
 				isLoadUploadVideoBtn: false,
+				QNToken: {}
             },
             watch: {
                 'formData.validity': function (v) {

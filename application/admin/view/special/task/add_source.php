@@ -309,6 +309,7 @@
                 cateList:[],
 				isLoadUploadAudioBtn: false,
 				isLoadUploadVideoBtn: false,
+				QNToken: {}
             },
             methods:{
                 // 预览音视频
