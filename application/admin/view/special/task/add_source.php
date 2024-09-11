@@ -901,9 +901,9 @@
 						number: 1,
 						choose: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
 							let _that = this
-							obj.preview(async function(index, file, result){
+							obj.preview(function(index, file, result){
 								let time=new Date();
-								const randomString = generateRandomString(16);
+								let randomString = self.generateRandomString(16);
 								_that.data = {
 									...self.QNToken,
 									key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${randomString}.${file.name.split('.').pop()}`
