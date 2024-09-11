@@ -261,7 +261,7 @@
     </div>
 	<div v-if="taskInfo.type == 1 && taskInfo.link">
 		<!-- <embed :src="taskInfo.link" type="application/pdf" width="100%" height="500px" /> -->
-		<iframe :src="`{__WAP_PATH}zsff/js/web/viewer.html?file=${taskInfo.link}`" width="100%" height="100vh"></iframe>  
+		<iframe :src="`{__WAP_PATH}zsff/js/web/viewer.html?file=${taskInfo.link}`" width="100%" style="height: 100vh"></iframe>  
 	</div>
     <div ref="content" class="content" v-html="isPay || isSourcePay ? taskInfo.content : taskInfo.try_content" @scroll="handleScroll"></div>
   </div>
