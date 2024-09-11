@@ -217,6 +217,7 @@
 						// 指定工作线程脚本的路径
 						pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.js'
 						var container = document.getElementById('pdf-container')
+						console.log('vm.taskInfo.link=====>', vm.taskInfo.link)
 						// 放入pdf文件链接地址
 						pdfjsLib.getDocument(vm.taskInfo.link).promise.then(function (pdf) {
 						  var currentPage = 1
@@ -229,6 +230,8 @@
 							  var context = canvas.getContext('2d')
 							  canvas.width = viewport.width
 							  canvas.height = viewport.height
+								console.log('context=====>', context)
+								console.log('viewport=====>', viewport)
 							  page.render({
 								canvasContext: context,
 								viewport: viewport
