@@ -946,8 +946,8 @@
 									elem: '#' + this.id,
 									url: "https://up-z2.qiniup.com/",
 									auto: false,
-									accept: 'images',
-									acceptMime: 'images/*',
+									accept: 'image',
+									acceptMime: 'image/*',
 									number: 1,
 									choose: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
 										let _that = this
