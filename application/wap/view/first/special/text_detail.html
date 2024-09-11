@@ -306,7 +306,6 @@
               :is-alipay="is_alipay" :is-balance="is_yue" :template-id="templateIds" :wxpay-h5="wxpayH5" :is-member="isMember" :member-money="specialInfo.member_money" :member-link="memberLink"
               @change="changeVal"></pay-dialog>
 </div>
-<script src="{__WAP_PATH}zsff/js/pdf.js"></script>
 {/block} {block name="foot"}
 <script>
   var uid = {$userInfo['uid']? $userInfo['uid']: 0};
@@ -379,7 +378,9 @@
       },
       methods: {
 		  loadPDF: function(url) {
+			  console.log('url', url)
 			  PDFJS.workerSrc = '{__WAP_PATH}zsff/js/pdf.worker.js';   //引入主要文件
+			  console.log('pdf', PDFJS)
 			  var pdfDoc = null,  
 				  pageNum = 1,  
 				  pageRendering = false,  
