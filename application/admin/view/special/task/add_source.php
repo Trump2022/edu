@@ -306,7 +306,9 @@
                 },
                 videoWidth:0,
                 uploader:null,
-                cateList:[]
+                cateList:[],
+				isLoadUploadAudioBtn: false,
+				isLoadUploadVideoBtn: false,
             },
             methods:{
                 // 预览音视频
@@ -747,6 +749,15 @@
                 },
                 audio_video_upload:function () {
                     var that=this;
+					if(!that.isLoadUploadAudioBtn) {
+						that.isLoadUploadAudioBtn = true
+						that.uploadAudioBtn()
+					}
+					if(!that.isLoadUploadVideoBtn) {
+						that.isLoadUploadVideoBtn = true
+						that.uploadVideoBtn()
+					}
+					return false
                     if (that.uploader) {
                         that.uploader.destroy();
                     }
@@ -777,7 +788,88 @@
                             layList.msg(err);
                         }
                     })
-                }
+                },
+				uploadAudioBtn: function () {
+					layui.upload.render({
+						elem: '#ossupload_audio',
+						url: "https://up-z2.qiniup.com/",
+						auto: false,
+						accept: 'audio',
+						number: 1,
+						choose: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+							let _that = this
+							obj.preview(function(index, file, result){
+								let time=new Date();
+								_that.data = {
+									...self.QNToken,
+									key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`
+								}
+								fileType = file.type.split('/')[0]
+								if(fileType !== 'audio') {
+									return layList.msg('请选择音频！');
+								}
+								obj.upload(index, file)
+								return false
+							});
+							// return false
+						},
+						done: function(res, index) {
+							const link = self.QNToken.domain + '/' + res.key
+							self.uploadVideo(link)
+						}
+					})
+				},
+				uploadVideoBtn: function () {
+					layui.upload.render({
+						elem: '#ossupload_video',
+						url: "https://up-z2.qiniup.com/",
+						auto: false,
+						accept: 'audio',
+						number: 1,
+						choose: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+							let _that = this
+							obj.preview(function(index, file, result){
+								let time=new Date();
+								_that.data = {
+									...self.QNToken,
+									key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`
+								}
+								fileType = file.type.split('/')[0]
+								if(fileType !== 'audio') {
+									return layList.msg('请选择音频！');
+								}
+								obj.upload(index, file)
+								return false
+							});
+							// return false
+						},
+						done: function(res, index) {
+							const link = self.QNToken.domain + '/' + res.key
+							self.uploadVideo(link)
+						}
+					})
+				},
+				//获取空间域名
+				get_crm_domain: function () {
+				    var that = this;
+					$.ajax({
+						url: '/admin/setting.system_bucket/get_crm_domain',
+						success: function (res) {
+							res = JSON.parse(res)
+							that.get_qiniu_token(res.count.crm_doamin)
+						},
+					})
+				},
+				//获取空间token配置
+				get_qiniu_token: function (domain) {
+				    var that = this;
+					$.ajax({
+						url: domain + '/api/qiniu/token',
+						success: function (res) {
+							that.QNToken = res.data
+						},
+					})
+				},
             },
             mounted:function () {
                 var that=this;
