@@ -505,10 +505,22 @@
                                 delete vm.files[key];
                             }
                         }
-                        layui.layer.closeAll('loading');
-                        layui.layer.msg(res.msg === 'ok' ? '上传成功': res.msg);
-                        vm.page = 1;
-                        vm.getImageList();
+						$.ajax({
+							url: '/admin/widget.images/save',
+							type: 'post',
+							data: {
+								key: res.key,
+								title: res.key,
+								url: vm.QNToken.domain + '/' + res.key,
+								pid: vm.pid,
+							},
+							success: r => {
+								layui.layer.closeAll('loading');
+								layui.layer.msg(res.msg === 'ok' ? '上传成功': res.msg);
+								vm.page = 1;
+								vm.getImageList();
+							}
+						})
                     },
                     error: function (index, upload) {
                         layui.layer.closeAll('loading');
