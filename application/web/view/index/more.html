@@ -118,7 +118,7 @@
                 },
                 // 点击课程
                 handleSelectDetils: function (val) {
-                    window.location.href = (val.is_light ? this.$router.single_detail : this.$router.special_detail) + '?id=' + val.id + '&from=more_list&type=' + this.type + '&recommend_id=' + this.recommend_id;
+                    window.location.href = (val.is_light ? this.$router.single_detail : this.$router.special_detail) + '?id=' + val.id + '&from=more_list&type=' + this.type + '&recommend_id=' + this.recommend_id + '&name=' + this.title;
                 }
             }
         });
