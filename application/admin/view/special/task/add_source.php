@@ -330,13 +330,28 @@
                 // 预览音视频
                 previewSource: function () {
                     if (this.link.indexOf('http')) {
-                        layList.msg('请输入正确的'+ (this.source_type == '2' ? '音' : '视') +'频链接');
+                        layList.msg('请输入正确的'+ (this.source_type == '2' ? '音频' : this.source_type == '3' ? '视频' : 'PDF') +'链接');
                     } else {
                         this.isPreview = true;
                         if (this.formData.videoId) {
                             this.playbackAddress(this.formData.videoId);
                         } else {
-                            this.previewPlayer();
+							if(this.source_type < 4) {
+								this.previewPlayer();
+							} else {
+								layer.open({
+								    type: 1 //Page层类型
+								    ,area: ['80%', '90%']
+								    ,title: '预览'
+								    ,shade: 0.6 //遮罩透明度
+								    ,maxmin: true //允许全屏最小化
+								    ,anim: 1 //0-6的动画形式，-1不开启
+								    ,content: `<embed src="${this.link}" width="100%" height="100%">`
+								    ,end:function () {
+								        layer.closeAll();
+								    }
+								});
+							}
                         }
                     }
                 },
