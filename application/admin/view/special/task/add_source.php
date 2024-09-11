@@ -912,6 +912,7 @@
                 }
                 //选择图片插入到编辑器中
                 window.insertEditor = function(list,fodder){
+					console.log('fodder=====>', fodder)
                     that[fodder].execCommand('insertimage', list);
                 };
                 if(that.formData.link && that.formData.videoId=='' && that.source_type!=1){
@@ -932,6 +933,8 @@
 					let loadFinish = false
                     //实例化编辑器
                     UE.registerUI('选择图片', function (editor, uiName) {
+						console.log('editor=====>', editor)
+						console.log('uiName=====>', uiName)
                         var btn = new UE.ui.Button({
                             name: uiName,
                             title: uiName,
