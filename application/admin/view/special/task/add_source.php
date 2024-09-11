@@ -323,6 +323,7 @@
                 cateList:[],
 				isLoadUploadAudioBtn: false,
 				isLoadUploadVideoBtn: false,
+				isLoadUploadPDFBtn: false,
 				QNToken: {}
             },
             methods:{
@@ -772,6 +773,10 @@
 						that.isLoadUploadVideoBtn = true
 						that.uploadVideoBtn()
 					}
+					if(!that.isLoadUploadPDFBtn) {
+						that.isLoadUploadPDFBtn = true
+						that.uploadPDFBtn()
+					}
 					return false
                     if (that.uploader) {
                         that.uploader.destroy();
@@ -866,6 +871,38 @@
 						done: function(res, index) {
 							const link = self.QNToken.domain + '/' + res.key
                             self.link = link;
+							self.uploadVideo()
+						}
+					})
+				},
+				uploadPDFBtn: function () {
+					let self = this
+					layui.upload.render({
+						elem: '#ossupload_pdf',
+						url: "https://up-z2.qiniup.com/",
+						auto: false,
+						acceptMime: 'application/pdf',
+						number: 1,
+						choose: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+							let _that = this
+							obj.preview(function(index, file, result){
+								let time=new Date();
+								_that.data = {
+									...self.QNToken,
+									key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`
+								}
+								// fileType = file.type.split('/')[0]
+								// if(fileType !== 'video') {
+								// 	return layList.msg('请选择视频！');
+								// }
+								obj.upload(index, file)
+								return false
+							});
+							// return false
+						},
+						done: function(res, index) {
+							const link = self.QNToken.domain + '/' + res.key
+				            self.link = link;
 							self.uploadVideo()
 						}
 					})
