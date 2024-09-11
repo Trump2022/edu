@@ -818,7 +818,7 @@
 						},
 						done: function(res, index) {
 							const link = self.QNToken.domain + '/' + res.key
-							console.log('link====>')
+							console.log('link====>', link)
 							self.uploadVideo(link)
 						}
 					})
