@@ -464,7 +464,9 @@
               vm.linkUrl = data.link_url;
               vm.specialInfo = data.specialInfo;
               vm.taskInfo = data.taskInfo;
+			  console.log('vm.taskInfo=====>', vm.taskInfo)
 			  if(vm.taskInfo.type == 1 && vm.taskInfo.link) {
+				  console.log('vm.link=====>', vm.taskInfo.link)
 				  vm.loadPDF(vm.taskInfo.link)
 			  }
               if (isWechat) {
