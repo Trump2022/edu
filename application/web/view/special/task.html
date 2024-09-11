@@ -80,7 +80,8 @@
             <template v-if="taskInfo.type == 1 || taskInfo.light_type == 1">
                 <div v-if="taskInfo.type == 1" v-html="!isPay && taskInfo.is_try ? taskInfo.try_content : taskInfo.content"></div>
                 <div v-if="taskInfo.type == 1">
-					<embed :src="taskInfo.link" width="100%" height="1000px">
+					<!-- <embed :src="taskInfo.link" width="100%" height="1000px"> -->
+					<div id="pdf-container"></div>
 				</div>
                 <div v-else v-html="!isPay && taskInfo.singleProfile.is_try ? taskInfo.singleProfile.try_content : taskInfo.content"></div>
             </template>
@@ -211,6 +212,39 @@
                         vm.$nextTick(function () {
                           this.createPlayer();
                         });
+						
+						// 指定工作线程脚本的路径
+						pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.js'
+						var container = document.getElementById('pdf-container')
+						// 放入pdf文件链接地址
+						pdfjsLib.getDocument(vm.taskInfo.link).promise.then(function (pdf) {
+						  var currentPage = 1
+						  function renderPage(pageNumber) {
+							container.innerHTML = '' // 清空容器
+							pdf.getPage(pageNumber).then(function (page) {
+							  var scale = 1.2
+							  var viewport = page.getViewport({ scale: scale })
+							  var canvas = document.createElement('canvas')
+							  var context = canvas.getContext('2d')
+							  canvas.width = viewport.width
+							  canvas.height = viewport.height
+							  page.render({
+								canvasContext: context,
+								viewport: viewport
+							  })
+							  container.appendChild(canvas)
+							  currentPage = pageNumber
+							})
+						  }
+						  // 监听翻页按钮点击事件
+						  document.getElementById('prev-btn').addEventListener('click', function () {
+							if (currentPage > 1) { renderPage(currentPage - 1) }
+						  })
+						  document.getElementById('next-btn').addEventListener('click', function () {
+							if (currentPage < pdf.numPages) { renderPage(currentPage + 1) }
+						  })
+						  renderPage(1)
+						})
                     }).catch(function (err) {
                         vm.$message.error(err.msg);
                     });
