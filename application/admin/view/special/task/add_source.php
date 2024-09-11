@@ -99,6 +99,7 @@
                         <input type="radio" name="source_type" lay-filter="source_type" v-model="source_type" value="1" title="图文">
                         <input type="radio" name="source_type" lay-filter="source_type" v-model="source_type" value="2" title="音频">
                         <input type="radio" name="source_type" lay-filter="source_type" v-model="source_type" value="3" title="视频">
+                        <input type="radio" name="source_type" lay-filter="source_type" v-model="source_type" value="4" title="PDF">
                     </div>
                 </div>
                 <div class="layui-form-item">
@@ -203,6 +204,19 @@
                     </div>
                     <div class="layui-form-mid layui-word-aux" style="margin-left: 0;">输入链接将视为添加音频直接添加,请确保音频链接的正确性</div>
                 </div>
+				<div class="layui-form-item"  v-show="source_type==4">
+				    <label class="layui-form-label">素材链接：</label>
+				    <div class="layui-input-block">
+				        <input type="text" name="title" v-model.trim="link" style="width:50%;display:inline-block;margin-right: 10px;" autocomplete="off" placeholder="请输入PDF链接" class="layui-input">
+				        <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" @click="confirmAdd" v-show="is_upload==false">确认添加</button>
+				        <button v-show="is_upload==false && !is_video" type="button" class="layui-btn layui-btn-normal layui-btn-sm ossupload">
+				          <div id="ossupload_pdf">上传PDF</div>
+				        </button>
+				        <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" v-show="is_upload" @click="delVideo()">删除</button>
+				        <button v-show="link" type="button" class="layui-btn layui-btn-warm layui-btn-sm" @click="previewSource">预览</button>
+				    </div>
+				    <div class="layui-form-mid layui-word-aux" style="margin-left: 0;">输入链接将视为添加PDF直接添加,请确保PDF链接的正确性</div>
+				</div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">试{{ source_type == 2 ? '听' :  '看' }}：</label>
                     <div class="layui-input-block">
@@ -999,8 +1013,8 @@
 									elem: '#' + this.id,
 									url: "https://up-z2.qiniup.com/",
 									auto: false,
-									accept: 'file',
-									acceptMime: 'image/*, application/pdf',
+									accept: 'image',
+									acceptMime: 'image/*',
 									number: 1,
 									choose: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
 										let _that = this
@@ -1011,9 +1025,9 @@
 												key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`
 											}
 											fileType = file.type.split('/')[0]
-											// if(fileType !== 'image') {
-											// 	return layList.msg('请选择图片！');
-											// }
+											if(fileType !== 'image') {
+												return layList.msg('请选择图片！');
+											}
 											obj.upload(index, file)
 											return false
 										});
@@ -1021,12 +1035,11 @@
 									},
 									done: function(res, index) {
 										const link = self.QNToken.domain + '/' + res.key
-										console.log('fileType======>', fileType)
-										console.log('link======>', link)
 										if(fileType === 'image') {
 											editor.setContent('<img src="' + link + '" _src="' + link + '" />', true);
-										} else {
-											editor.setContent('<embed src="' + link + '" width="100%" height="600px" />', true);
+										}
+										if(fileType === 'video') {
+											editor.setContent('<div><video style="width: 100%" src="' + link + '" class="video-ue" controls="controls"><source src="' + link + '"></source></video></div><span style="color:white">.</span>', true);
 										}
 									}
 								})
