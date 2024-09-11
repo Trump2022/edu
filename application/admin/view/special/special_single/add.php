@@ -992,7 +992,7 @@
 						elem: '#ossupload_audio',
 						url: "https://up-z2.qiniup.com/",
 						auto: false,
-						accept: 'audio',
+						accept: 'audio/*',
 						number: 1,
 						choose: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
 							let _that = this
@@ -1023,7 +1023,7 @@
 						elem: '#ossupload_video',
 						url: "https://up-z2.qiniup.com/",
 						auto: false,
-						accept: 'audio',
+						accept: 'video/*',
 						number: 1,
 						choose: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
 							let _that = this
@@ -1034,8 +1034,8 @@
 									key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`
 								}
 								fileType = file.type.split('/')[0]
-								if(fileType !== 'audio') {
-									return layList.msg('请选择音频！');
+								if(fileType !== 'video') {
+									return layList.msg('请选择视频！');
 								}
 								obj.upload(index, file)
 								return false
