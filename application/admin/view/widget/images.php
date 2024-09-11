@@ -492,11 +492,10 @@
                             }
                         }
 						let time=new Date();
-						console.log('file====>', file)
                         this.data = {
                             pid: vm.pid,
                             title: file.name.slice(0, file.name.lastIndexOf('.')),
-							// key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`,
+							key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`,
 							...vm.QNToken
                         };
                     },
