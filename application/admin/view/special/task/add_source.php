@@ -791,6 +791,7 @@
                     })
                 },
 				uploadAudioBtn: function () {
+					let self = this
 					layui.upload.render({
 						elem: '#ossupload_audio',
 						url: "https://up-z2.qiniup.com/",
@@ -821,6 +822,7 @@
 					})
 				},
 				uploadVideoBtn: function () {
+					let self = this
 					layui.upload.render({
 						elem: '#ossupload_video',
 						url: "https://up-z2.qiniup.com/",
