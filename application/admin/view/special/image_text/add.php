@@ -850,7 +850,7 @@
                     });
 					let loadFinish = false
                     //实例化编辑器
-                    UE.registerUI('选择图片/视频', function (editor, uiName) {
+                    UE.registerUI('图片/视频', function (editor, uiName) {
                         var btn = new UE.ui.Button({
                             name: uiName,
                             title: uiName,
