@@ -99,6 +99,7 @@
                         <input type="radio" name="source_type" lay-filter="source_type" v-model="source_type" value="1" title="图文">
                         <input type="radio" name="source_type" lay-filter="source_type" v-model="source_type" value="2" title="音频">
                         <input type="radio" name="source_type" lay-filter="source_type" v-model="source_type" value="3" title="视频">
+                        <input type="radio" name="source_type" lay-filter="source_type" v-model="source_type" value="4" title="PDF">
                     </div>
                 </div>
                 <div class="layui-form-item">
@@ -203,8 +204,21 @@
                     </div>
                     <div class="layui-form-mid layui-word-aux" style="margin-left: 0;">输入链接将视为添加音频直接添加,请确保音频链接的正确性</div>
                 </div>
+				<div class="layui-form-item"  v-show="source_type==4">
+				    <label class="layui-form-label">素材链接：</label>
+				    <div class="layui-input-block">
+				        <input type="text" name="title" v-model.trim="link" style="width:50%;display:inline-block;margin-right: 10px;" autocomplete="off" placeholder="请输入PDF链接" class="layui-input">
+				        <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" @click="confirmAdd" v-show="is_upload==false">确认添加</button>
+				        <button v-show="is_upload==false && !is_video" type="button" class="layui-btn layui-btn-normal layui-btn-sm ossupload">
+				          <div id="ossupload_pdf">上传PDF</div>
+				        </button>
+				        <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" v-show="is_upload" @click="delVideo()">删除</button>
+				        <button v-show="link" type="button" class="layui-btn layui-btn-warm layui-btn-sm" @click="previewSource">预览</button>
+				    </div>
+				    <div class="layui-form-mid layui-word-aux" style="margin-left: 0;">输入链接将视为添加PDF直接添加,请确保PDF链接的正确性</div>
+				</div>
                 <div class="layui-form-item">
-                    <label class="layui-form-label">试{{ source_type == 2 ? '听' : '看' }}：</label>
+                    <label class="layui-form-label">试{{ source_type == 2 ? '听' :  '看' }}：</label>
                     <div class="layui-input-block">
                         <input :checked="formData.is_try" type="checkbox" name="is_try" lay-skin="switch" lay-text="开启|关闭" lay-filter="isTry">
                     </div>
@@ -306,19 +320,38 @@
                 },
                 videoWidth:0,
                 uploader:null,
-                cateList:[]
+                cateList:[],
+				isLoadUploadAudioBtn: false,
+				isLoadUploadVideoBtn: false,
+				isLoadUploadPDFBtn: false,
+				QNToken: {}
             },
             methods:{
                 // 预览音视频
                 previewSource: function () {
                     if (this.link.indexOf('http')) {
-                        layList.msg('请输入正确的'+ (this.source_type == '2' ? '音' : '视') +'频链接');
+                        layList.msg('请输入正确的'+ (this.source_type == '2' ? '音频' : this.source_type == '3' ? '视频' : 'PDF') +'链接');
                     } else {
                         this.isPreview = true;
                         if (this.formData.videoId) {
                             this.playbackAddress(this.formData.videoId);
                         } else {
-                            this.previewPlayer();
+							if(this.source_type < 4) {
+								this.previewPlayer();
+							} else {
+								layer.open({
+								    type: 1 //Page层类型
+								    ,area: ['80%', '90%']
+								    ,title: '预览'
+								    ,shade: 0.6 //遮罩透明度
+								    ,maxmin: true //允许全屏最小化
+								    ,anim: 1 //0-6的动画形式，-1不开启
+								    ,content: `<embed src="${this.link}" width="100%" height="100%">`
+								    ,end:function () {
+								        layer.closeAll();
+								    }
+								});
+							}
                         }
                     }
                 },
@@ -747,6 +780,19 @@
                 },
                 audio_video_upload:function () {
                     var that=this;
+					if(!that.isLoadUploadAudioBtn) {
+						that.isLoadUploadAudioBtn = true
+						that.uploadAudioBtn()
+					}
+					if(!that.isLoadUploadVideoBtn) {
+						that.isLoadUploadVideoBtn = true
+						that.uploadVideoBtn()
+					}
+					if(!that.isLoadUploadPDFBtn) {
+						that.isLoadUploadPDFBtn = true
+						that.uploadPDFBtn()
+					}
+					return false
                     if (that.uploader) {
                         that.uploader.destroy();
                     }
@@ -777,10 +823,132 @@
                             layList.msg(err);
                         }
                     })
-                }
+                },
+				uploadAudioBtn: function () {
+					let self = this
+					layui.upload.render({
+						elem: '#ossupload_audio',
+						url: "https://up-z2.qiniup.com/",
+						auto: false,
+						accept: 'audio',
+						acceptMime: 'audio/*',
+						number: 1,
+						choose: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+							let _that = this
+							obj.preview(function(index, file, result){
+								let time=new Date();
+								_that.data = {
+									...self.QNToken,
+									key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`
+								}
+								fileType = file.type.split('/')[0]
+								if(fileType !== 'audio') {
+									return layList.msg('请选择音频！');
+								}
+								obj.upload(index, file)
+								return false
+							});
+							// return false
+						},
+						done: function(res, index) {
+							const link = self.QNToken.domain + '/' + res.key
+                            self.link = link;
+							self.uploadVideo()
+						}
+					})
+				},
+				uploadVideoBtn: function () {
+					let self = this
+					layui.upload.render({
+						elem: '#ossupload_video',
+						url: "https://up-z2.qiniup.com/",
+						auto: false,
+						accept: 'video',
+						acceptMime: 'video/*',
+						number: 1,
+						choose: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+							let _that = this
+							obj.preview(function(index, file, result){
+								let time=new Date();
+								_that.data = {
+									...self.QNToken,
+									key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`
+								}
+								fileType = file.type.split('/')[0]
+								if(fileType !== 'video') {
+									return layList.msg('请选择视频！');
+								}
+								obj.upload(index, file)
+								return false
+							});
+							// return false
+						},
+						done: function(res, index) {
+							const link = self.QNToken.domain + '/' + res.key
+                            self.link = link;
+							self.uploadVideo()
+						}
+					})
+				},
+				uploadPDFBtn: function () {
+					let self = this
+					layui.upload.render({
+						elem: '#ossupload_pdf',
+						url: "https://up-z2.qiniup.com/",
+						auto: false,
+						acceptMime: 'application/pdf',
+						accept: 'file',
+						number: 1,
+						choose: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+							let _that = this
+							obj.preview(function(index, file, result){
+								let time=new Date();
+								_that.data = {
+									...self.QNToken,
+									key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`
+								}
+								// fileType = file.type.split('/')[0]
+								// if(fileType !== 'video') {
+								// 	return layList.msg('请选择视频！');
+								// }
+								obj.upload(index, file)
+								return false
+							});
+							// return false
+						},
+						done: function(res, index) {
+							const link = self.QNToken.domain + '/' + res.key
+				            self.link = link;
+							self.uploadVideo()
+						}
+					})
+				},
+				//获取空间域名
+				get_crm_domain: function () {
+				    var that = this;
+					$.ajax({
+						url: '/admin/setting.system_bucket/get_crm_domain',
+						success: function (res) {
+							res = JSON.parse(res)
+							that.get_qiniu_token(res.count.crm_doamin)
+						},
+					})
+				},
+				//获取空间token配置
+				get_qiniu_token: function (domain) {
+				    var that = this;
+					$.ajax({
+						url: domain + '/api/qiniu/token',
+						success: function (res) {
+							that.QNToken = res.data
+						},
+					})
+				},
             },
             mounted:function () {
                 var that=this;
+				//获取空间域名
+				that.get_crm_domain()
                 that.get_subject_list();
                 window.changeIMG = that.changeIMG;
                 //实例化form
@@ -811,6 +979,7 @@
                 }
                 //选择图片插入到编辑器中
                 window.insertEditor = function(list,fodder){
+					console.log('fodder=====>', fodder)
                     that[fodder].execCommand('insertimage', list);
                 };
                 if(that.formData.link && that.formData.videoId=='' && that.source_type!=1){
@@ -821,12 +990,14 @@
                     that.playbackAddress(that.formData.videoId);
                 }
 
+				const self = this
                 this.$nextTick(function () {
                     var form = layList.form;
                     form.render();
                     form.on('switch(isTry)', function (data) {
                         that.formData.is_try = data.elem.checked ? 1 : 0;
                     });
+					let loadFinishIds = []
                     //实例化编辑器
                     UE.registerUI('选择图片', function (editor, uiName) {
                         var btn = new UE.ui.Button({
@@ -834,7 +1005,44 @@
                             title: uiName,
                             cssRules: 'background-position: -380px 0;',
                             onclick: function() {
-                                ossUpload.createFrame(uiName, { fodder: editor.key }, { w: 800, h: 550 });
+                                // ossUpload.createFrame(uiName, { fodder: editor.key }, { w: 800, h: 550 });
+								if(loadFinishIds.includes(this.id)) return
+								loadFinishIds.push(this.id)
+								let fileType = ''
+								layui.upload.render({
+									elem: '#' + this.id,
+									url: "https://up-z2.qiniup.com/",
+									auto: false,
+									accept: 'image',
+									acceptMime: 'image/*',
+									number: 1,
+									choose: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+										let _that = this
+										obj.preview(function(index, file, result){
+											let time=new Date();
+											_that.data = {
+												...self.QNToken,
+												key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`
+											}
+											fileType = file.type.split('/')[0]
+											if(fileType !== 'image') {
+												return layList.msg('请选择图片！');
+											}
+											obj.upload(index, file)
+											return false
+										});
+										// return false
+									},
+									done: function(res, index) {
+										const link = self.QNToken.domain + '/' + res.key
+										if(fileType === 'image') {
+											editor.setContent('<img src="' + link + '" _src="' + link + '" />', true);
+										}
+										if(fileType === 'video') {
+											editor.setContent('<div><video style="width: 100%" src="' + link + '" class="video-ue" controls="controls"><source src="' + link + '"></source></video></div><span style="color:white">.</span>', true);
+										}
+									}
+								})
                             }
                         });
                         return btn;

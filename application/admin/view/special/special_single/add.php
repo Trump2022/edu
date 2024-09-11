@@ -505,7 +505,10 @@
                 },
                 videoWidth: 0,
                 uploader: null,
-                tabIndex: 0
+                tabIndex: 0,
+				isLoadUploadAudioBtn: false,
+				isLoadUploadVideoBtn: false,
+				QNToken: {}
             },
             watch: {
                 'formData.validity': function (v) {
@@ -940,44 +943,141 @@
                 },
                 audio_video_upload: function () {
                     var that = this;
-                    if (that.uploader) {
-                        that.uploader.destroy();
-                    }
-                    that.uploader = ossUpload.upload({
-                        id: that.formData.light_type == 2 ? 'ossupload_audio' : 'ossupload_video',
-                        mime_types: [
-                            that.formData.light_type == 2 ? {title: "Mp3 files", extensions: "mp3"} : {title: "Mp4 files", extensions: "mp4,m3u8"}
-                        ],
-                        FilesAddedSuccess: function () {
-                            that.is_video = true;
-                        },
-                        uploadIng: function (file) {
-                            that.videoWidth = file.percent;
-                        },
-                        success: function (res) {
-                            layList.msg('上传成功');
-                            that.videoWidth = 0;
-                            that.is_video = false;
-                            that.formData.videoId = '';
-                            that.is_upload = true;
-                            that.link = res.url;
-                            that.uploadVideo();
-                        },
-                        fail: function (err) {
-                            that.videoWidth = 0;
-                            that.is_video = false;
-                            that.is_upload = false;
-                            layList.msg(err);
-                        }
-                    })
+					if(!that.isLoadUploadAudioBtn) {
+						that.isLoadUploadAudioBtn = true
+						that.uploadAudioBtn()
+					}
+					if(!that.isLoadUploadVideoBtn) {
+						that.isLoadUploadVideoBtn = true
+						that.uploadVideoBtn()
+					}
+                    // if (that.uploader) {
+                    //     that.uploader.destroy();
+                    // }
+                    // that.uploader = ossUpload.upload({
+                    //     id: that.formData.light_type == 2 ? 'ossupload_audio' : 'ossupload_video',
+                    //     mime_types: [
+                    //         that.formData.light_type == 2 ? {title: "Mp3 files", extensions: "mp3"} : {title: "Mp4 files", extensions: "mp4,m3u8"}
+                    //     ],
+                    //     FilesAddedSuccess: function () {
+                    //         that.is_video = true;
+                    //     },
+                    //     uploadIng: function (file) {
+                    //         that.videoWidth = file.percent;
+                    //     },
+                    //     success: function (res) {
+                    //         layList.msg('上传成功');
+                    //         that.videoWidth = 0;
+                    //         that.is_video = false;
+                    //         that.formData.videoId = '';
+                    //         that.is_upload = true;
+                    //         that.link = res.url;
+                    //         that.uploadVideo();
+                    //     },
+                    //     fail: function (err) {
+                    //         that.videoWidth = 0;
+                    //         that.is_video = false;
+                    //         that.is_upload = false;
+                    //         layList.msg(err);
+                    //     }
+                    // })
                 },
                 // 上一步、下一步
                 tabChange: function (value) {
                     layui.element.tabChange('tab', this.tabIndex + value);
-                }
+                },
+				uploadAudioBtn: function () {
+					let self = this
+					layui.upload.render({
+						elem: '#ossupload_audio',
+						url: "https://up-z2.qiniup.com/",
+						auto: false,
+						accept: 'audio',
+						acceptMime: 'audio/*',
+						number: 1,
+						choose: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+							let _that = this
+							obj.preview(function(index, file, result){
+								let time=new Date();
+								_that.data = {
+									...self.QNToken,
+									key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`
+								}
+								fileType = file.type.split('/')[0]
+								if(fileType !== 'audio') {
+									return layList.msg('请选择音频！');
+								}
+								obj.upload(index, file)
+								return false
+							});
+							// return false
+						},
+						done: function(res, index) {
+							const link = self.QNToken.domain + '/' + res.key
+                            self.link = link;
+							self.uploadVideo()
+						}
+					})
+				},
+				uploadVideoBtn: function () {
+					let self = this
+					layui.upload.render({
+						elem: '#ossupload_video',
+						url: "https://up-z2.qiniup.com/",
+						auto: false,
+						accept: 'video',
+						acceptMime: 'video/*',
+						number: 1,
+						choose: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+							let _that = this
+							obj.preview(function(index, file, result){
+								let time=new Date();
+								_that.data = {
+									...self.QNToken,
+									key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`
+								}
+								fileType = file.type.split('/')[0]
+								if(fileType !== 'video') {
+									return layList.msg('请选择视频！');
+								}
+								obj.upload(index, file)
+								return false
+							});
+							// return false
+						},
+						done: function(res, index) {
+							const link = self.QNToken.domain + '/' + res.key
+                            self.link = link;
+							self.uploadVideo()
+						}
+					})
+				},
+				//获取空间域名
+				get_crm_domain: function () {
+				    var that = this;
+					$.ajax({
+						url: '/admin/setting.system_bucket/get_crm_domain',
+						success: function (res) {
+							res = JSON.parse(res)
+							that.get_qiniu_token(res.count.crm_doamin)
+						},
+					})
+				},
+				//获取空间token配置
+				get_qiniu_token: function (domain) {
+				    var that = this;
+					$.ajax({
+						url: domain + '/api/qiniu/token',
+						success: function (res) {
+							that.QNToken = res.data
+						},
+					})
+				},
             },
             mounted: function () {
                 var that = this;
+				//获取空间域名
+				that.get_crm_domain()
                 window.changeIMG = that.changeIMG;
                 layList.date({
                     elem: '#start_time',

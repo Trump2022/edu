@@ -1,5 +1,5 @@
 {extend name="public/container"}
-{block name="title"}精品课程{/block}
+{block name="title"}{/block}
 {block name="app"}
 <div v-cloak id="app">
     <!-- <base-header ref="baseHeader" :public-data="publicData" :user-info="userInfo"></base-header> -->
@@ -7,7 +7,7 @@
     <div class="container">
         <el-breadcrumb separator-class="el-icon-arrow-right">
             <el-breadcrumb-item><a :href="$router.home">首页</a></el-breadcrumb-item>
-            <el-breadcrumb-item>精品课程</el-breadcrumb-item>
+            <el-breadcrumb-item>{{title}}</el-breadcrumb-item>
         </el-breadcrumb>
         <!-- 课程列表开始 -->
         <div class="container_curriculum_list">
@@ -93,7 +93,8 @@
                 this.recommend_id = util.getParmas('recommend_id');
                 this.type = util.getParmas('type');
                 this.get_unifiend_list();
-				console.log('this.$router====>', this.$router);
+				this.title = util.getParmas('name')
+				document.title = this.title
             },
             methods: {
                 // 课程列表

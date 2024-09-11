@@ -125,7 +125,8 @@
             selectedImageIDS: [],
             uploadInst: null,
             searchContent: '',
-            files: {}
+            files: {},
+			QNToken: {}
         },
         watch: {
             page: function () {
@@ -477,7 +478,8 @@
                 var vm = this;
                 this.uploadInst = layui.upload.render({
                     elem: this.$refs.upload,
-                    url: this.U({ a: 'upload' }),
+                    // url: this.U({ a: 'upload' }),
+					url: "https://up-z2.qiniup.com/",
                     acceptMime: 'image/*',
                     size: 2097152,
                     before: function (obj) {
@@ -489,9 +491,12 @@
                                 file = vm.files[key];
                             }
                         }
+						let time=new Date();
                         this.data = {
                             pid: vm.pid,
-                            title: file.name.slice(0, file.name.lastIndexOf('.'))
+                            title: file.name.slice(0, file.name.lastIndexOf('.')),
+							key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`,
+							...vm.QNToken
                         };
                     },
                     done: function (res, index, upload) {
@@ -509,13 +514,36 @@
                         layui.layer.closeAll('loading');
                     }
                 });
-            }
+            },
+			//获取空间域名
+			get_crm_domain: function () {
+			    var that = this;
+				$.ajax({
+					url: '/admin/setting.system_bucket/get_crm_domain',
+					success: function (res) {
+						res = JSON.parse(res)
+						that.get_qiniu_token(res.count.crm_doamin)
+					},
+				})
+			},
+			//获取空间token配置
+			get_qiniu_token: function (domain) {
+			    var that = this;
+				$.ajax({
+					url: domain + '/api/qiniu/token',
+					success: function (res) {
+						that.QNToken = res.data
+					},
+				})
+			},
         },
         mounted: function () {
             this.getCategoryList();
             this.getImageList();
             window.SuccessCateg = this.SuccessCateg;
             this.renderUpload();
+			//获取空间域名
+			this.get_crm_domain()
         }
     });
 </script>
