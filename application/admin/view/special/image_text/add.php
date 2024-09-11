@@ -885,7 +885,6 @@
 										// return false
 									},
 									done: function(res, index) {
-										console.log('fileType====>', fileType)
 										const link = self.QNToken.domain + '/' + res.key
 										if(fileType === 'image') {
 											self.ue.setContent('<img src="' + link + '" _src="' + link + '" />', true);

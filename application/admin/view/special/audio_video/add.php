@@ -455,7 +455,8 @@
                 videoWidth: 0,
                 uploader: null,
                 searchTask:false,
-                tabIndex: 0
+                tabIndex: 0,
+				QNToken: {}
             },
             watch:{
                 'formData.validity':function (v) {
@@ -467,6 +468,27 @@
                 }
             },
             methods: {
+				//获取空间域名
+				get_crm_domain: function () {
+				    var that = this;
+					$.ajax({
+						url: '/admin/setting.system_bucket/get_crm_domain',
+						success: function (res) {
+							res = JSON.parse(res)
+							that.get_qiniu_token(res.count.crm_doamin)
+						},
+					})
+				},
+				//获取空间token配置
+				get_qiniu_token: function (domain) {
+				    var that = this;
+					$.ajax({
+						url: domain + '/api/qiniu/token',
+						success: function (res) {
+							that.QNToken = res.data
+						},
+					})
+				},
                 //取消
                 cancelUpload: function () {
                     this.uploader.stop();
@@ -820,20 +842,60 @@
                         layui.table.resize('table');
                         that.tabIndex = data.index;
                     });
+					let loadFinish = false
                     //实例化编辑器
-                    UE.registerUI('选择图片', function (editor, uiName) {
+                    UE.registerUI('选择图片/视频', function (editor, uiName) {
                         var btn = new UE.ui.Button({
                             name: uiName,
                             title: uiName,
                             cssRules: 'background-position: -380px 0;',
                             onclick: function() {
-                                ossUpload.createFrame(uiName, { fodder: editor.key }, { w: 800, h: 550 });
+                                // ossUpload.createFrame(uiName, { fodder: editor.key }, { w: 800, h: 550 });
+								if(loadFinish) return
+								loadFinish = true
+								let fileType = ''
+								layui.upload.render({
+									elem: '#' + this.id,
+									url: "https://up-z2.qiniup.com/",
+									auto: false,
+									accept: 'file',
+									number: 1,
+									choose: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+										let _that = this
+										console.log('触发选择')
+										obj.preview(function(index, file, result){
+											let time=new Date();
+											_that.data = {
+												...self.QNToken,
+												key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${file.name}`
+											}
+											fileType = file.type.split('/')[0]
+											if(fileType !== 'image' && fileType !== 'video') {
+												return layList.msg('请选择图片或视频！');
+											}
+											obj.upload(index, file)
+											return false
+										});
+										// return false
+									},
+									done: function(res, index) {
+										const link = self.QNToken.domain + '/' + res.key
+										if(fileType === 'image') {
+											self.ue.setContent('<img src="' + link + '" _src="' + link + '" />', true);
+										}
+										if(fileType === 'video') {
+											self.ue.setContent('<div><video style="width: 100%" src="' + link + '" class="video-ue" controls="controls"><source src="' + link + '"></source></video></div><span style="color:white">.</span>', true);
+										}
+									}
+								})
                             }
                         });
                         return btn;
                     });
                     that.ue = UE.getEditor('editor');
                 });
+				//获取空间域名
+				that.get_crm_domain()
                 //获取科目
                 that.get_subject_list();
                 //获取已添加的素材
