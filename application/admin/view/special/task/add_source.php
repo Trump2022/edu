@@ -930,7 +930,7 @@
                     form.on('switch(isTry)', function (data) {
                         that.formData.is_try = data.elem.checked ? 1 : 0;
                     });
-					let loadFinish = false
+					let loadFinishIds = []
                     //实例化编辑器
                     UE.registerUI('选择图片', function (editor, uiName) {
 						console.log('editor=====>', editor)
@@ -941,8 +941,8 @@
                             cssRules: 'background-position: -380px 0;',
                             onclick: function() {
                                 // ossUpload.createFrame(uiName, { fodder: editor.key }, { w: 800, h: 550 });
-								if(loadFinish) return
-								loadFinish = true
+								if(loadFinishIds.includes(this.id)) return
+								loadFinishIds.push(this.id)
 								let fileType = ''
 								layui.upload.render({
 									elem: '#' + this.id,
