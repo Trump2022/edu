@@ -493,7 +493,7 @@
                         }
                         this.data = {
                             pid: vm.pid,
-                            title: file.name.slice(0, file.name.lastIndexOf('.'))
+                            title: file.name.slice(0, file.name.lastIndexOf('.')),
 							...vm.QNToken
                         };
                     },
