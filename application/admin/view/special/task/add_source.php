@@ -1022,6 +1022,7 @@
 									done: function(res, index) {
 										const link = self.QNToken.domain + '/' + res.key
 										console.log('fileType======>', fileType)
+										console.log('link======>', link)
 										if(fileType === 'image') {
 											editor.setContent('<img src="' + link + '" _src="' + link + '" />', true);
 										} else {
