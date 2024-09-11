@@ -796,7 +796,8 @@
 						elem: '#ossupload_audio',
 						url: "https://up-z2.qiniup.com/",
 						auto: false,
-						accept: 'audio/*',
+						accept: 'audio',
+						acceptMime: 'audio/*',
 						number: 1,
 						choose: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
 							let _that = this
@@ -828,7 +829,8 @@
 						elem: '#ossupload_video',
 						url: "https://up-z2.qiniup.com/",
 						auto: false,
-						accept: 'video/*',
+						accept: 'video',
+						acceptMime: 'video/*',
 						number: 1,
 						choose: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
 							let _that = this
