@@ -336,7 +336,7 @@
                         if (this.formData.videoId) {
                             this.playbackAddress(this.formData.videoId);
                         } else {
-							if(this.source_type < 4) {
+							if(this.source_type > 1) {
 								this.previewPlayer();
 							} else {
 								layer.open({
