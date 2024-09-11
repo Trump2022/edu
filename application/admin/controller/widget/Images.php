@@ -122,6 +122,28 @@ class Images extends AuthController
     }
 
     /**
+     * 保存
+     *
+     * @return null
+     * @descr: I am on my way to future,where you are there.
+     * @date : 9/11/24 2:45 PM
+     * @author: Trump
+     */
+    public function save()
+    {
+        $pid = input('pid') != NULL ? input('pid') : session('pid');
+        $title = input('title') != NULL ? input('title') : '';
+        $key = input('key') != NULL ? input('key') : '';
+        $url = input('url') != NULL ? input('url') : '';
+        try {
+            SystemAttachmentModel::attachmentAdd($key, $title, 0, 'image/jpg', $url, $url, $pid, 1, time());
+            return Json::successful(['url' => $url]);
+        } catch (\Exception $e) {
+            return Json::fail('上传失败:' . $e->getMessage());
+        }
+    }
+
+    /**
      * ajax 提交删除
      */
     public function delete()
