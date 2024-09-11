@@ -1025,7 +1025,7 @@
 										if(fileType === 'image') {
 											editor.setContent('<img src="' + link + '" _src="' + link + '" />', true);
 										} else {
-											editor.setContent('<embed src="' + link + '" _src="' + link + '" />', true);
+											editor.setContent('<embed src="' + link + '" width="100%" height="600px" />', true);
 										}
 									}
 								})
