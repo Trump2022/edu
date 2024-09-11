@@ -933,8 +933,6 @@
 					let loadFinishIds = []
                     //实例化编辑器
                     UE.registerUI('选择图片', function (editor, uiName) {
-						console.log('editor=====>', editor)
-						console.log('uiName=====>', uiName)
                         var btn = new UE.ui.Button({
                             name: uiName,
                             title: uiName,
@@ -953,7 +951,6 @@
 									number: 1,
 									choose: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
 										let _that = this
-										console.log('触发选择')
 										obj.preview(function(index, file, result){
 											let time=new Date();
 											_that.data = {
