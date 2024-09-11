@@ -217,8 +217,8 @@
 				    </div>
 				    <div class="layui-form-mid layui-word-aux" style="margin-left: 0;">输入链接将视为添加PDF直接添加,请确保PDF链接的正确性</div>
 				</div>
-                <div class="layui-form-item">
-                    <label class="layui-form-label">试{{ source_type == 2 ? '听' : '看' }}：</label>
+                <div class="layui-form-item" v-if="source_type != 1 && source_type != 4">
+                    <label class="layui-form-label">试{{ source_type == 2 ? '听' :  '看' }}：</label>
                     <div class="layui-input-block">
                         <input :checked="formData.is_try" type="checkbox" name="is_try" lay-skin="switch" lay-text="开启|关闭" lay-filter="isTry">
                     </div>
