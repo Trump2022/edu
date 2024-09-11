@@ -439,8 +439,9 @@
 				  queueRenderPage(pageNum);  
 			  }  
 			  document.getElementById('next').addEventListener('click', onNextPage);  
-				  
+				console.log('url=======>', url)
 			  PDFJS.getDocument(url).then(function(pdfDoc_) {  
+				  console.log('pdfDoc_=======>', pdfDoc_)
 				  pdfDoc = pdfDoc_;  
 				  document.getElementById('page_count').textContent = pdfDoc.numPages;  
 				  
