@@ -856,7 +856,8 @@
                             title: uiName,
                             cssRules: 'background-position: -380px 0;',
                             onclick: function (d) {
-                                // ossUpload.createFrame(uiName, {fodder: editor.key}, {w: 800, h: 550});
+                                ossUpload.createFrame(uiName, {fodder: editor.key}, {w: 800, h: 550});
+								return false
 								if(loadFinish) return
 								loadFinish = true
 								let fileType = ''
