@@ -663,8 +663,7 @@
                 //素材
                 search_task: function () {
                     var that = this;
-                    // var url = "{:Url('special.special_type/searchs_task')}?special_id=" + id + "&special_type={$special_type}";
-                    var url = "{:Url('special.special_type/searchs_task')}?special_id=" + id + "&special_type=0";
+                    var url = "{:Url('special.special_type/searchs_task')}?special_id=" + id + "&special_type={$special_type}";
                     var title = '选择素材';
                     that.searchTask = true;
                     layer.open({
