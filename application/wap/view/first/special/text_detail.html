@@ -260,7 +260,7 @@
       <div class="browse">已浏览 {{ taskInfo.play_count }}</div>
     </div>
     <div ref="content" class="content" v-html="isPay || isSourcePay ? taskInfo.content : taskInfo.try_content" @scroll="handleScroll"></div>
-	<div v-if="taskInfo.type == 1">
+	<div v-if="taskInfo.type == 1 && taskInfo.link">
 		<embed :src="taskInfo.link" type="application/pdf" width="100%" height="500px">
 	</div>
   </div>
