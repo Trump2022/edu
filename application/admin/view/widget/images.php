@@ -516,7 +516,7 @@
 							},
 							success: r => {
 								layui.layer.closeAll('loading');
-								layui.layer.msg(res.msg === 'ok' ? '上传成功': res.msg);
+								layui.layer.msg(r.msg === 'ok' ? '上传成功': r.msg);
 								vm.page = 1;
 								vm.getImageList();
 							}
