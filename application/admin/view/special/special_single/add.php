@@ -165,6 +165,20 @@
                                     <textarea id="editor2">{{formData.abstract}}</textarea>
                                 </div>
                             </div>
+							
+							<div class="layui-form-item">
+							    <label class="layui-form-label">素材链接：</label>
+							    <div class="layui-input-block">
+							        <input type="text" name="title" v-model.trim="link" style="width:50%;display:inline-block;margin-right: 10px;" autocomplete="off" placeholder="请输入PDF链接" class="layui-input">
+							        <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" @click="confirmAdd" v-show="is_upload==false">确认添加</button>
+							        <button v-show="is_upload==false && !is_video" type="button" class="layui-btn layui-btn-normal layui-btn-sm ossupload">
+							          <div id="ossupload_pdf">上传PDF</div>
+							        </button>
+							        <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" v-show="is_upload" @click="delVideo()">删除</button>
+							        <button v-show="link" type="button" class="layui-btn layui-btn-warm layui-btn-sm" @click="previewSource(true)">预览</button>
+							    </div>
+							    <div class="layui-form-mid layui-word-aux" style="margin-left: 0;">输入链接将视为添加PDF直接添加,请确保PDF链接的正确性</div>
+							</div>
                         </div>
                         <div class="layui-tab-item">
                             <div class="layui-form-item">
@@ -508,6 +522,7 @@
                 tabIndex: 0,
 				isLoadUploadAudioBtn: false,
 				isLoadUploadVideoBtn: false,
+				isLoadUploadPDFBtn: false,
 				QNToken: {}
             },
             watch: {
@@ -521,29 +536,44 @@
             },
             methods: {
                 // 预览音视频
-                previewSource: function () {
+                previewSource: function (isPDF) {
                     if (this.link.indexOf('http')) {
                         layList.msg('请输入正确的' + (this.formData.light_type == '2' ? '音' : '视') + '频链接');
                     } else {
-                        new Aliplayer({
-                            id: 'J_prismPlayer',
-                            source: this.link || '',
-                            height: '100%',
-                            cover: this.formData.light_type == '2' ? '' : this.formData.image,
-                            autoplay: false,
-                            format: this.formData.light_type == '2' ? 'mp3' : ''
-                        }, function (player) {
-                            layList.layer.open({
-                                type: 1,
-                                title: false,
-                                resize: false,
-                                content: $('#J_prismPlayer'),
-                                area: ['640px', '360px'],
-                                end: function () {
-                                    player.dispose();
-                                }
-                            });
-                        });
+						if(isPDF) {
+							layer.open({
+							    type: 1 //Page层类型
+							    ,area: ['80%', '90%']
+							    ,title: '预览'
+							    ,shade: 0.6 //遮罩透明度
+							    ,maxmin: true //允许全屏最小化
+							    ,anim: 1 //0-6的动画形式，-1不开启
+							    ,content: `<embed src="${this.link}" width="100%" height="100%">`
+							    ,end:function () {
+							        layer.closeAll();
+							    }
+							});
+						} else {
+							new Aliplayer({
+							    id: 'J_prismPlayer',
+							    source: this.link || '',
+							    height: '100%',
+							    cover: this.formData.light_type == '2' ? '' : this.formData.image,
+							    autoplay: false,
+							    format: this.formData.light_type == '2' ? 'mp3' : ''
+							}, function (player) {
+							    layList.layer.open({
+							        type: 1,
+							        title: false,
+							        resize: false,
+							        content: $('#J_prismPlayer'),
+							        area: ['640px', '360px'],
+							        end: function () {
+							            player.dispose();
+							        }
+							    });
+							});
+						}
                     }
                 },
                 //取消
@@ -951,6 +981,10 @@
 						that.isLoadUploadVideoBtn = true
 						that.uploadVideoBtn()
 					}
+					if(!that.isLoadUploadPDFBtn) {
+						that.isLoadUploadPDFBtn = true
+						that.uploadPDFBtn()
+					}
                     // if (that.uploader) {
                     //     that.uploader.destroy();
                     // }
@@ -1048,6 +1082,40 @@
 						done: function(res, index) {
 							const link = self.QNToken.domain + '/' + res.key
                             self.link = link;
+							self.uploadVideo()
+						}
+					})
+				},
+				uploadPDFBtn: function () {
+					let self = this
+					layui.upload.render({
+						elem: '#ossupload_pdf',
+						url: "https://up-z2.qiniup.com/",
+						auto: false,
+						acceptMime: 'application/pdf',
+						accept: 'file',
+						number: 1,
+						choose: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+							let _that = this
+							obj.preview(function(index, file, result){
+								let time=new Date();
+								let randomString = self.generateRandomString(16);
+								_that.data = {
+									...self.QNToken,
+									key: `${time.getFullYear().toString() + (time.getMonth() + 1) + time.getDate() + time.getHours()}/${time.getMinutes() + time.getSeconds()}/${randomString}.${file.name.split('.').pop()}`
+								}
+								// fileType = file.type.split('/')[0]
+								// if(fileType !== 'video') {
+								// 	return layList.msg('请选择视频！');
+								// }
+								obj.upload(index, file)
+								return false
+							});
+							// return false
+						},
+						done: function(res, index) {
+							const link = self.QNToken.domain + '/' + res.key
+				            self.link = link;
 							self.uploadVideo()
 						}
 					})
