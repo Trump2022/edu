@@ -1273,7 +1273,7 @@
                       });
                   }
                   if (that.demand_switch == '2') {
-                      that.audio_video_upload();
+                      // that.audio_video_upload();
                   }
                   that.$nextTick(function () {
                       layList.form.render('radio');
@@ -1320,8 +1320,9 @@
                         }
                     });
                 } else if (that.demand_switch == '2' && id > 0) {
-                    that.audio_video_upload();
+                    // that.audio_video_upload();
                 }
+				that.audio_video_upload();
             }
         })
     })
