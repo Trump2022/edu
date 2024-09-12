@@ -357,7 +357,8 @@ class SpecialType extends AuthController
         }
         $data['label'] = json_encode($data['label']);
         $content = htmlspecialchars($data['content']);
-        $link = '';
+        // $link = '';
+        $link = $data['link'];
         $videoId = '';
         $file_type = '';
         $file_name = '';
@@ -367,7 +368,7 @@ class SpecialType extends AuthController
             $file_type = $data['file_type'];
             $file_name = $data['file_name'];
         } else if ($data['light_type'] != 1 && $data['link'] && $data['videoId'] == '') {
-            $link = $data['link'];
+            // $link = $data['link'];
         }
         if ($data['is_try']) {
             if ($data['light_type'] > 1) {
