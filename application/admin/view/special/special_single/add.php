@@ -1121,6 +1121,14 @@
 						}
 					})
 				},
+				generateRandomString: function(length) {
+				    const characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+				    let result = '';
+				    for (let i = 0; i < length; i++) {
+				        result += characters.charAt(Math.floor(Math.random() * characters.length));
+				    }
+				    return result;
+				},
 				//获取空间域名
 				get_crm_domain: function () {
 				    var that = this;
