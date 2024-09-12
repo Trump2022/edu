@@ -145,6 +145,10 @@ class Special extends AuthController
         $recordCoujnt = processingData(bcadd($specialinfo['fake_sales'], $count, 0));
         $isBatch = SpecialBatch::isBatch($id);//专题是否开启兑换活动
         if ($isPay && $this->uid && $specialinfo['type'] == SPECIAL_COLUMN) SpecialBuy::update_column($id, $this->uid);
+        // $mobile_url = SystemConfigService::get('site_url') . Url::build('wap/special/details') . '?id=' . $id;
+        var_dump(cookie('account'));
+        var_dump(cookie('pwd'));
+        exit;
         $mobile_url = SystemConfigService::get('site_url') . Url::build('wap/special/details') . '?id=' . $id;
         $cookie = Config::get('cookie', '');
         $this->assign([
