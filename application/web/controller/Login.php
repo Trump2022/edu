@@ -157,6 +157,7 @@ class Login extends WapBasic
             'samesite' => 'None'          // 允许跨域传输
         ]);
 
+        var_dump(Cookie::prefix().'is_login', 555555);
         // Cookie::set('is_login', 1);
         // Cookie::set('__login_phone', 1);
 
