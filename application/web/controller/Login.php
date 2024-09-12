@@ -92,16 +92,7 @@ class Login extends WapBasic
         if (!$account || !$pwd) return JsonService::fail('请输入登录账号');
         if (!PhoneUser::be(['phone' => $account])) return JsonService::fail('登陆账号不存在!');
 
-        setcookie(Cookie::prefix().'account', $account, [
-            'expires' => time() + 86400,  // 1天后过期
-            'path' => '/',
-            'domain' => $_SERVER['HTTP_HOST'],    // 确保是目标域名
-            'secure' => true,             // 仅在 HTTPS 中有效
-            'httponly' => true,           // 仅通过 HTTP 传输，防止 JavaScript 访问
-            'samesite' => 'None'          // 允许跨域传输
-        ]);
-
-        setcookie(Cookie::prefix().'pwd', $account, [
+        setcookie(Cookie::prefix().'pwd', $pwd, [
             'expires' => time() + 86400,  // 1天后过期
             'path' => '/',
             'domain' => $_SERVER['HTTP_HOST'],    // 确保是目标域名
