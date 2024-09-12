@@ -212,7 +212,11 @@ class Special extends AuthController
         $count = SpecialModel::learning_records($id);
         $recordCoujnt = processingData(bcadd($specialinfo['fake_sales'], $count, 0));
         $isBatch = SpecialBatch::isBatch($id);//专题是否开启兑换活动
+        // $mobile_url = SystemConfigService::get('site_url') . Url::build('wap/special/single_details') . '?id=' . $id;
         $mobile_url = SystemConfigService::get('site_url') . Url::build('wap/special/single_details') . '?id=' . $id;
+        var_dump(cookie('account'));
+        var_dump(cookie('pwd'));
+        exit;
         $this->assign([
             'id' => $id,
             'title' => $special['title'],
