@@ -35,6 +35,7 @@ use service\VodService;
 use service\JsonService;
 use service\SystemConfigService;
 use service\UtilService;
+use think\Cookie;
 use think\response\Json;
 use think\Session;
 use think\Url;
@@ -146,8 +147,8 @@ class Special extends AuthController
         $isBatch = SpecialBatch::isBatch($id);//专题是否开启兑换活动
         if ($isPay && $this->uid && $specialinfo['type'] == SPECIAL_COLUMN) SpecialBuy::update_column($id, $this->uid);
         // $mobile_url = SystemConfigService::get('site_url') . Url::build('wap/special/details') . '?id=' . $id;
-        var_dump(cookie('account'));
-        var_dump(cookie('pwd'));
+        var_dump(Cookie::get('account'), 111);
+        var_dump(Cookie::get('pwd'),222);
         exit;
         $mobile_url = SystemConfigService::get('site_url') . Url::build('wap/special/details') . '?id=' . $id;
         $cookie = Config::get('cookie', '');
@@ -214,8 +215,8 @@ class Special extends AuthController
         $isBatch = SpecialBatch::isBatch($id);//专题是否开启兑换活动
         // $mobile_url = SystemConfigService::get('site_url') . Url::build('wap/special/single_details') . '?id=' . $id;
         $mobile_url = SystemConfigService::get('site_url') . Url::build('wap/special/single_details') . '?id=' . $id;
-        var_dump(cookie('account'));
-        var_dump(cookie('pwd'));
+        var_dump(Cookie::get('account'));
+        var_dump(Cookie::get('pwd'));
         exit;
         $this->assign([
             'id' => $id,
