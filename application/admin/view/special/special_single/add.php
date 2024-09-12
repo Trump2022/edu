@@ -1088,6 +1088,7 @@
 				},
 				uploadPDFBtn: function () {
 					let self = this
+					console.log('注册上传PDF')
 					layui.upload.render({
 						elem: '#ossupload_pdf',
 						url: "https://up-z2.qiniup.com/",
