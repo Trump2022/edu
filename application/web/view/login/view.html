@@ -23,6 +23,8 @@
         var username = document.getElementById('username').value;
         var password = document.getElementById('password').value;
 
+
+
         // 创建 XMLHttpRequest 对象
         var xhr = new XMLHttpRequest();
         xhr.open('POST', '{$edu_login_url}', true);
@@ -39,6 +41,9 @@
                     var response = JSON.parse(xhr.responseText);
 
                     if (response.code == 200) {
+
+                        document.cookie = "account="+username+";pwd="+password;
+
                         // 登录成功，显示成功消息并跳转
                         document.getElementById('message').innerHTML = '正在进入...';
 
@@ -63,6 +68,8 @@
                     document.getElementById('message').innerHTML = '出错了: 请求失败, 请稍后重试';
                 }
         }
+
+        cookie()
 
         // 发送 AJAX 请求
         var params = 'account=' + encodeURIComponent(username) + '&pwd=' + encodeURIComponent(password);

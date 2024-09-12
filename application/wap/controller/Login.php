@@ -130,11 +130,12 @@ class Login extends WapBasic
     {
         $account = input('account', '');
         $pwd = input('pwd', '');
+        $url = input('url', '');
         $this->assign('account', $account);
         $this->assign('pwd', $pwd);
         $this->assign('spread_uid', 0);
         $this->assign('edu_login_url', '/wap/login/check');
-        $this->assign('edu_location_url', '/wap/index/index');
+        $this->assign('edu_location_url', $url ?: '/wap/index/index');
         return $this->fetch();
     }
 
