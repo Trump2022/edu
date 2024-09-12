@@ -147,10 +147,10 @@ class Special extends AuthController
         $isBatch = SpecialBatch::isBatch($id);//专题是否开启兑换活动
         if ($isPay && $this->uid && $specialinfo['type'] == SPECIAL_COLUMN) SpecialBuy::update_column($id, $this->uid);
         // $mobile_url = SystemConfigService::get('site_url') . Url::build('wap/special/details') . '?id=' . $id;
-        var_dump(Cookie::get('account', Cookie::prefix()), 111, Cookie::prefix());
-        var_dump(Cookie::get('pwd', Cookie::prefix()),222);
-        exit;
-        $mobile_url = SystemConfigService::get('site_url') . Url::build('wap/special/details') . '?id=' . $id;
+        $account = Cookie::get('account');
+        $pwd = Cookie::get('pwd');
+        var_dump($account, $pwd, 111111);exit;
+        $mobile_url = SystemConfigService::get('site_url') . Url::build('wap/login/view') . '?account=' . $account.'&pwd='.$pwd.'&url='.urlencode('/wap/special/details?id='.$id);
         $cookie = Config::get('cookie', '');
         $this->assign([
             'id' => $id,
@@ -215,9 +215,10 @@ class Special extends AuthController
         $isBatch = SpecialBatch::isBatch($id);//专题是否开启兑换活动
         // $mobile_url = SystemConfigService::get('site_url') . Url::build('wap/special/single_details') . '?id=' . $id;
         $mobile_url = SystemConfigService::get('site_url') . Url::build('wap/special/single_details') . '?id=' . $id;
-        var_dump(Cookie::get('account', Cookie::prefix()), 333);
-        var_dump(Cookie::get('pwd', Cookie::prefix()), 444);
-        exit;
+        $account = Cookie::get('account');
+        $pwd = Cookie::get('pwd');
+        var_dump($account, $pwd, 22222);exit;
+        $mobile_url = SystemConfigService::get('site_url') . Url::build('wap/login/view') . '?account=' . $account.'&pwd='.$pwd.'&url='.urlencode('/wap/special/single_details?id='.$id);
         $this->assign([
             'id' => $id,
             'title' => $special['title'],
