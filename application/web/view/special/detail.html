@@ -991,8 +991,6 @@
                             }
                             return;
                         }
-						console.log('name=====>', vm.title);
-						return false;
                         window.location.assign(vm.$router.task_info + '?specialId=' + vm.id + '&task_id=' + vm.courseList[0].id + '&special_title=' + vm.special.title + '&name=' + vm.title);
                     }).catch(function (err) {
                         store.setLoginAction(true);
