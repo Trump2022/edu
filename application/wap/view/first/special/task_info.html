@@ -213,7 +213,7 @@
                         vm.taskInfo = data.taskInfo;
                         if (vm.taskInfo.videoId) {
                             vm.getPlayAuth();
-                        } else if (vm.taskInfo.link) {
+                        } else if (vm.taskInfo.link && (vm.taskInfo.type == 2 || vm.taskInfo.type == 3)) {
                             vm.createPlayer();
                         }
                         if (isWechat) {

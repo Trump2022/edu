@@ -703,7 +703,7 @@
                 learn: function () {
                     var vm = this;
                     homeApi.user_login().then(function () {
-                        window.location.href = vm.$router.task_info + '?task_id=0' + '&specialId=' + vm.id + '&special_title=' + vm.special.title;
+                        window.location.href = vm.$router.task_info + '?task_id=0' + '&specialId=' + vm.id + '&special_title=' + vm.special.title + '&name=' + vm.title;
                     }).catch(function (err) {
                         store.setLoginAction(true);
                     });
