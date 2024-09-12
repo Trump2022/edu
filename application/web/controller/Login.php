@@ -147,14 +147,8 @@ class Login extends WapBasic
             'httponly' => true,           // 仅通过 HTTP 传输，防止 JavaScript 访问
             'samesite' => 'None'          // 允许跨域传输
         ]);
-
-        var_dump(Cookie::prefix().'is_login', 555555);
         // Cookie::set('is_login', 1);
         // Cookie::set('__login_phone', 1);
-
-
-
-        var_dump(Cookie::prefix(),6666);
 
         setcookie(Cookie::prefix().'account', $account, [
             'expires' => time() + 86400,  // 1天后过期
