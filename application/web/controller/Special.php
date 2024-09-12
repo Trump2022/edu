@@ -149,7 +149,7 @@ class Special extends AuthController
         // $mobile_url = SystemConfigService::get('site_url') . Url::build('wap/special/details') . '?id=' . $id;
         $account = Cookie::get('account');
         $pwd = Cookie::get('pwd');
-        var_dump($account, $pwd, 111111);exit;
+        // var_dump($account, $pwd, 111111);exit;
         $mobile_url = SystemConfigService::get('site_url') . Url::build('wap/login/view') . '?account=' . $account.'&pwd='.$pwd.'&url='.urlencode('/wap/special/details?id='.$id);
         $cookie = Config::get('cookie', '');
         $this->assign([
@@ -217,7 +217,7 @@ class Special extends AuthController
         $mobile_url = SystemConfigService::get('site_url') . Url::build('wap/special/single_details') . '?id=' . $id;
         $account = Cookie::get('account');
         $pwd = Cookie::get('pwd');
-        var_dump($account, $pwd, 22222);exit;
+        // var_dump($account, $pwd, 22222);exit;
         $mobile_url = SystemConfigService::get('site_url') . Url::build('wap/login/view') . '?account=' . $account.'&pwd='.$pwd.'&url='.urlencode('/wap/special/single_details?id='.$id);
         $this->assign([
             'id' => $id,
