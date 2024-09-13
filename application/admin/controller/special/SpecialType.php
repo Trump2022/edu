@@ -262,6 +262,9 @@ class SpecialType extends AuthController
         if ($id) {
             $special = SpecialModel::getsingleOne($id);
             if (!$special) return Json::fail('专题不存在');
+            echo '<pre>';
+            var_dump($special);
+            exit;
             $this->assign(['special' => json_encode($special)]);
         }
         $alicloud_account_id = SystemConfigService::get('alicloud_account_id');//阿里云账号ID
