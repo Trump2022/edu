@@ -129,7 +129,7 @@ class Special extends ModelBasic
         if (!$special) return false;
         if ($special->is_del) return false;
         $special->singleProfile->content = htmlspecialchars_decode($special->singleProfile->content);
-        $special->singleProfile->link = link;
+        $special->singleProfile->link = $special->singleProfile->link;
         return $special->toArray();
     }
 
