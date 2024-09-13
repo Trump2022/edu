@@ -302,7 +302,9 @@ class Special extends ModelBasic
         if (count($data)) {
             foreach ($data as &$item) {
                 $item->grade_name = $item->secondSubject->grade_name;
-                $item->second_name = $item->secondSubject->name;
+                var_dump($item->secondSubject->id);
+                var_dump($item->secondSubject->name);
+                var_dump($item->secondSubject->grade_id);
             }
         }
 
