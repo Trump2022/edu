@@ -9,6 +9,7 @@
 /public/install/install.lock
 /extend/basic/AuthBasic.php
 /public/nginx.htaccess
+public/.well-known
 *.txt
 think
 .htaccess
