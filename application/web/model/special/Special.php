@@ -59,8 +59,8 @@ class Special extends ModelBasic
      */
     public function secondSubject(): HasOne
     {
-        return $this->hasOne(SpecialSubject::class, 'id', 'subject_id')->field('id,name,grade_id')
-            ->with(['firstSubject'])->bind(['second_name' => 'name']);
+        return $this->hasOne(SpecialSubject::class, 'id', 'subject_id')->field('id,name second_name,grade_id')
+            ->with(['firstSubject']);
     }
 
     public static function getAddTimeAttr($value)
@@ -302,7 +302,7 @@ class Special extends ModelBasic
         if (count($data)) {
             foreach ($data as &$item) {
                 $item->grade_name = $item->secondSubject->grade_name;
-                var_dump($item->secondSubject->name, $item->second_name);
+                var_dump($item->secondSubject->second_name);
             }
         }
 
