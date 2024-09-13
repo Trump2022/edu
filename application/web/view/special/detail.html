@@ -151,8 +151,8 @@
             <el-breadcrumb separator-class="el-icon-arrow-right">
                 <el-breadcrumb-item><a :href="$router.home">首页</a></el-breadcrumb-item>
                 <el-breadcrumb-item v-if="from == 'live'"><a :href="$router.special_live">直播课</a></el-breadcrumb-item>
-                <el-breadcrumb-item v-else-if="from == 'special_cate'"><a :href="$router.special_cate">{{}}</a></el-breadcrumb-item> 
-                <el-breadcrumb-item v-else><a :href="$router.more_list + '?type=' + type + '&recommend_id=' + recommend_id + '&name=' + title">{{title}}</a></el-breadcrumb-item>
+                <el-breadcrumb-item v-else-if="from == 'special_cate'"><a :href="$router.special_cate">{{title || '精品课程'}}</a></el-breadcrumb-item> 
+                <el-breadcrumb-item v-else><a :href="$router.more_list + '?type=' + type + '&recommend_id=' + recommend_id + '&name=' + title">{{title || '精品课程'}}</a></el-breadcrumb-item>
                 <el-breadcrumb-item>课程详情</el-breadcrumb-item>
             </el-breadcrumb>
             <div class="container_content">
@@ -696,7 +696,7 @@
             created: function () {
                 this.from = util.getParmas('from');
                 this.type = util.getParmas('type');
-                this.title = util.getParmas('name');
+                this.title = util.getParmas('name') || '';
                 this.recommend_id = util.getParmas('recommend_id');
                 this.lecturer_details();
                 this.special_data_download();
@@ -991,7 +991,7 @@
                             }
                             return;
                         }
-                        window.location.assign(vm.$router.task_info + '?specialId=' + vm.id + '&task_id=' + vm.courseList[0].id + '&special_title=' + vm.special.title + '&name=' + vm.title);
+                        window.location.assign(vm.$router.task_info + '?specialId=' + vm.id + '&task_id=' + vm.courseList[0].id + '&special_title=' + vm.special.title + '&name=' + vm.title + '&recommend_id=' + vm.recommend_id);
                     }).catch(function (err) {
                         store.setLoginAction(true);
                     });
@@ -1066,7 +1066,7 @@
                                     task_id: task.id,
                                     special_id: task.special_id
                                 }).then(function () {
-                                    window.location.assign(vm.$router.task_info + '?task_id=' + task.id + '&specialId=' + task.special_id + '&special_title=' + vm.special.title + '&viewing_time=' + (task.watch && task.watch.viewing_time || 0));
+                                    window.location.assign(vm.$router.task_info + '?task_id=' + task.id + '&specialId=' + task.special_id + '&special_title=' + vm.special.title + '&viewing_time=' + (task.watch && task.watch.viewing_time || 0) + '&recommend_id=' + vm.recommend_id);
                                 }).catch(function (err) {
                                     vm.$message.error(err.msg);
                                 });

@@ -31,7 +31,8 @@
         <div class="container">
             <el-breadcrumb separator-class="el-icon-arrow-right">
                 <el-breadcrumb-item><a :href="$router.home">首页</a></el-breadcrumb-item>
-                <el-breadcrumb-item><a :href="$router.special_cate">{{title || '精品课程'}}</a></el-breadcrumb-item>
+                <!-- <el-breadcrumb-item><a :href="$router.special_cate">{{title || '精品课程'}}</a></el-breadcrumb-item> -->
+                <el-breadcrumb-item><a :href="$router.more_list + '?type=' + type + '&recommend_id=' + recommend_id + '&name=' + title">{{title || '精品课程'}}</a></el-breadcrumb-item>
                 <el-breadcrumb-item>课程详情</el-breadcrumb-item>
             </el-breadcrumb>
             <div class="container_content">
@@ -83,6 +84,9 @@
 				</div>
                 <div v-if="taskInfo.type == 1" v-html="!isPay && taskInfo.is_try ? taskInfo.try_content : taskInfo.content"></div>
                 <div v-else v-html="!isPay && taskInfo.singleProfile.is_try ? taskInfo.singleProfile.try_content : taskInfo.content"></div>
+				<div v-if="taskInfo.type == 6 && taskInfo.singleProfile && taskInfo.singleProfile.link">
+					<embed :src="taskInfo.singleProfile.link" width="100%" height="1000px">
+				</div>
             </template>
             <div v-else-if="taskInfo.type == 2 || taskInfo.light_type == 2" class="container_courseDetils_content" v-html="taskInfo.detail || taskInfo.abstract"></div>
             <div v-else-if="taskInfo.type == 3 || taskInfo.light_type == 3" class="container_courseDetils_content" v-html="taskInfo.detail || taskInfo.abstract"></div>
@@ -148,7 +152,9 @@
                 tryShow: true,
                 special_id: 0,
                 dialogVisible: false,
-				title: ''
+				title: '',
+				type: 0,
+				recommend_id: 0
             },
             computed: {
               taskName: function () {
@@ -158,7 +164,9 @@
             created: function () {
                 this.task_id = util.getParmas('task_id');
                 this.special_id = util.getParmas('specialId');
-                this.title = util.getParmas('name');
+                this.title = util.getParmas('name') || '';
+                this.type = util.getParmas('type') || '';
+                this.recommend_id = util.getParmas('recommend_id') || '';
                 var viewing_time = this.getTime(this.taskName)
                 // this.viewing_time = util.getParmas('viewing_time') / 1e3;
                 this.viewing_time = viewing_time ? parseInt(viewing_time) : parseInt(util.getParmas('viewing_time') / 1000)

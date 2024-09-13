@@ -16,6 +16,7 @@ use app\web\model\special\StoreOrder;
 use app\web\model\user\User;
 use basic\ModelBasic;
 use service\SystemConfigService;
+use think\model\relation\HasOne;
 use think\Url;
 use traits\ModelTrait;
 use think\Db;
@@ -35,7 +36,7 @@ class Special extends ModelBasic
     use ModelTrait;
 
     /**获取专题详情内容
-     * @return \think\model\relation\HasOne
+     * @return HasOne
      */
     public function profile()
     {
@@ -43,11 +44,27 @@ class Special extends ModelBasic
     }
 
     /**获取轻专题链接或视频点播ID
-     * @return \think\model\relation\HasOne
+     * @return HasOne
      */
     public function singleProfile()
     {
         return $this->hasOne('SpecialContent', 'special_id', 'id')->field('is_try,try_time,try_content,link,videoId,content');
+    }
+
+    /**
+     * @return HasOne
+     * @descr: I am on my way to future,where you are there.
+     * @date : 9/13/24 5:11 PM
+     * @author: Trump
+     */
+    public function secondSubject(): HasOne
+    {
+        return $this->hasOne('SpecialSubject', 'id', 'special_id')->field('id,name,grade_id')
+            // ->with(['firstSubject'])
+            ->bind([
+            'second_name' => 'name',
+            // 'grade_name' => 'grade_name'
+        ]);
     }
 
     public static function getAddTimeAttr($value)
@@ -285,7 +302,7 @@ class Special extends ModelBasic
     {
         $field = ['browse_count', 'image', 'title', 'type', 'sort', 'IFNULL(browse_count,0) + IFNULL(fake_sales,0) as sales', 'is_light', 'light_type', 'is_mer_visible', 'money', 'member_money', 'subject_id', 'pay_type', 'label', 'id', 'fake_sales', 'add_time'];
         $model = self::setWhere($where, $is_member)->field($field);
-        $data = $model->page($where['page'], $where['limit'])->select();
+        $data = $model->with(['secondSubject'])->page($where['page'], $where['limit'])->select();
         $data = count($data) ? $data->toArray() : [];
         foreach ($data as &$item) {
             $item['count'] = self::numberChapters($item['type'], $item['id']);
