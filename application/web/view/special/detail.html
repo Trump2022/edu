@@ -696,7 +696,7 @@
             created: function () {
                 this.from = util.getParmas('from');
                 this.type = util.getParmas('type');
-                this.title = util.getParmas('name');
+                this.title = util.getParmas('name') || '';
                 this.recommend_id = util.getParmas('recommend_id');
                 this.lecturer_details();
                 this.special_data_download();
