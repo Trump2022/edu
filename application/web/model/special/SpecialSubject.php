@@ -12,6 +12,7 @@
 namespace app\web\model\special;
 
 use basic\ModelBasic;
+use think\model\relation\HasOne;
 use traits\ModelTrait;
 
 /**专题分类 二级分类
@@ -22,9 +23,17 @@ class SpecialSubject extends ModelBasic
 {
     use ModelTrait;
 
-    public function firstSubject()
+    /**
+     * @return HasOne
+     * @descr: I am on my way to future,where you are there.
+     * @date : 9/13/24 5:12 PM
+     * @author: Trump
+     */
+    public function firstSubject(): HasOne
     {
-        return $this->hasOne('SpecialSubject', 'id', 'grade_id')->field('id,name,grade_id');
+        return $this->hasOne('SpecialSubject', 'id', 'grade_id')->field('id,name,grade_id')->bind([
+            'grade_name' => 'name'
+        ]);
     }
 
     public function children()

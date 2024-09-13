@@ -16,6 +16,7 @@ use app\web\model\special\StoreOrder;
 use app\web\model\user\User;
 use basic\ModelBasic;
 use service\SystemConfigService;
+use think\model\relation\HasOne;
 use think\Url;
 use traits\ModelTrait;
 use think\Db;
@@ -35,7 +36,7 @@ class Special extends ModelBasic
     use ModelTrait;
 
     /**获取专题详情内容
-     * @return \think\model\relation\HasOne
+     * @return HasOne
      */
     public function profile()
     {
@@ -43,17 +44,24 @@ class Special extends ModelBasic
     }
 
     /**获取轻专题链接或视频点播ID
-     * @return \think\model\relation\HasOne
+     * @return HasOne
      */
     public function singleProfile()
     {
         return $this->hasOne('SpecialContent', 'special_id', 'id')->field('is_try,try_time,try_content,link,videoId,content');
     }
 
-
-    public function secondSubject()
+    /**
+     * @return HasOne
+     * @descr: I am on my way to future,where you are there.
+     * @date : 9/13/24 5:11 PM
+     * @author: Trump
+     */
+    public function secondSubject(): HasOne
     {
-        return $this->hasOne('SpecialSubject', 'id', 'special_id')->field('id,special_id,grade_id')->with(['firstSubject']);
+        return $this->hasOne('SpecialSubject', 'id', 'special_id')->field('id,special_id,grade_id')->with(['firstSubject'])->bind([
+            'grade_name' => 'grade_name'
+        ]);
     }
 
     public static function getAddTimeAttr($value)
