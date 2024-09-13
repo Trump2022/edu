@@ -1189,6 +1189,7 @@
                     that.is_upload = true;
                     that.playbackAddress(that.formData.videoId);
                 }
+				if(that.formData.link) that.link = that.formData.link
                 this.$nextTick(function () {
                     var form = layList.form;
                     form.render();
