@@ -989,7 +989,6 @@
                 }
                 //选择图片插入到编辑器中
                 window.insertEditor = function(list,fodder){
-					console.log('fodder=====>', fodder)
                     that[fodder].execCommand('insertimage', list);
                 };
                 if(that.formData.link && that.formData.videoId=='' && that.source_type!=1){
@@ -999,7 +998,9 @@
                     that.is_upload=true;
                     that.playbackAddress(that.formData.videoId);
                 }
-
+				if(that.formData.link){
+				    that.link = that.formData.link;
+				}
 				const self = this
                 this.$nextTick(function () {
                     var form = layList.form;
