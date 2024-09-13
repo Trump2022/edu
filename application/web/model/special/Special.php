@@ -12,6 +12,7 @@
 namespace app\web\model\special;
 
 use app\web\model\special\SpecialSource;
+use app\web\model\special\SpecialSubject;
 use app\web\model\special\StoreOrder;
 use app\web\model\user\User;
 use basic\ModelBasic;
@@ -23,7 +24,6 @@ use think\Db;
 use app\web\model\live\LiveStudio;
 use app\web\model\live\LivePlayback;
 use app\web\model\special\LearningRecords;
-use app\web\model\special\SpecialSubject;
 use app\web\model\special\SpecialReply;
 use app\web\model\material\DataDownload;
 
@@ -61,10 +61,11 @@ class Special extends ModelBasic
     {
         return $this->hasOne(SpecialSubject::class, 'id', 'special_id')->field('id,name,grade_id')
             // ->with(['firstSubject'])
-            ->bind([
-            'second_name' => 'name',
-            // 'grade_name' => 'grade_name'
-        ]);
+            // ->bind([
+            //     'second_name' => 'name',
+            //     // 'grade_name' => 'grade_name'
+            // ])
+        ;
     }
 
     public static function getAddTimeAttr($value)
@@ -301,8 +302,8 @@ class Special extends ModelBasic
     public static function get_special_list($where, $is_member)
     {
         $field = ['browse_count', 'image', 'title', 'type', 'sort', 'IFNULL(browse_count,0) + IFNULL(fake_sales,0) as sales', 'is_light', 'light_type', 'is_mer_visible', 'money', 'member_money', 'subject_id', 'pay_type', 'label', 'id', 'fake_sales', 'add_time'];
-        $model = self::setWhere($where, $is_member)->field($field);
-        $data = $model->page($where['page'], $where['limit'])->withs(['secondSubject'])->select();
+        $model = self::setWhere($where, $is_member)->field($field)->with(['secondSubject']);
+        $data = $model->page($where['page'], $where['limit'])->select();
         $data = count($data) ? $data->toArray() : [];
         foreach ($data as &$item) {
             $item['count'] = self::numberChapters($item['type'], $item['id']);
