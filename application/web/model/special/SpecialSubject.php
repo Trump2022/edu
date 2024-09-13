@@ -22,6 +22,11 @@ class SpecialSubject extends ModelBasic
 {
     use ModelTrait;
 
+    public function firstSubject()
+    {
+        return $this->hasOne('SpecialSubject', 'id', 'grade_id')->field('id,name,grade_id');
+    }
+
     public function children()
     {
         return $this->hasMany('SpecialSubject', 'grade_id', 'id')->where(['is_del' => 0, 'is_show' => 1])->order('sort DESC,id DESC');
