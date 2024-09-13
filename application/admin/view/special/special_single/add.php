@@ -435,7 +435,7 @@
 {block name='script'}
 <script>
     var id = {$id}, special =<?= isset($special) ? $special : "{}" ?>, special_type = "{$special_type}", alicloud_account_id = "{$alicloud_account_id}", configuration_item_region = "{$configuration_item_region}", demand_switch = "{$demand_switch}";
-    alert(special.singleProfile.link);
+    // alert(special.singleProfile.link);
     require(['vue', 'helper', 'zh-cn', 'request', 'plupload', 'aliyun-oss', 'OssUpload'], function (Vue, $h) {
         new Vue({
             el: "#app",
