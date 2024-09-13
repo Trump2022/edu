@@ -298,8 +298,8 @@ class Special extends ModelBasic
     public static function get_special_list($where, $is_member)
     {
         $field = ['browse_count', 'image', 'title', 'type', 'sort', 'IFNULL(browse_count,0) + IFNULL(fake_sales,0) as sales', 'is_light', 'light_type', 'is_mer_visible', 'money', 'member_money', 'subject_id', 'pay_type', 'label', 'id', 'fake_sales', 'add_time'];
-        $model = self::setWhere($where, $is_member)->field($field)->with(['secondSubject']);
-        $data = $model->page($where['page'], $where['limit'])->select();
+        $model = self::setWhere($where, $is_member)->field($field);
+        $data = $model->with(['secondSubject'])->page($where['page'], $where['limit'])->select();
         $data = count($data) ? $data->toArray() : [];
         foreach ($data as &$item) {
             $item['count'] = self::numberChapters($item['type'], $item['id']);
