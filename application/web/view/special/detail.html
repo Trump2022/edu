@@ -1066,7 +1066,7 @@
                                     task_id: task.id,
                                     special_id: task.special_id
                                 }).then(function () {
-                                    window.location.assign(vm.$router.task_info + '?task_id=' + task.id + '&specialId=' + task.special_id + '&special_title=' + vm.special.title + '&viewing_time=' + (task.watch && task.watch.viewing_time || 0));
+                                    window.location.assign(vm.$router.task_info + '?task_id=' + task.id + '&specialId=' + task.special_id + '&special_title=' + vm.special.title + '&viewing_time=' + (task.watch && task.watch.viewing_time || 0) + '&recommend_id=' + vm.recommend_id);
                                 }).catch(function (err) {
                                     vm.$message.error(err.msg);
                                 });
