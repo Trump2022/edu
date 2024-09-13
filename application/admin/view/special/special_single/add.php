@@ -627,7 +627,7 @@
                 confirmAdd: function () {
                     var link = this.link.trim();
                     if (link) {
-                        if (/^https?:\/\/(.+\/)+.+(\.(m3u8|mp4|mp3))$/i.test(link)) {
+                        if (/^https?:\/\/(.+\/)+.+(\.(m3u8|mp4|mp3|pdf))$/i.test(link)) {
                             this.is_upload = true;
                             this.uploadVideo();
                         } else {
