@@ -61,10 +61,10 @@ class Special extends ModelBasic
     {
         return $this->hasOne(SpecialSubject::class, 'id', 'subject_id')->field('id,name,grade_id')
             ->with(['firstSubject'])
-            ->bind([
-                'second_name' => 'name',
-                'grade_name' => 'grade_name'
-            ])
+            // ->bind([
+            //     'second_name' => 'name',
+            //     'grade_name' => 'grade_name'
+            // ])
         ;
     }
 
@@ -305,7 +305,6 @@ class Special extends ModelBasic
         $model = self::setWhere($where, $is_member)->field($field);
         $data = $model->page($where['page'], $where['limit'])->select();
         foreach ($data as &$item) {
-            var_dump($item->secondSubject->second_name);
             var_dump($item->secondSubject->grade_name);
         }
         $data = count($data) ? $data->toArray() : [];
