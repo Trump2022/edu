@@ -301,7 +301,6 @@ class Special extends ModelBasic
         $model = self::setWhere($where, $is_member)->field($field);
         $data = $model->with(['secondSubject'])->page($where['page'], $where['limit'])->select();
         $data = count($data) ? $data->toArray() : [];
-        var_dump($data);exit;
         foreach ($data as &$item) {
             $item['count'] = self::numberChapters($item['type'], $item['id']);
             $count = self::learning_records($item['id']);
