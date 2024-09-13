@@ -164,10 +164,10 @@ class Images extends AuthController
     {
         $attinfo = SystemAttachmentModel::get($att_id);
         if ($attinfo) {
-            try {
-                $this->init()->delOssFile($attinfo->name);
-            } catch (\Throwable $e) {
-            }
+            // try {
+            //     $this->init()->delOssFile($attinfo->name);
+            // } catch (\Throwable $e) {
+            // }
             $attinfo->delete();
         }
     }
