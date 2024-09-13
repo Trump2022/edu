@@ -59,7 +59,7 @@ class Special extends ModelBasic
      */
     public function secondSubject(): HasOne
     {
-        return $this->hasOne(SpecialSubject::class, 'id', 'special_id')->field('id,name,grade_id')
+        return $this->hasOne(SpecialSubject::class, 'id', 'subject_id')->field('id,name,grade_id')
             // ->with(['firstSubject'])
             // ->bind([
             //     'second_name' => 'name',
