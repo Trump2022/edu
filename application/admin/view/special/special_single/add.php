@@ -165,8 +165,17 @@
                                     <textarea id="editor2">{{formData.abstract}}</textarea>
                                 </div>
                             </div>
-							
-							<div class="layui-form-item">
+                        </div>
+                        <div class="layui-tab-item">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">素材类型：</label>
+                                <div class="layui-input-block">
+                                    <input type="radio" name="light_type" lay-filter="light_type" v-model="formData.light_type" value="1" title="图文">
+                                    <input type="radio" name="light_type" lay-filter="light_type" v-model="formData.light_type" value="2" title="音频">
+                                    <input type="radio" name="light_type" lay-filter="light_type" v-model="formData.light_type" value="3" title="视频">
+                                </div>
+                            </div>
+							<div class="layui-form-item" v-show="formData.light_type==1">
 							    <label class="layui-form-label">素材链接：</label>
 							    <div class="layui-input-block">
 							        <input type="text" name="title" v-model.trim="link" style="width:50%;display:inline-block;margin-right: 10px;" autocomplete="off" placeholder="请输入PDF链接" class="layui-input">
@@ -179,16 +188,6 @@
 							    </div>
 							    <div class="layui-form-mid layui-word-aux" style="margin-left: 0;">输入链接将视为添加PDF直接添加,请确保PDF链接的正确性</div>
 							</div>
-                        </div>
-                        <div class="layui-tab-item">
-                            <div class="layui-form-item">
-                                <label class="layui-form-label">素材类型：</label>
-                                <div class="layui-input-block">
-                                    <input type="radio" name="light_type" lay-filter="light_type" v-model="formData.light_type" value="1" title="图文">
-                                    <input type="radio" name="light_type" lay-filter="light_type" v-model="formData.light_type" value="2" title="音频">
-                                    <input type="radio" name="light_type" lay-filter="light_type" v-model="formData.light_type" value="3" title="视频">
-                                </div>
-                            </div>
                             <div class="layui-form-item" v-show="formData.light_type==3">
                                 <div>
                                     <div class="layui-inline">
