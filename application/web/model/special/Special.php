@@ -305,7 +305,8 @@ class Special extends ModelBasic
         $model = self::setWhere($where, $is_member)->field($field);
         $data = $model->page($where['page'], $where['limit'])->select();
         foreach ($data as &$item) {
-            var_dump($item->secondSubject);
+            var_dump($item->secondSubject->second_name);
+            var_dump($item->secondSubject->grade_name);
         }
         $data = count($data) ? $data->toArray() : [];
         foreach ($data as &$item) {
