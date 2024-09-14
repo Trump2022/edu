@@ -682,6 +682,8 @@ class Special extends AuthController
         list($special_id) = UtilService::getMore([
             ['special_id', 0]
         ], $this->request);
+
+        var_dump($special_id);exit;
         $res = SpecialWatch::viewList($special_id);
         return JsonService::successful($res);
     }
