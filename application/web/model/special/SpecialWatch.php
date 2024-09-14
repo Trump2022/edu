@@ -62,7 +62,7 @@ class SpecialWatch extends ModelBasic
     }
 
     /**
-     * @param $special_id
+     * @param int $special_id
      * @return array
      * @throws DataNotFoundException
      * @throws ModelNotFoundException
@@ -71,9 +71,9 @@ class SpecialWatch extends ModelBasic
      * @date : 9/14/24 3:53 PM
      * @author: Trump
      */
-    public static function viewList($special_id = 0): array
+    public static function viewList(int $special_id = 0): array
     {
-        return self::where(['special_id' => $special_id])->where('percentage', '>=', 100)->field('uid,special_id, task_id, add_time')->with(['user', 'specialTask'])->select()->toArray();
+        return self::where(['special_id' => $special_id])->where('percentage', '>=', 100)->field('uid,special_id, task_id, add_time')->order('add_time desc')->with(['user', 'specialTask'])->select()->toArray();
     }
 
     /**

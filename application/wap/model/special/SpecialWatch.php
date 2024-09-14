@@ -13,6 +13,9 @@ namespace app\wap\model\special;
 
 
 use basic\ModelBasic;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
+use think\exception\DbException;
 use think\model\relation\HasOne;
 use traits\ModelTrait;
 use think\Db;
@@ -59,9 +62,19 @@ class SpecialWatch extends ModelBasic
         return self::where(['uid' => $uid, 'special_id' => $special_id, 'task_id' => $task_id])->find();
     }
 
+    /**
+     * @param $special_id
+     * @return array
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
+     * @descr: I am on my way to future,where you are there.
+     * @date : 9/14/24 4:15 PM
+     * @author: Trump
+     */
     public static function viewList($special_id = 0)
     {
-        return self::where(['special_id' => $special_id])->where('percentage', '>=', 100)->field('uid,special_id, task_id, add_time')->with(['user', 'specialTask'])->select()->toArray();
+        return self::where(['special_id' => $special_id])->where('percentage', '>=', 100)->field('uid,special_id, task_id, add_time')->order('add_time desc')->with(['user', 'specialTask'])->select()->toArray();
     }
 
     /**
