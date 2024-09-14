@@ -1638,8 +1638,9 @@ class Special extends AuthController
             ['special_id', 0]
         ], $this->request, true);
         $res = SpecialWatch::viewList($special_id);
+        $time = time();
         foreach ($res as &$item) {
-            $item['add_time'] = friendlyDate($item['add_time']);
+            $item['add_time'] = friendlyDate($item['add_time'],'mohu',$time);
         }
         return JsonService::successful($res);
     }
