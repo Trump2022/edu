@@ -12,9 +12,14 @@
 namespace app\web\model\special;
 
 use basic\ModelBasic;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
+use think\exception\DbException;
+use think\model\relation\HasOne;
 use traits\ModelTrait;
 use think\Db;
 use app\web\model\user\User;
+use app\web\model\special\SpecialTask;
 
 /**素材观看记录
  * Class SpecialWatch
@@ -56,15 +61,44 @@ class SpecialWatch extends ModelBasic
         return self::where(['uid' => $uid, 'special_id' => $special_id, 'task_id' => $task_id])->find();
     }
 
-    public static function viewList($special_id = 0)
+    /**
+     * @param $special_id
+     * @return array
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
+     * @descr: I am on my way to future,where you are there.
+     * @date : 9/14/24 3:53 PM
+     * @author: Trump
+     */
+    public static function viewList($special_id = 0): array
     {
-        return self::where(['special_id' => $special_id])->where('percentage', '>=', 100)->field('uid, task_id, add_time')->with(['user']);
+        return self::where(['special_id' => $special_id])->where('percentage', '>=', 100)->field('uid,special_id, task_id, add_time')->with(['user', 'specialTask'])->select()->toArray();
     }
 
+    /**
+     * @return HasOne
+     * @descr: I am on my way to future,where you are there.
+     * @date : 9/14/24 3:54 PM
+     * @author: Trump
+     */
     public function user()
     {
         return $this->hasOne(User::class, 'uid', 'uid')->field('uid, nickname')->bind([
             'nickname' => 'nickname'
+        ]);
+    }
+
+    /**
+     * @return HasOne
+     * @descr: I am on my way to future,where you are there.
+     * @date : 9/14/24 3:54 PM
+     * @author: Trump
+     */
+    public function specialTask(): HasOne
+    {
+        return $this->hasOne(SpecialTask::class, 'id', 'task_id')->field('id, title')->bind([
+            'task_title' => 'title'
         ]);
     }
 }

@@ -36,6 +36,9 @@ use service\JsonService;
 use service\SystemConfigService;
 use service\UtilService;
 use think\Cookie;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
+use think\exception\DbException;
 use think\response\Json;
 use think\Session;
 use think\Url;
@@ -96,9 +99,9 @@ class Special extends AuthController
     /**获取专题价格
      * @param $id
      * @return void
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function getSpecialPrice($id = 0)
     {
@@ -257,9 +260,9 @@ class Special extends AuthController
      * @param $task_id 素材ID
      * @return mixed|void
      * @throws \think\Exception
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function task_info($task_id = 0, $specialId = 0)
     {
@@ -270,9 +273,9 @@ class Special extends AuthController
 
     /**获取素材内容
      * @throws \think\Exception
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      * special_id 专题ID task_id素材ID
      */
     public function getTaskInfo()
@@ -344,9 +347,9 @@ class Special extends AuthController
     /**记录专题浏览人
      * @param $id
      * @throws \think\Exception
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function addLearningRecords($id)
     {
@@ -365,9 +368,9 @@ class Special extends AuthController
 
     /**用户专题评价
      * @param int $special_id
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function user_comment_special($special_id = 0)
     {
@@ -400,9 +403,9 @@ class Special extends AuthController
      * @param int $page
      * @param int $limit
      * @param string $filter
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function special_reply_list($special_id = '', $page = 1, $limit = 8, $filter = 'all')
     {
@@ -538,9 +541,9 @@ class Special extends AuthController
 
     /**
      * 获取课程分类
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function get_grade_cate()
     {
@@ -677,22 +680,32 @@ class Special extends AuthController
         return JsonService::successful($res);
     }
 
+    /**
+     * @return null
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
+     * @descr: I am on my way to future,where you are there.
+     * @date : 9/14/24 3:57 PM
+     * @author: Trump
+     */
     public function view_list()
     {
         list($special_id) = UtilService::getMore([
             ['special_id', 0]
-        ], $this->request);
-
-        var_dump($special_id);exit;
+        ], $this->request, true);
         $res = SpecialWatch::viewList($special_id);
+        foreach ($res as &$item) {
+            $item['add_time'] = friendlyDate($item['add_time']);
+        }
         return JsonService::successful($res);
     }
 
     /**专题推荐课程
      * @param int $id 专题ID
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function recommended_courses($id)
     {

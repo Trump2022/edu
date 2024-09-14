@@ -11,10 +11,13 @@
 
 namespace app\wap\model\special;
 
+
 use basic\ModelBasic;
+use think\model\relation\HasOne;
 use traits\ModelTrait;
 use think\Db;
 use app\wap\model\user\User;
+use app\wap\model\special\SpecialTask;
 
 /**专题观看记录
  * Class SpecialWatch
@@ -58,13 +61,33 @@ class SpecialWatch extends ModelBasic
 
     public static function viewList($special_id = 0)
     {
-        self::where(['special_id' => $special_id])->where('percentage', '>=', 100)->field('uid, task_id, add_time')->with(['user']);
+        return self::where(['special_id' => $special_id])->where('percentage', '>=', 100)->field('uid,special_id, task_id, add_time')->with(['user', 'specialTask'])->select()->toArray();
     }
 
-    public function user()
+    /**
+     * @return HasOne
+     * @descr: I am on my way to future,where you are there.
+     * @date : 9/14/24 3:53 PM
+     * @author: Trump
+     */
+    public function user(): HasOne
     {
         return $this->hasOne(User::class, 'uid', 'uid')->field('uid, nickname')->bind([
             'nickname' => 'nickname'
+        ]);
+    }
+
+
+    /**
+     * @return HasOne
+     * @descr: I am on my way to future,where you are there.
+     * @date : 9/14/24 3:53 PM
+     * @author: Trump
+     */
+    public function specialTask(): HasOne
+    {
+        return $this->hasOne(SpecialTask::class, 'id', 'task_id')->field('id, title')->bind([
+            'task_title' => 'title'
         ]);
     }
 }
