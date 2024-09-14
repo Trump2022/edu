@@ -297,14 +297,8 @@ class Special extends ModelBasic
     public static function get_special_list($where, $is_member)
     {
         $field = ['browse_count', 'image', 'title', 'type', 'sort', 'IFNULL(browse_count,0) + IFNULL(fake_sales,0) as sales', 'is_light', 'light_type', 'is_mer_visible', 'money', 'member_money', 'subject_id', 'pay_type', 'label', 'id', 'fake_sales', 'add_time'];
-        $model = self::setWhere($where, $is_member)->field($field);
+        $model = self::setWhere($where, $is_member)->field($field)->with(['secondSubject']);
         $data = $model->page($where['page'], $where['limit'])->select();
-        if (count($data)) {
-            foreach ($data as &$item) {
-                $item->grade_name = $item->secondSubject->grade_name;
-                $item->second_name = $item->secondSubject->second_name;
-            }
-        }
 
         $data = count($data) ? $data->toArray() : [];
         foreach ($data as &$item) {
@@ -314,6 +308,10 @@ class Special extends ModelBasic
             if ($item['is_light']) {
                 $item['type'] = self::lightType($item['light_type']);
             }
+            $second_subject = $item['second_subject'] ?? [];
+            $item['grade_id'] = $second_subject['grade_id'];
+            $item['grade_name'] = $second_subject['grade_name'];
+            $item['second_name'] = $second_subject['second_name'];
         }
         $count = $model = self::setWhere($where, $is_member)->count();
         return compact('data', 'count');
