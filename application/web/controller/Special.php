@@ -78,7 +78,8 @@ class Special extends AuthController
             'special_data_download',
             'teacher_detail',
             'teacher_list',
-            'exchange'
+            'exchange',
+            'view_list'
         ];
     }
 
@@ -673,6 +674,15 @@ class Special extends AuthController
             ['total', 0]
         ], $this->request);
         $res = SpecialWatch::materialViewing($this->uid, $data);
+        return JsonService::successful($res);
+    }
+
+    public function view_list()
+    {
+        list($special_id) = UtilService::getMore([
+            ['special_id', 0]
+        ], $this->request);
+        $res = SpecialWatch::viewList($special_id);
         return JsonService::successful($res);
     }
 

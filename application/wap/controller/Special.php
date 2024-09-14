@@ -109,7 +109,8 @@ class Special extends AuthController
             'data_details',
             'exchange',
             'question_index',
-            'special_validity'
+            'special_validity',
+            'view_list'
         ];
     }
 
@@ -1628,6 +1629,15 @@ class Special extends AuthController
             ['total', 0]
         ], $this->request);
         $res = SpecialWatch::materialViewing($this->uid, $data);
+        return JsonService::successful($res);
+    }
+
+    public function view_list()
+    {
+        list($special_id) = UtilService::getMore([
+            ['special_id', 0]
+        ], $this->request);
+        $res = SpecialWatch::viewList($special_id);
         return JsonService::successful($res);
     }
 

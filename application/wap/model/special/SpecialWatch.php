@@ -14,6 +14,7 @@ namespace app\wap\model\special;
 use basic\ModelBasic;
 use traits\ModelTrait;
 use think\Db;
+use app\wap\model\user\User;
 
 /**专题观看记录
  * Class SpecialWatch
@@ -55,4 +56,15 @@ class SpecialWatch extends ModelBasic
         return self::where(['uid' => $uid, 'special_id' => $special_id, 'task_id' => $task_id])->find();
     }
 
+    public static function viewList($special_id = 0)
+    {
+        self::where(['special_id' => $special_id])->where('percentage', '>=', 100)->field('uid, task_id, add_time')->with(['user']);
+    }
+
+    public function user()
+    {
+        return $this->hasOne(User::class, 'uid', 'uid')->field('uid, nickname')->bind([
+            'nickname' => 'nickname'
+        ]);
+    }
 }
