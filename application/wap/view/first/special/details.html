@@ -1017,6 +1017,12 @@
                     <div>暂无评价</div>
                 </div>
             </div>
+			
+			<div v-show="active === 7">
+			    <div v-for="(item, index) in viewList" :key="index" style="color: #333; margin-bottom: 8px;">
+			    	{{item.nickname}} {{item.add_time}} <span style="color: #ccc">完成了学习</span> {{item.task_title}}
+			    </div>
+			</div>
         </template>
     </div>
     <footer class="acea-row row-middle" ref="storeMenu" v-if="is_pay==false && is_gift==false && isPink==false">
@@ -1305,6 +1311,10 @@
                     {
                         title: '评价',
                         value: 5
+                    },
+                    {
+                        title: '学习动态',
+                        value: 7
                     }
                 ],
                 otherNavlist: [
@@ -1319,6 +1329,10 @@
                     {
                         title: '评价',
                         value: 5
+                    },
+                    {
+                        title: '学习动态',
+                        value: 7
                     }
                 ],
                 liveNavlist: [
@@ -1421,7 +1435,8 @@
                 special_validity: -1, // -1 未购买显示课程有效期 0 已购买并永久 >0 已购买并有有效期
                 rebateMoney: 0,
                 isShareDisplaySwitch: {$is_share_display_switch},
-                memberLink: memberLink
+                memberLink: memberLink,
+				viewList: []
             },
             watch: {
                 pay_type_num: function () {
@@ -1577,6 +1592,7 @@
                 if (this.special.type != 4) {
                     this.getInspect();
                 }
+				this.get_view_list()
             },
             updated: function () {
                 this.$nextTick(function () {
@@ -1584,6 +1600,20 @@
                 });
             },
             methods: {
+				get_view_list: function() {
+					app.baseGet($h.U({
+					    c: 'special',
+					    a: 'view_list',
+					    q: {
+					        special_id: this.special.id
+					    }
+					}), function (res) {
+					    $h.loadClear();
+						this.viewList = res.data
+					}.bind(this), function () {
+					    $h.loadClear();
+					});
+				},
               wxShareLink: function (uid) {
                 var search = window.location.search.slice(1);
                 var searchArr = search.split('&');
