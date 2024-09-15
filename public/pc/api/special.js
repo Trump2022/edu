@@ -246,7 +246,7 @@ define([
                 url: '/special/play_num',
                 params: params
             });
-        }
+        },
         /**
          * 专题的学习动态
          * @param {object} params 
