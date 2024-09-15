@@ -490,6 +490,9 @@
                             </li>
                         </ul>
                     </div>
+					<div v-if="selectValue == 7" class="container_content_detils_content">
+						学习动态
+					</div>
                 </div>
             </div>
             <div class="container_detils_propaganda">
@@ -650,6 +653,10 @@
                     {
                         title: '评论(0条)',
                         value: 4
+                    },
+                    {
+                        title: '学习动态',
+                        value: 7
                     }
                 ],
                 tipLeft: 0,
@@ -1018,7 +1025,7 @@
                         store.setLoginAction(true);
                     });
                 },
-                // 切换详情、目录、套餐、评价
+                // 切换详情、目录、套餐、评价、学习动态
                 selectTip: function (item) {
                     this.selectValue = item.value
                 },
