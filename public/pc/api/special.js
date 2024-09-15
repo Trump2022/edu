@@ -247,5 +247,16 @@ define([
                 params: params
             });
         }
+        /**
+         * 专题的学习动态
+         * @param {object} params 
+         * @returns 
+         */
+        get_view_list: function (params) {
+            return request({
+                url: '/special/get_view_list',
+                params: params
+            });
+        },
     };
 });

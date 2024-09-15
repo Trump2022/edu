@@ -491,7 +491,9 @@
                         </ul>
                     </div>
 					<div v-if="selectValue == 7" class="container_content_detils_content">
-						学习动态
+						<div v-for="(item, index) in viewList" :key="index">
+							{{item.nickname}} {{item.add_time}} <span style="color: #D9D8DB">完成了学习</span> {{item.task_title}}
+						</div>
 					</div>
                 </div>
             </div>
@@ -690,7 +692,8 @@
                 sidebarHeight: 0,
                 problemList: [],
                 questionList: [],
-				title: ''
+				title: '',
+				viewList: []
             },
             watch: {
                 selectValue: {
@@ -757,6 +760,13 @@
                 });
             },
             methods: {
+				get_view_list: function() {
+					specialApi.get_view_list({
+					    special_id: this.id
+					}).then(function (res) {
+						vm.viewList = res.data
+					})
+				},
                 baseFooterAction: function (value) {
                     this.sidebarHeight = value;
                 },
