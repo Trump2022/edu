@@ -1641,6 +1641,7 @@ class Special extends AuthController
         $time = time();
         foreach ($res as &$item) {
             $item['add_time'] = friendlyDate($item['add_time'],'mohu',$time);
+            $item['task_title'] = $item['task_title'] ?? '';
         }
         return JsonService::successful($res);
     }
