@@ -21,6 +21,9 @@ class JsonService
 
     public static function result($code, $msg = '', $data = [], $count = 0)
     {
+        if ( ! headers_sent()) {
+            header('Content-Type: application/json;charset=UTF-8');
+        }
         exit(json_encode(compact('code', 'msg', 'data', 'count')));
     }
 
