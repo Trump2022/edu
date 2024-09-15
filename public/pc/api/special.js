@@ -254,7 +254,7 @@ define([
          */
         get_view_list: function (params) {
             return request({
-                url: '/special/get_view_list',
+                url: '/special/view_list',
                 params: params
             });
         },
