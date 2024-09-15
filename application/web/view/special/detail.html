@@ -153,11 +153,12 @@
                 <el-breadcrumb-item v-if="from == 'live'"><a :href="$router.special_live">直播课</a></el-breadcrumb-item>
                 <el-breadcrumb-item v-else-if="from == 'special_cate'">
 					<a v-if="title" :href="$router.more_list + '?type=' + type + '&recommend_id=' + recommend_id + '&name=' + title">{{title}}</a></el-breadcrumb-item>
-					<a v-else :href="$router.special_cate">全部</a></el-breadcrumb-item>
+					<a v-else :href="$router.special_cate">全部</a>
 				</el-breadcrumb-item> 
                 <el-breadcrumb-item v-else>
 					<a v-if="title" :href="$router.more_list + '?type=' + type + '&recommend_id=' + recommend_id + '&name=' + title">{{title}}</a></el-breadcrumb-item>
-					<a v-else :href="$router.special_cate">全部</a></el-breadcrumb-item>
+					<a v-else :href="$router.special_cate">全部</a>
+				</el-breadcrumb-item>
                 <el-breadcrumb-item>课程详情</el-breadcrumb-item>
             </el-breadcrumb>
             <div class="container_content">
