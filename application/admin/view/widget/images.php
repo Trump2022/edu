@@ -515,7 +515,6 @@
 								pid: vm.pid,
 							},
 							success: r => {
-								r = JSON.parse(r)
 								layui.layer.closeAll('loading');
 								layui.layer.msg(r.msg === 'ok' ? '上传成功': r.msg);
 								vm.page = 1;
