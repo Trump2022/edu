@@ -534,7 +534,6 @@
 				$.ajax({
 					url: '/admin/setting.system_bucket/get_crm_domain',
 					success: function (res) {
-						res = JSON.parse(res)
 						that.get_qiniu_token(res.count.crm_doamin)
 					},
 				})
