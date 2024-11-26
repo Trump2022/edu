@@ -959,6 +959,7 @@
 				//获取空间域名
 				that.get_crm_domain()
                 that.get_subject_list();
+				that.uploadPDFBtn()
                 window.changeIMG = that.changeIMG;
                 //实例化form
                 layList.select('pid', function (obj) {

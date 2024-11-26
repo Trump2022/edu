@@ -1088,7 +1088,6 @@
 				},
 				uploadPDFBtn: function () {
 					let self = this
-					console.log('注册上传PDF')
 					layui.upload.render({
 						elem: '#ossupload_pdf',
 						url: "https://up-z2.qiniup.com/",
@@ -1162,6 +1161,7 @@
                         that.formData.pink_strar_time = value;
                     }
                 });
+				that.uploadPDFBtn()
                 layList.date({
                     elem: '#end_time',
                     type: 'datetime',
