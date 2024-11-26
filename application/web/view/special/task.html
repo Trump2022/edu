@@ -186,10 +186,19 @@
                   vm.saveTime(vm.taskName, vm.player.getCurrentTime())
                 }
               })
+			  
+			  window.addEventListener('message', function(e) {
+			       var data = e.data;       
+			       if(data && data.type && data.type == 'host') { //判断一下 
+			            conosle.log(data)
+			            console.log(data.data); //打印出来看一下
+			            // do something
+			       }
+			  }, false)
             },
             methods: {
 				fullScreen: function(url) {
-					console.log('top=======>', top);
+					console.log('top=======>', top[0].location);
 					console.log('top=======>', top.location.host);
 				},
               getTime: function (task) {
