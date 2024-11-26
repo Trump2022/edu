@@ -189,6 +189,8 @@
             },
             methods: {
 				fullScreen: function(url) {
+					console.log('url=====', url);
+					return false
 					if(top[0].location.origin.indexOf('dev') > -1) {
 						window.open(top[0].location.origin.replace('edu-dev', 'fcdev') + `/training/index/full_screen?url=${url}`)
 					}
