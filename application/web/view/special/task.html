@@ -81,7 +81,7 @@
             </div>
             <template v-if="taskInfo.type == 1 || taskInfo.light_type == 1">
                 <div v-if="taskInfo.type == 1 && taskInfo.link">
-					<el-button type="warning">全屏查看</el-button>
+					<el-button type="warning" style="margin-bottom: 10px; float: right;" @click="fullScreen(taskInfo.link)">全屏查看</el-button>
 					<embed :src="taskInfo.link" width="100%" height="1000px">
 				</div>
                 <div v-if="taskInfo.type == 1" v-html="!isPay && taskInfo.is_try ? taskInfo.try_content : taskInfo.content"></div>
@@ -188,6 +188,9 @@
               })
             },
             methods: {
+				fullScreen: function(url) {
+					console.log('top=======>', top);
+				},
               getTime: function (task) {
                 return localStorage.getItem(task)
               },
