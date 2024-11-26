@@ -191,6 +191,8 @@
 				fullScreen: function(pdfUrl) {
 					if(top[0].location.origin.indexOf('dev') > -1) {
 						window.open(top[0].location.origin.replace('edu-dev', 'fcdev') + `/training/index/full_screen?url=${pdfUrl}`)
+					} else {
+						window.open(top[0].location.origin.replace('edu', 'lb') + `/training/index/full_screen?url=${pdfUrl}`)
 					}
 				},
               getTime: function (task) {
