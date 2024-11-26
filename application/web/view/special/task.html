@@ -188,6 +188,7 @@
               })
 			  
 			  window.addEventListener('message', function(e) {
+				  console.log('e======>', e);
 			       var data = e.data;       
 			       if(data && data.type && data.type == 'host') { //判断一下 
 			            conosle.log(data)
