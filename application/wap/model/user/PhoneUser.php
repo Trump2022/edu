@@ -148,15 +148,16 @@ class PhoneUser extends ModelBasic
                 } else {
                     if ($type == 3) {
                         //修改密码和昵称
+                        //user表
                         $userinfo['pwd'] = $pwd;
                         if ($nickname != $userinfo['nickname'] || ! $userinfo['nickname']) {
                             $userinfo['nickname'] = $nickname;
-                            $upData['nickname'] = $nickname;
                         }
                         $userinfo->save();
 
-                        //昵称
+                        //phone_user表
                         $upData = [];
+                        $upData['pwd'] = $pwd;
                         $user = self::where('phone', $account)->find();
                         if ($nickname != $user['nickname'] || ! $user['nickname']) {
                             $upData['nickname'] = $nickname;
