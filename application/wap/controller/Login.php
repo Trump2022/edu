@@ -156,7 +156,7 @@ class Login extends WapBasic
         $phoneInfo = PhoneUser::where('phone', $account)->find();
         $errorInfo = Session::get('login_error_info', 'wap') ?: ['num' => 0];
         $now = time();
-        if ($errorInfo['num'] > 5 && $errorInfo['time'] < ($now - 900))
+        if ($errorInfo['num'] > 5 && $errorInfo['time'] < ($now - 60))
             return JsonService::fail('错误次数过多,请稍候再试!');
         if ($phoneInfo['pwd'] != $pwd) {
             Session::set('login_error_info', ['num' => $errorInfo['num'] + 1, 'time' => $now], 'wap');
