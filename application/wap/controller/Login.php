@@ -131,6 +131,7 @@ class Login extends WapBasic
      */
     public function view()
     {
+        header('Access-Control-Allow-Origin: *');
         $account = input('account', '');
         $pwd = input('pwd', '');
         $url = input('url', '');
