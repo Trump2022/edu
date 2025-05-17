@@ -22,7 +22,10 @@ use service\UtilService;
 use service\JsonService;
 use think\Cache;
 use think\Cookie;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
 use think\Env;
+use think\exception\DbException;
 use think\Request;
 use think\Session;
 use think\Url;
@@ -141,14 +144,17 @@ class Login extends WapBasic
 
     /**账号密码登录
      * @param Request $request
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @return null
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function check(Request $request)
     {
         $allow_domain = Env::get('AccessControl.Access-Control-Allow-Origin', 'https://lb.fanchenai.com');
         header('Access-Control-Allow-Origin: '.$allow_domain); //设置允许跨域访问
+        header('Access-Control-Allow-Origin: https://lb.fanchenai.com'); //设置允许跨域访问
+        header('Access-Control-Allow-Origin: https://lb.fanxinghy.com'); //设置允许跨域访问
         header("Access-Control-Allow-Credentials: true"); // 允许携带 credentials（cookie）
         list($account, $pwd, $spread_uid) = UtilService::postMore(['account', 'pwd', ['spread_uid', 0]], $request, true);
         if (!$account || !$pwd) return JsonService::fail('请输入登录账号');

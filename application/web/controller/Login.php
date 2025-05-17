@@ -86,6 +86,8 @@ class Login extends WapBasic
     {
         $allow_domain = Env::get('AccessControl.Access-Control-Allow-Origin', 'https://lb.fanchenai.com');
         header('Access-Control-Allow-Origin: '.$allow_domain); //设置允许跨域访问
+        header('Access-Control-Allow-Origin: https://lb.fanchenai.com'); //设置允许跨域访问
+        header('Access-Control-Allow-Origin: https://lb.fanxinghy.com'); //设置允许跨域访问
         header("Access-Control-Allow-Credentials: true"); // 允许携带 credentials（cookie）
 
         list($account, $pwd) = UtilService::postMore(['account', 'pwd'], $request, true);
