@@ -142,7 +142,7 @@ define([
                         }
                     }
                 };
-                request.open('GET', '../public_api/get_website_statistics');
+                request.open('GET', '/wap/public_api/get_website_statistics');
                 request.send();
             },
             getCopyright: function () {
