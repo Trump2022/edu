@@ -134,10 +134,10 @@ class Login extends WapBasic
         header('Access-Control-Allow-Origin: *');
         $account = input('account', '');
         $pwd = input('pwd', '');
-        $url = input('url', '');
         $this->assign('account', $account);
         $this->assign('pwd', $pwd);
         $this->assign('spread_uid', 0);
+        $url = trim(input('url', ''));
         $this->assign('edu_login_url', '/wap/login/check');
         $this->assign('edu_location_url', $url ?: '/wap/index/index');
         return $this->fetch();

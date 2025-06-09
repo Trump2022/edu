@@ -22,7 +22,10 @@ use service\JsonService;
 use service\SystemConfigService;
 use service\UploadService as Upload;
 use app\web\model\recommend\WebRecommendRelation;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
 use think\Env;
+use think\exception\DbException;
 use think\Url;
 
 /**首页控制器
@@ -164,15 +167,18 @@ class Index extends AuthController
      * 学员端获取我的课程
      *
      * @return null
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      * @descr: I am on my way to future,where you are there.
      * @date : 6/9/25 4:30 PM
      * @author: Trump
      */
-    public function get_student_my_course()
+    public function student_my_course()
     {
+        if ( ! request()->isAjax()) {
+            return $this->fetch();
+        }
         $is_member = isset($this->userInfo['level']) ? $this->userInfo['level'] : 0;
         $recommend_list = json_encode(WebRecommend::getContentRecommendStudentMyCourse($is_member));
         return JsonService::successful(json_decode($recommend_list, true));
@@ -181,7 +187,7 @@ class Index extends AuthController
 
     /**
      * @param int $recommend_id
-     * @throws \think\exception\DbException
+     * @throws DbException
      */
     public function get_recommend_info($recommend_id = 0)
     {
