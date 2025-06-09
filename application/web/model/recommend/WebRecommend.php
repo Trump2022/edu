@@ -13,6 +13,9 @@ namespace app\web\model\recommend;
 
 use app\web\model\user\User;
 use basic\ModelBasic;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
+use think\exception\DbException;
 use traits\ModelTrait;
 
 /**首页导航及首页推荐表
@@ -25,9 +28,9 @@ class WebRecommend extends ModelBasic
 
     /**首页导航
      * @return false|\PDOStatement|string|\think\Collection
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public static function getWebRecommend()
     {
@@ -38,9 +41,9 @@ class WebRecommend extends ModelBasic
     /**
      * @param $uid
      * @return array
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public static function getRecommendIdAll()
     {
@@ -77,14 +80,14 @@ class WebRecommend extends ModelBasic
      *
      * @param $is_member
      * @return array
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      * @descr: I am on my way to future,where you are there.
      * @date : 6/9/25 3:54 PM
      * @author: Trump
      */
-    public static function getContentRecommendStudentMyCourse($is_member)
+    public static function getContentRecommendStudentMyCourse($is_member): array
     {
         // $idsAll = self::getRecommendIdAll();
         $model = self::where(['title' => '我的课程'])
