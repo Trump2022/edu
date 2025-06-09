@@ -160,6 +160,24 @@ class Index extends AuthController
         }
     }
 
+    /**
+     * 学员端获取我的课程
+     *
+     * @return null
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     * @descr: I am on my way to future,where you are there.
+     * @date : 6/9/25 4:30 PM
+     * @author: Trump
+     */
+    public function get_student_my_course()
+    {
+        $is_member = isset($this->userInfo['level']) ? $this->userInfo['level'] : 0;
+        $recommend_list = json_encode(WebRecommend::getContentRecommendStudentMyCourse($is_member));
+        return JsonService::successful(json_decode($recommend_list, true));
+    }
+
 
     /**
      * @param int $recommend_id

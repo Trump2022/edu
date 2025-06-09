@@ -72,4 +72,31 @@ class WebRecommend extends ModelBasic
         return compact('recommend');
     }
 
+    /**
+     * 学员PC端获取我的课程
+     *
+     * @param $is_member
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     * @descr: I am on my way to future,where you are there.
+     * @date : 6/9/25 3:54 PM
+     * @author: Trump
+     */
+    public static function getContentRecommendStudentMyCourse($is_member)
+    {
+        // $idsAll = self::getRecommendIdAll();
+        $model = self::where(['title' => '我的课程'])
+            // ->where('id', 'in', $idsAll)
+            ->field(['id', 'title', 'explain', 'type', 'sort', 'show_count']);
+        $recommend = $model->order('sort desc,add_time desc')->select();
+        $recommend = count($recommend) ? $recommend->toArray() : [];
+        foreach ($recommend as &$item) {
+            $item['sum_count'] = WebRecommendRelation::getRelationCount($item['id'], (int)$item['type']);
+            $item['list'] = WebRecommendRelation::getRelationList($item['id'], (int)$item['type'], $item['show_count'], $is_member);
+            $item['courseIndex'] = 1;
+        }
+        return compact('recommend');
+    }
 }
