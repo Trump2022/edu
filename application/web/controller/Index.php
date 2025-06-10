@@ -176,6 +176,7 @@ class Index extends AuthController
      */
     public function student_my_course()
     {
+        header('Access-Control-Allow-Origin: *');
         if ( ! request()->isAjax()) {
             return $this->fetch();
         }
