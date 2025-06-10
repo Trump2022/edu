@@ -50,6 +50,8 @@
 
                         // 跳转到指定地址，并携带登录时的 cookie
                         setTimeout(function() {
+                            var url = '{$edu_location_url}';
+                            alert(url);
                             window.location.href = '{$edu_location_url}';
                             // top.location.href = '{$edu_location_url}';
                         }, 500);

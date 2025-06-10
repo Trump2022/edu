@@ -73,6 +73,7 @@ class Login extends WapBasic
         $this->assign('pwd', $pwd);
         $url = trim(input('url', ''));
         $this->assign('edu_login_url', '/web/login/check');
+        var_dump($url ?: '/web/index/index');
         $this->assign('edu_location_url', $url ?: '/web/index/index');
         return $this->fetch();
     }
