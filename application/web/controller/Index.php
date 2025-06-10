@@ -176,6 +176,7 @@ class Index extends AuthController
      */
     public function student_my_course()
     {
+        var_dump(request()->isAjax(), 'test');exit;
         if ( ! request()->isAjax()) {
             return $this->fetch();
         }
