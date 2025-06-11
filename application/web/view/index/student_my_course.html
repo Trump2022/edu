@@ -59,24 +59,11 @@
                 news_recommend: ''
             },
             created: function () {
-                this.get_content_recommend();
+                this.student_my_course();
             },
             methods: {
-                get_content_recommend: function () {
-                    homeApi.get_content_recommend().then(function (res) {
-                        var recommend = res.data.recommend;
-                        recommend.forEach(function (item) {
-                            if (item.type == 4) {
-                                vm.getArticleList({
-                                    type: 2,
-                                    limit: 9
-                                });
-                            } else if (item.type == 5) {
-                                vm.getCourseRanking();
-                                vm.getNewCourseFirst();
-                                vm.get_good_class_recommend();
-                            }
-                        });
+                student_my_course: function () {
+                    homeApi.student_my_course().then(function (res) {
                         vm.contentRecommend = res.data.recommend;
                     }).catch(function (err) {
                         vm.$message.error(err.msg);

@@ -66,6 +66,15 @@ define([
                 url: '/index/get_unifiend_list',
                 params: params
             });
-        }
+        },
+		/**
+		 * 我的课程数据
+		 * @returns
+		 */
+		student_my_course: function () {
+		    return request({
+		        url: '/web/index/student_my_course'
+		    });
+		},
     };
 });
