@@ -59,28 +59,9 @@
                 news_recommend: ''
             },
             created: function () {
-                this.index_data();
                 this.get_content_recommend();
             },
             methods: {
-                getHotSearch: function () {
-                    homeApi.hotSearch().then(function (res) {
-                        vm.hotSearch = res.data;
-                    });
-                },
-                index_data: function () {
-                    homeApi.index_data().then(function (res) {
-                        var data = res.data;
-                        vm.bannerList = data.pc_rotation_diagram;
-                        vm.advertList = data.pc_home_page_advertisement;
-                        vm.advert = data.pc_home_bottom_img;
-                        vm.advertLink = data.pc_home_bottom_figure_link;
-                        vm.automatic_recommend = data.pc_automatic_recommend;
-                        vm.news_recommend = data.pc_news_recommend;
-                    }).catch(function (err) {
-                        vm.$message.error(err.msg);
-                    });
-                },
                 get_content_recommend: function () {
                     homeApi.get_content_recommend().then(function (res) {
                         var recommend = res.data.recommend;
@@ -101,30 +82,6 @@
                         vm.$message.error(err.msg);
                     });
                 },
-                // 课程排行
-                getCourseRanking: function () {
-                    homeApi.courseRanking().then(function (res) {
-                        vm.rankList = res.data;
-                    });
-                },
-                // 好课推荐
-                get_good_class_recommend: function (params) {
-                    homeApi.get_good_class_recommend().then(function (res) {
-                        vm.goodList = res.data;
-                    });
-                },
-                // 新课首推
-                getNewCourseFirst: function () {
-                    homeApi.newCourseFirst().then(function (res) {
-                        vm.newList = res.data;
-                    });
-                },
-                // 最新资讯
-                getArticleList: function (params) {
-                    homeApi.articleList(params).then(function (res) {
-                        vm.articleList = res.data;
-                    });
-                }
             }
         });
     });
