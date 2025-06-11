@@ -73,7 +73,7 @@ define([
 		 */
 		student_my_course: function () {
 		    return request({
-		        url: '/web/index/student_my_course'
+		        url: '/index/student_my_course'
 		    });
 		},
     };
