@@ -11,10 +11,6 @@
 
 namespace think;
 
-use app\wap\model\user\PhoneUser;
-use app\wap\model\user\SmsCode;
-use service\JsonService;
-use service\UtilService;
 use think\exception\ValidateException;
 use traits\controller\Jump;
 
