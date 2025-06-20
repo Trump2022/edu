@@ -21,7 +21,7 @@
         "topthink/think-image": "^1.0",
         "topthink/think-captcha": "1.*",
         "overtrue/wechat": "^3.3",
-        "tp5er/tp5-databackup": "dev-main",
+        "tp5er/tp5-databackup": "dev-master",
         "xaboy/form-builder": "^1.2",
         "topthink/think-helper": "^1.0",
         "phpoffice/phpspreadsheet": "^1.6",
