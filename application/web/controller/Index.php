@@ -147,6 +147,14 @@ class Index extends AuthController
     public function get_content_recommend()
     {
         try {
+            $redisHandler = $this->redisModel->handler();
+            try {
+                $connected = $redisHandler->ping();  // 如果成功，会返回 +PONG
+                var_dump($connected);
+            } catch (\Exception $e) {
+                echo "Redis connection error: " . $e->getMessage();
+            }
+            
             //获取推荐列表
             $this->redisModel = new \think\cache\driver\Redis();
             var_dump(method_exists($this->redisModel, 'hExists'));    // 期望 true
