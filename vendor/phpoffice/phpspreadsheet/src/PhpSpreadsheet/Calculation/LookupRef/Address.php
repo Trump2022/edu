@@ -119,6 +119,6 @@ class Address
         }
         [$rowChar, $colChar] = AddressHelper::getRowAndColumnChars();
 
-        return "{$sheetName}$rowChar{$row}$colChar{$column}";
+        return "{$sheetName}rowChar[$row]colChar[$column]";
     }
 }

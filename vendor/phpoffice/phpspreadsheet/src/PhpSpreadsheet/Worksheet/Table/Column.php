@@ -232,7 +232,7 @@ class Column
             if ($cell->getDataType() === DataType::TYPE_FORMULA) {
                 $formula = $cell->getValue();
                 if (preg_match($pattern, $formula) === 1) {
-                    $formula = preg_replace($pattern, "[$1{$newTitle}]", $formula);
+                    $formula = preg_replace($pattern, "[1[$newTitle]]", $formula);
                     $cell->setValueExplicit($formula, DataType::TYPE_FORMULA);
                 }
             }
@@ -246,7 +246,7 @@ class Column
         foreach ($spreadsheet->getNamedFormulae() as $namedFormula) {
             $formula = $namedFormula->getValue();
             if (preg_match($pattern, $formula) === 1) {
-                $formula = preg_replace($pattern, "[$1{$newTitle}]", $formula);
+                $formula = preg_replace($pattern, "[1[$newTitle]]", $formula);
                 $namedFormula->setValue($formula); // @phpstan-ignore-line
             }
         }
