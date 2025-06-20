@@ -7,7 +7,6 @@
  * @copyright  Copyright (c) 2018 Mark Baker (https://github.com/MarkBaker/PHPMatrix)
  * @license    https://opensource.org/licenses/MIT    MIT
  */
-
 namespace Matrix;
 
 /**
@@ -21,13 +20,13 @@ class Builder
      * Create a new matrix of specified dimensions, and filled with a specified value
      * If the column argument isn't provided, then a square matrix will be created
      *
-     * @param mixed $fillValue
-     * @param int $rows
-     * @param int|null $columns
+     * @param $value
+     * @param $rows
+     * @param null $columns
      * @return Matrix
      * @throws Exception
      */
-    public static function createFilledMatrix($fillValue, $rows, $columns = null)
+    public static function createFilledMatrix($value, $rows, $columns = null)
     {
         if ($columns === null) {
             $columns = $rows;
@@ -43,7 +42,7 @@ class Builder
                 array_fill(
                     0,
                     $columns,
-                    $fillValue
+                    $value
                 )
             )
         );
@@ -57,9 +56,9 @@ class Builder
      * @return Matrix
      * @throws Exception
      */
-    public static function createIdentityMatrix($dimensions, $fillValue = null)
+    public static function createIdentityMatrix($dimensions)
     {
-        $grid = static::createFilledMatrix($fillValue, $dimensions)->toArray();
+        $grid = static::createFilledMatrix(null, $dimensions)->toArray();
 
         for ($x = 0; $x < $dimensions; ++$x) {
             $grid[$x][$x] = 1;

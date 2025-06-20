@@ -2,8 +2,6 @@
 
 namespace OSS\Model;
 
-use OSS\Core\OssException;
-
 /**
  * Class StorageCapacityConfig
  *

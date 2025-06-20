@@ -109,29 +109,10 @@ abstract class Result
         if (empty($body) || false === strpos($body, '<?xml')) {
             return '';
         }
-        $flag = false;
-        try {
-            $xml = simplexml_load_string($body);
-            if (isset($xml->Message)) {
-                return strval($xml->Message);
-            }
-            $flag = true;
-        } catch (\Exception $e) {
-            $flag = true;
+        $xml = simplexml_load_string($body);
+        if (isset($xml->Message)) {
+            return strval($xml->Message);
         }
-        if ($flag === true) {
-            $start = strpos($body, '<Message>');
-            if ($start === false) {
-                return '';
-            }
-            $start += 9;
-            $end = strpos($body, '</Message>', $start);
-            if ($end === false) {
-                return '';
-            }
-            return substr($body, $start, $end - $start);
-        }
-
         return '';
     }
 
@@ -146,29 +127,10 @@ abstract class Result
         if (empty($body) || false === strpos($body, '<?xml')) {
             return '';
         }
-        $flag = false;
-        try {
-            $xml = simplexml_load_string($body);
-            if (isset($xml->Code)) {
-                return strval($xml->Code);
-            }
-            $flag = true;
-        } catch (\Exception $e) {
-            $flag = true;
+        $xml = simplexml_load_string($body);
+        if (isset($xml->Code)) {
+            return strval($xml->Code);
         }
-        if ($flag === true) {
-            $start = strpos($body, '<Code>');
-            if ($start === false) {
-                return '';
-            }
-            $start += 6;
-            $end = strpos($body, '</Code>', $start);
-            if ($end === false) {
-                return '';
-            }
-            return substr($body, $start, $end - $start);
-        }
-
         return '';
     }
 

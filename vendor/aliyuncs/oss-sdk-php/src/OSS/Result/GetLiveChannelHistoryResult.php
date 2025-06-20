@@ -7,7 +7,7 @@ use OSS\Model\GetLiveChannelHistory;
 class GetLiveChannelHistoryResult extends Result
 {
     /**
-     * @return GetLiveChannelHistory
+     * @return
      */
     protected function parseDataFromResponse()
     {

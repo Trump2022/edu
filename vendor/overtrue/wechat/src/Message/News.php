@@ -44,7 +44,6 @@ class News extends AbstractMessage
                                 'url',
                                 'image',
                             ];
-
     /**
      * Aliases of attribute.
      *

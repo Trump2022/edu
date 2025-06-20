@@ -71,7 +71,7 @@ class Size
      */
     public function getWidth()
     {
-        return intval($this->width);
+        return $this->width;
     }
 
     /**
@@ -81,7 +81,7 @@ class Size
      */
     public function getHeight()
     {
-        return intval($this->height);
+        return $this->height;
     }
 
     /**
@@ -338,8 +338,8 @@ class Size
             case 'middle':
             case 'center-center':
             case 'middle-middle':
-                $x = intval($this->width / 2) + $offset_x;
-                $y = intval($this->height / 2) + $offset_y;
+                $x = intval($this->width / 2);
+                $y = intval($this->height / 2);
                 break;
 
             default:

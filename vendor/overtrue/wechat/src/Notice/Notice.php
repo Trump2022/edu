@@ -47,7 +47,6 @@ class Notice extends AbstractAPI
         'template_id' => '',
         'url' => '',
         'data' => [],
-        'miniprogram' => '',
     ];
 
     /**
@@ -132,9 +131,9 @@ class Notice extends AbstractAPI
      *
      * @return \EasyWeChat\Support\Collection
      */
-    public function addTemplate($shortId)
+    public function addTemplate($shortId, $keywordList)
     {
-        $params = ['template_id_short' => $shortId];
+        $params = ['template_id_short' => $shortId, 'keyword_name_list' => $keywordList];
 
         return $this->parseJSON('json', [self::API_ADD_TEMPLATE, $params]);
     }

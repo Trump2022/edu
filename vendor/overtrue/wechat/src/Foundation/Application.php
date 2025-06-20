@@ -121,6 +121,10 @@ class Application extends Container
             return new Config($config);
         };
 
+        if ($this['config']['debug']) {
+            error_reporting(E_ALL);
+        }
+
         $this->registerProviders();
         $this->registerBase();
         $this->initializeLogger();

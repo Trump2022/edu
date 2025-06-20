@@ -47,13 +47,6 @@ abstract class AbstractFont
     public $valign;
 
     /**
-     * Space between text characters
-     *
-     * @var float
-     */
-    public $kerning = 0;
-
-    /**
      * Path to TTF or GD library internal font file of the text
      *
      * @var mixed
@@ -69,7 +62,7 @@ abstract class AbstractFont
      * @return boolean
      */
     abstract public function applyToImage(Image $image, $posx = 0, $posy = 0);
-
+    
     /**
      * Calculates bounding box of current font setting
      *
@@ -80,7 +73,7 @@ abstract class AbstractFont
     /**
      * Create a new instance of Font
      *
-     * @param String $text Text to be written
+     * @param Strinf $text Text to be written
      */
     public function __construct($text = null)
     {
@@ -91,7 +84,7 @@ abstract class AbstractFont
      * Set text to be written
      *
      * @param  String $text
-     * @return self
+     * @return void
      */
     public function text($text)
     {
@@ -114,7 +107,7 @@ abstract class AbstractFont
      * Set font size in pixels
      *
      * @param  int $size
-     * @return self
+     * @return void
      */
     public function size($size)
     {
@@ -137,7 +130,7 @@ abstract class AbstractFont
      * Set color of text to be written
      *
      * @param  mixed $color
-     * @return self
+     * @return void
      */
     public function color($color)
     {
@@ -160,7 +153,7 @@ abstract class AbstractFont
      * Set rotation angle of text
      *
      * @param  int $angle
-     * @return self
+     * @return void
      */
     public function angle($angle)
     {
@@ -183,7 +176,7 @@ abstract class AbstractFont
      * Set horizontal text alignment
      *
      * @param  string $align
-     * @return self
+     * @return void
      */
     public function align($align)
     {
@@ -206,7 +199,7 @@ abstract class AbstractFont
      * Set vertical text alignment
      *
      * @param  string $valign
-     * @return self
+     * @return void
      */
     public function valign($valign)
     {
@@ -226,31 +219,10 @@ abstract class AbstractFont
     }
 
     /**
-     * Set text kerning
-     *
-     * @param  string $kerning
-     * @return void
-     */
-    public function kerning($kerning)
-    {
-        $this->kerning = $kerning;
-    }
-
-    /**
-     * Get kerning
-     *
-     * @return float
-     */
-    public function getKerning()
-    {
-        return $this->kerning;
-    }
-
-    /**
      * Set path to font file
      *
      * @param  string $file
-     * @return self
+     * @return void
      */
     public function file($file)
     {

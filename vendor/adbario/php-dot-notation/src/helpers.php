@@ -11,14 +11,13 @@ use Adbar\Dot;
 
 if (! function_exists('dot')) {
     /**
-     * Create a new Dot object with the given items and optional delimiter
+     * Create a new Dot object with the given items
      *
-     * @param  mixed  $items
-     * @param  string $delimiter
+     * @param  mixed $items
      * @return \Adbar\Dot
      */
-    function dot($items, $delimiter = '.')
+    function dot($items)
     {
-        return new Dot($items, $delimiter);
+        return new Dot($items);
     }
 }

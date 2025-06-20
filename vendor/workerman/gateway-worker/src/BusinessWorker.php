@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This file is part of workerman.
  *
@@ -17,7 +16,7 @@ namespace GatewayWorker;
 use Workerman\Connection\TcpConnection;
 
 use Workerman\Worker;
-use Workerman\Timer;
+use Workerman\Lib\Timer;
 use Workerman\Connection\AsyncTcpConnection;
 use GatewayWorker\Protocols\GatewayProtocol;
 use GatewayWorker\Lib\Context;
@@ -53,6 +52,20 @@ class BusinessWorker extends Worker
     public $eventHandler = 'Events';
 
     /**
+     * 业务超时时间，可用来定位程序卡在哪里
+     *
+     * @var int
+     */
+    public $processTimeout = 30;
+
+    /**
+     * 业务超时时间，可用来定位程序卡在哪里
+     *
+     * @var callable
+     */
+    public $processTimeoutHandler = '\\Workerman\\Worker::log';
+    
+    /**
      * 秘钥
      *
      * @var string
@@ -69,21 +82,21 @@ class BusinessWorker extends Worker
     /**
      * 保存用户设置的 worker 启动回调
      *
-     * @var callable|null
+     * @var callback
      */
     protected $_onWorkerStart = null;
 
     /**
      * 保存用户设置的 workerReload 回调
      *
-     * @var callable|null
+     * @var callback
      */
     protected $_onWorkerReload = null;
     
     /**
      * 保存用户设置的 workerStop 回调
      *
-     * @var callable|null
+     * @var callback
      */
     protected $_onWorkerStop= null;
 
@@ -118,21 +131,21 @@ class BusinessWorker extends Worker
     /**
      * Event::onConnect 回调
      *
-     * @var callable|null
+     * @var callback
      */
     protected $_eventOnConnect = null;
 
     /**
      * Event::onMessage 回调
      *
-     * @var callable|null
+     * @var callback
      */
     protected $_eventOnMessage = null;
 
     /**
      * Event::onClose 回调
      *
-     * @var callable|null
+     * @var callback
      */
     protected $_eventOnClose = null;
 
@@ -173,7 +186,7 @@ class BusinessWorker extends Worker
     /**
      * {@inheritdoc}
      */
-    public function run(): void
+    public function run()
     {
         $this->_onWorkerStart  = $this->onWorkerStart;
         $this->_onWorkerReload = $this->onWorkerReload;
@@ -191,10 +204,6 @@ class BusinessWorker extends Worker
      */
     protected function onWorkerStart()
     {
-        if (function_exists('opcache_reset')) {
-            opcache_reset();
-        }
-
         if (!class_exists('\Protocols\GatewayProtocol')) {
             class_alias('GatewayWorker\Protocols\GatewayProtocol', 'Protocols\GatewayProtocol');
         }
@@ -212,6 +221,13 @@ class BusinessWorker extends Worker
         
         if (is_callable($this->eventHandler . '::onWorkerStart')) {
             call_user_func($this->eventHandler . '::onWorkerStart', $this);
+        }
+
+        if (function_exists('pcntl_signal')) {
+            // 业务超时信号处理
+            pcntl_signal(SIGALRM, array($this, 'timeoutHandler'), false);
+        } else {
+            $this->processTimeout = 0;
         }
 
         // 设置回调
@@ -360,7 +376,6 @@ class BusinessWorker extends Worker
         // 检查session版本，如果是过期的session数据则拉取最新的数据
         if ($cmd !== GatewayProtocol::CMD_ON_CLOSE && isset($this->_sessionVersion[Context::$client_id]) && $this->_sessionVersion[Context::$client_id] !== crc32($data['ext_data'])) {
             $_SESSION = Context::$old_session = \GatewayWorker\Lib\Gateway::getSession(Context::$client_id);
-            $this->_sessionVersion[Context::$client_id] = crc32($data['ext_data']);
         } else {
             if (!isset($this->_sessionVersion[Context::$client_id])) {
                 $this->_sessionVersion[Context::$client_id] = crc32($data['ext_data']);
@@ -373,6 +388,9 @@ class BusinessWorker extends Worker
             }
         }
 
+        if ($this->processTimeout) {
+            pcntl_alarm($this->processTimeout);
+        }
         // 尝试执行 Event::onConnection、Event::onMessage、Event::onClose
         switch ($cmd) {
             case GatewayProtocol::CMD_ON_CONNECT:
@@ -396,6 +414,9 @@ class BusinessWorker extends Worker
                     call_user_func($this->_eventOnWebSocketConnect, Context::$client_id, $data['body']);
                 }
                 break;
+        }
+        if ($this->processTimeout) {
+            pcntl_alarm(0);
         }
         
         // session 必须是数组
@@ -421,7 +442,7 @@ class BusinessWorker extends Worker
      */
     public function onGatewayClose($connection)
     {
-        $addr = $connection->remoteAddr;
+        $addr = $connection->remoteAddress;
         unset($this->gatewayConnections[$addr], $this->_connectingGatewayAddresses[$addr]);
         if (isset($this->_gatewayAddresses[$addr]) && !isset($this->_waitingConnectGatewayAddresses[$addr])) {
             Timer::add(1, array($this, 'tryToConnectGateway'), array($addr), false);
@@ -438,7 +459,7 @@ class BusinessWorker extends Worker
     {
         if (!isset($this->gatewayConnections[$addr]) && !isset($this->_connectingGatewayAddresses[$addr]) && isset($this->_gatewayAddresses[$addr])) {
             $gateway_connection                    = new AsyncTcpConnection("GatewayProtocol://$addr");
-            $gateway_connection->remoteAddr        = $addr;
+            $gateway_connection->remoteAddress     = $addr;
             $gateway_connection->onConnect         = array($this, 'onConnectGateway');
             $gateway_connection->onMessage         = array($this, 'onGatewayMessage');
             $gateway_connection->onClose           = array($this, 'onGatewayClose');
@@ -487,8 +508,8 @@ class BusinessWorker extends Worker
      */
     public function onConnectGateway($connection)
     {
-        $this->gatewayConnections[$connection->remoteAddr] = $connection;
-        unset($this->_connectingGatewayAddresses[$connection->remoteAddr], $this->_waitingConnectGatewayAddresses[$connection->remoteAddr]);
+        $this->gatewayConnections[$connection->remoteAddress] = $connection;
+        unset($this->_connectingGatewayAddresses[$connection->remoteAddress], $this->_waitingConnectGatewayAddresses[$connection->remoteAddress]);
     }
 
     /**
@@ -511,5 +532,29 @@ class BusinessWorker extends Worker
     public function getAllGatewayAddresses()
     {
         return $this->_gatewayAddresses;
+    }
+
+    /**
+     * 业务超时回调
+     *
+     * @param int $signal
+     * @throws \Exception
+     */
+    public function timeoutHandler($signal)
+    {
+        switch ($signal) {
+            // 超时时钟
+            case SIGALRM:
+                // 超时异常
+                $e         = new \Exception("process_timeout", 506);
+                $trace_str = $e->getTraceAsString();
+                // 去掉第一行timeoutHandler的调用栈
+                $trace_str = $e->getMessage() . ":\n" . substr($trace_str, strpos($trace_str, "\n") + 1) . "\n";
+                // 开发者没有设置超时处理函数，或者超时处理函数返回空则执行退出
+                if (!$this->processTimeoutHandler || !call_user_func($this->processTimeoutHandler, $trace_str, $e)) {
+                    Worker::stopAll();
+                }
+                break;
+        }
     }
 }

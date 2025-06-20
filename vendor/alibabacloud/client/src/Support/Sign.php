@@ -111,9 +111,6 @@ class Sign
         ksort($parameters);
         $canonicalized = '';
         foreach ($parameters as $key => $value) {
-            if ($value === null || $value === '') {
-                continue;
-            }
             $canonicalized .= '&' . self::percentEncode($key) . '=' . self::percentEncode($value);
         }
 
@@ -138,6 +135,6 @@ class Sign
      */
     public static function uuid($salt)
     {
-        return md5($salt . uniqid(md5(microtime(true)), true)) . microtime();
+        return md5($salt . uniqid(md5(microtime(true)), true));
     }
 }

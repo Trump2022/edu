@@ -11,9 +11,8 @@
 
 namespace Symfony\Bridge\PsrHttpMessage\Factory;
 
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\UriInterface;
 use Symfony\Bridge\PsrHttpMessage\HttpFoundationFactoryInterface;
@@ -21,7 +20,6 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * {@inheritdoc}
@@ -31,21 +29,11 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class HttpFoundationFactory implements HttpFoundationFactoryInterface
 {
     /**
-     * @var int The maximum output buffering size for each iteration when sending the response
-     */
-    private $responseBufferMaxLength;
-
-    public function __construct(int $responseBufferMaxLength = 16372)
-    {
-        $this->responseBufferMaxLength = $responseBufferMaxLength;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function createRequest(ServerRequestInterface $psrRequest)
     {
-        $server = [];
+        $server = array();
         $uri = $psrRequest->getUri();
 
         if ($uri instanceof UriInterface) {
@@ -60,7 +48,7 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
         $server = array_replace($server, $psrRequest->getServerParams());
 
         $parsedBody = $psrRequest->getParsedBody();
-        $parsedBody = \is_array($parsedBody) ? $parsedBody : [];
+        $parsedBody = is_array($parsedBody) ? $parsedBody : array();
 
         $request = new Request(
             $psrRequest->getQueryParams(),
@@ -85,7 +73,7 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
      */
     private function getFiles(array $uploadedFiles)
     {
-        $files = [];
+        $files = array();
 
         foreach ($uploadedFiles as $key => $value) {
             if ($value instanceof UploadedFileInterface) {
@@ -116,17 +104,6 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
             $clientFileName = $psrUploadedFile->getClientFilename();
         }
 
-        if (class_exists('Symfony\Component\HttpFoundation\HeaderUtils')) {
-            // Symfony 4.1+
-            return new UploadedFile(
-                $temporaryPath,
-                null === $clientFileName ? '' : $clientFileName,
-                $psrUploadedFile->getClientMediaType(),
-                $psrUploadedFile->getError(),
-                true
-            );
-        }
-
         return new UploadedFile(
             $temporaryPath,
             null === $clientFileName ? '' : $clientFileName,
@@ -150,28 +127,16 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createResponse(ResponseInterface $psrResponse, bool $streamed = false)
+    public function createResponse(ResponseInterface $psrResponse)
     {
-        $cookies = $psrResponse->getHeader('Set-Cookie');
-        $psrResponse = $psrResponse->withoutHeader('Set-Cookie');
-
-        if ($streamed) {
-            $response = new StreamedResponse(
-                $this->createStreamedResponseCallback($psrResponse->getBody()),
-                $psrResponse->getStatusCode(),
-                $psrResponse->getHeaders()
-            );
-        } else {
-            $response = new Response(
-                $psrResponse->getBody()->__toString(),
-                $psrResponse->getStatusCode(),
-                $psrResponse->getHeaders()
-            );
-        }
-
+        $response = new Response(
+            $psrResponse->getBody()->__toString(),
+            $psrResponse->getStatusCode(),
+            $psrResponse->getHeaders()
+        );
         $response->setProtocolVersion($psrResponse->getProtocolVersion());
 
-        foreach ($cookies as $cookie) {
+        foreach ($psrResponse->getHeader('Set-Cookie') as $cookie) {
             $response->headers->setCookie($this->createCookie($cookie));
         }
 
@@ -234,12 +199,6 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
 
                 continue;
             }
-
-            if ('samesite' === strtolower($name) && null !== $value) {
-                $samesite = $value;
-
-                continue;
-            }
         }
 
         if (!isset($cookieName)) {
@@ -253,28 +212,7 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
             isset($cookiePath) ? $cookiePath : '/',
             isset($cookieDomain) ? $cookieDomain : null,
             isset($cookieSecure),
-            isset($cookieHttpOnly),
-            false,
-            isset($samesite) ? $samesite : null
+            isset($cookieHttpOnly)
         );
-    }
-
-    private function createStreamedResponseCallback(StreamInterface $body): callable
-    {
-        return function () use ($body) {
-            if ($body->isSeekable()) {
-                $body->rewind();
-            }
-
-            if (!$body->isReadable()) {
-                echo $body;
-
-                return;
-            }
-
-            while (!$body->eof()) {
-                echo $body->read($this->responseBufferMaxLength);
-            }
-        };
     }
 }

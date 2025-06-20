@@ -69,9 +69,9 @@ class Notify
      *
      * @return bool
      */
-    public function isValid($signkey)
+    public function isValid()
     {
-        $localSign = generate_sign($this->getNotify()->except('sign')->all(), $signkey, 'md5');
+        $localSign = generate_sign($this->getNotify()->except('sign')->all(), $this->merchant->key, 'md5');
 
         return $localSign === $this->getNotify()->get('sign');
     }

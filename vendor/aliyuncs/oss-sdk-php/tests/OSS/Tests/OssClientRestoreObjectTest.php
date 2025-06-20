@@ -4,7 +4,6 @@ namespace OSS\Tests;
 
 use OSS\Core\OssException;
 use OSS\OssClient;
-use OSS\Model\RestoreConfig;
 
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'TestOssClientBase.php';
 
@@ -64,84 +63,7 @@ class OssClientRestoreObjectTest extends TestOssClientBase
         }
     }
 
-    public function testColdArchiveRestoreObject()
-    {
-        $client = new OssClient(
-            getenv('OSS_ACCESS_KEY_ID'),
-            getenv('OSS_ACCESS_KEY_SECRET'),
-            'oss-ap-southeast-1.aliyuncs.com', false);
-
-        $bucket = $this->bucket . 'cold-archive';
-        $object = 'storage-object';
-
-        //create bucket
-        $options = array(
-            OssClient::OSS_STORAGE => OssClient::OSS_STORAGE_COLDARCHIVE
-        );
-        $client->createBucket($bucket, OssClient::OSS_ACL_TYPE_PRIVATE, $options);
-
-        //test with days
-        $client->putObject($bucket, $object,'testcontent');
-
-        try{
-            $client->getObject($bucket, $object);
-            $this->assertTrue(false);
-        }catch (OssException $e){
-            $this->assertEquals('403', $e->getHTTPStatus());
-            $this->assertEquals('InvalidObjectState', $e->getErrorCode());
-        }
-
-        $config = new RestoreConfig(5);
-        $resoptions = array(
-            OssClient::OSS_RESTORE_CONFIG => $config
-        );
-        try{
-            $client->restoreObject($bucket, $object, $resoptions);
-        }catch(OssException $e){
-            $this->assertTrue(false);
-        }
-
-        try{
-            $client->restoreObject($bucket, $object, $resoptions);
-        }catch(OssException $e){
-            $this->assertEquals('409', $e->getHTTPStatus());
-            $this->assertEquals('RestoreAlreadyInProgress', $e->getErrorCode());
-        }
-
-        //test with days & tier
-        $client->putObject($bucket, $object,'testcontent');
-
-        try{
-            $client->getObject($bucket, $object);
-            $this->assertTrue(false);
-        }catch (OssException $e){
-            $this->assertEquals('403', $e->getHTTPStatus());
-            $this->assertEquals('InvalidObjectState', $e->getErrorCode());
-        }
-
-        $config = new RestoreConfig(5, "Expedited");
-        $resoptions = array(
-            OssClient::OSS_RESTORE_CONFIG => $config
-        );
-        try{
-            $client->restoreObject($bucket, $object, $resoptions);
-        }catch(OssException $e){
-            $this->assertTrue(false);
-        }
-
-        try{
-            $client->restoreObject($bucket, $object, $resoptions);
-        }catch(OssException $e){
-            $this->assertEquals('409', $e->getHTTPStatus());
-            $this->assertEquals('RestoreAlreadyInProgress', $e->getErrorCode());
-        }
-
-        $client->deleteObject($bucket, $object);
-        $client->deleteBucket($bucket);
-    }
-
-
-    protected function setUp(): void
+    public function setUp()
     {
         parent::setUp();
 
@@ -160,7 +82,7 @@ class OssClientRestoreObjectTest extends TestOssClientBase
         $this->ossClient->createBucket($this->archiveBucket, OssClient::OSS_ACL_TYPE_PRIVATE, $options);
     }
 
-    protected function tearDown(): void
+    public function tearDown()
     {
         parent::tearDown();
 

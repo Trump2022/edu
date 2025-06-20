@@ -3,7 +3,7 @@
 namespace AlibabaCloud\Client\Request;
 
 use Exception;
-use AlibabaCloud\Client\Support\Stringy;
+use Stringy\Stringy;
 use RuntimeException;
 use AlibabaCloud\Client\SDK;
 use AlibabaCloud\Client\Encode;
@@ -98,7 +98,9 @@ class RoaRequest extends Request
      */
     private function encodeBody(array $params)
     {
-        if (Stringy::contains($this->options['headers']['Content-Type'], 'application/json', false)) {
+        $stringy = Stringy::create($this->options['headers']['Content-Type']);
+
+        if ($stringy->contains('application/json', false)) {
             $this->options['body']                   = json_encode($params);
             $this->options['headers']['Content-MD5'] = base64_encode(md5($this->options['body'], true));
 
@@ -123,7 +125,7 @@ class RoaRequest extends Request
 
         $signature                                           = $this->httpClient()->getSignature();
         $this->options['headers']['x-acs-signature-method']  = $signature->getMethod();
-        $this->options['headers']['x-acs-signature-nonce']   = Sign::uuid($this->product . $this->action);
+        $this->options['headers']['x-acs-signature-nonce']   = Sign::uuid($this->product . $this->realRegionId());
         $this->options['headers']['x-acs-signature-version'] = $signature->getVersion();
         if ($signature->getType()) {
             $this->options['headers']['x-acs-signature-type'] = $signature->getType();

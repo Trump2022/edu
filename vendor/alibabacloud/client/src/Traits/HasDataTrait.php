@@ -131,7 +131,6 @@ trait HasDataTrait
      *
      * @return bool
      */
-    #[\ReturnTypeWillChange]
     public function offsetExists($key)
     {
         return $this->dot->has($key);
@@ -144,7 +143,6 @@ trait HasDataTrait
      *
      * @return mixed
      */
-    #[\ReturnTypeWillChange]
     public function offsetGet($key)
     {
         return $this->dot->offsetGet($key);
@@ -156,7 +154,6 @@ trait HasDataTrait
      * @param int|string|null $key
      * @param mixed           $value
      */
-    #[\ReturnTypeWillChange]
     public function offsetSet($key, $value)
     {
         $this->dot->offsetSet($key, $value);
@@ -167,7 +164,6 @@ trait HasDataTrait
      *
      * @param int|string $key
      */
-    #[\ReturnTypeWillChange]
     public function offsetUnset($key)
     {
         $this->delete($key);
@@ -196,7 +192,6 @@ trait HasDataTrait
      *
      * @return int
      */
-    #[\ReturnTypeWillChange]
     public function count($key = null)
     {
         return $this->dot->count($key);
@@ -207,7 +202,6 @@ trait HasDataTrait
      *
      * @return ArrayIterator
      */
-    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return $this->dot->getIterator();
@@ -218,7 +212,6 @@ trait HasDataTrait
      *
      * @return array
      */
-    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->dot->jsonSerialize();

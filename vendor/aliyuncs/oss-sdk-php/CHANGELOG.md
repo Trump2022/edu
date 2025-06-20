@@ -1,68 +1,6 @@
 # ChangeLog - Aliyun OSS SDK for PHP
 
-## v2.7.2 / 2024-10-28
-* Added: presign supports response-* parameters
-* Added: forcePathStyle option.
-
-## v2.7.1 / 2024-02-28
-* Fixed: fix deprecated
-
-## v2.7.0 / 2024-02-02
-* Added: support signature version 4.
-* Added: support checkObjectEndcoding option.
-* Added: support strictObjectName option.
-* Added: support filePathCompatible option.
-* Added: support path style.
-* Added: support environment variables credentials provider.
-* Update: add filed for some api.
-* Fixed: fix some bugs.
-
-## v2.6.0 / 2022-08-03
-* Added: support credentials provider.
-* Fixed: compatible with swoole curl handler.
-* Added: support more bucket stat info.
-
-## v2.5.0 / 2022-05-13
-* Added: support bucket transfer acceleration.
-* Added: support bucket cname token.
-* Added: support listobjectsV2.
-
-## v2.4.3 / 2021-08-25
-* Fixed: integer overflow in PHP5.x.
-
-## v2.4.2 / 2021-06-04
-* Compatible with PHP8.
-* Fixed: compatible with PHP5.4.
-* Fixed: the signature is incorrect in some scenarios
-* Update: change $requestUrl from a member variable to a local variable.
-
-## v2.4.1 / 2020-09-29
-* Fixed: the getBucketPolicy bug.
-
-
-## v2.4.0 / 2020-08-31
-
-* Added: disable Expect: 100-continue
-* Added: support getBucketInfo
-* Added: support getBucketStat
-* Added: support bucket policy
-* Added: support bucket encryption
-* Added: support bucket tagging
-* Added: support bucket  worm
-* Added: support versioning
-* Added: support request payment
-* Added: support object tagging
-* Added: support code archive
-* Added: support process object 
-* Added: support traffic limit paramter 
-* Added: support upload object from file handle
-* Added: support getSimplifiedObjectMeta
-* Fixed: the object name can not be '0' stirng.
-* Update: endpoint validity check
-* Update: add new pre-signed url api
-
-
-## v2.3.1 / 2019-01-15
+## v2.3.1 / 2019-011-15
 
 * translate chinese comments into english
 * Added: endpoint validity check

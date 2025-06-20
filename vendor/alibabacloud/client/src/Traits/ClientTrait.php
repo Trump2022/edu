@@ -182,14 +182,14 @@ trait ClientTrait
      */
     public static function accessKeyClient($accessKeyId, $accessKeySecret)
     {
-        if (null === $accessKeyId || strpos($accessKeyId, ' ') !== false) {
+        if (strpos($accessKeyId, ' ') !== false) {
             throw new ClientException(
                 'AccessKey ID format is invalid',
                 SDK::INVALID_ARGUMENT
             );
         }
 
-        if (null === $accessKeySecret || strpos($accessKeySecret, ' ') !== false) {
+        if (strpos($accessKeySecret, ' ') !== false) {
             throw new ClientException(
                 'AccessKey Secret format is invalid',
                 SDK::INVALID_ARGUMENT

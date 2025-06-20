@@ -52,20 +52,8 @@ class Gateway
      * 与Gateway是否是长链接
      * @var bool
      */
-    public static $persistentConnection = true;
-
-    /**
-     * 是否清除注册地址缓存
-     * @var bool
-     */
-    public static $addressesCacheDisable = false;
-
-    /**
-     * 与gateway建立的连接
-     * @var array
-     */
-    protected static $gatewayConnections = [];
-
+    public static $persistentConnection = false;
+    
     /**
      * 向所有客户端连接(或者 client_id_array 指定的客户端连接)广播消息
      *
@@ -149,26 +137,24 @@ class Gateway
     /**
      * 向某个client_id对应的连接发消息
      *
-     * @param string    $client_id
+     * @param int    $client_id
      * @param string $message
-     * @param bool $raw
-     * @return bool
+     * @return void
      */
-    public static function sendToClient($client_id, $message, $raw = false)
+    public static function sendToClient($client_id, $message)
     {
-        return static::sendCmdAndMessageToClient($client_id, GatewayProtocol::CMD_SEND_TO_ONE, $message, '', $raw);
+        return static::sendCmdAndMessageToClient($client_id, GatewayProtocol::CMD_SEND_TO_ONE, $message);
     }
 
     /**
      * 向当前客户端连接发送消息
      *
      * @param string $message
-     * @param bool $raw
      * @return bool
      */
-    public static function sendToCurrentClient($message, $raw = false)
+    public static function sendToCurrentClient($message)
     {
-        return static::sendCmdAndMessageToClient(null, GatewayProtocol::CMD_SEND_TO_ONE, $message, '', $raw);
+        return static::sendCmdAndMessageToClient(null, GatewayProtocol::CMD_SEND_TO_ONE, $message);
     }
 
     /**
@@ -185,7 +171,7 @@ class Gateway
     /**
      * 判断client_id对应的连接是否在线
      *
-     * @param string $client_id
+     * @param int $client_id
      * @return int 0|1
      */
     public static function isOnline($client_id)
@@ -764,8 +750,8 @@ class Gateway
         $client_array = $status_data = $client_address_map = $receive_buffer_array = $recv_length_array = array();
         // 批量向所有gateway进程发送请求数据
         foreach ($gateway_buffer_array as $address => $gateway_buffer) {
-            $client = static::getGatewayConnection("tcp://$address");
-            if (strlen($gateway_buffer) === stream_socket_sendto($client, $gateway_buffer)) {
+            $client = stream_socket_client("tcp://$address", $errno, $errmsg, static::$connectTimeout);
+            if ($client && strlen($gateway_buffer) === stream_socket_sendto($client, $gateway_buffer)) {
                 $socket_id                        = (int)$client;
                 $client_array[$socket_id]         = $client;
                 $client_address_map[$socket_id]   = explode(':', $address);
@@ -798,7 +784,6 @@ class Gateway
                 }
             }
             if (microtime(true) - $time_start > $timeout) {
-                static::$gatewayConnections = [];
                 break;
             }
         }
@@ -814,7 +799,7 @@ class Gateway
     /**
      * 踢掉某个客户端，并以$message通知被踢掉客户端
      *
-     * @param string $client_id
+     * @param int $client_id
      * @param string $message
      * @return void
      */
@@ -852,7 +837,7 @@ class Gateway
     /**
      * 踢掉某个客户端并直接立即销毁相关连接
      *
-     * @param string $client_id
+     * @param int $client_id
      * @return bool
      */
     public static function destoryClient($client_id)
@@ -888,7 +873,7 @@ class Gateway
     /**
      * 将 client_id 与 uid 绑定
      *
-     * @param string        $client_id
+     * @param int        $client_id
      * @param int|string $uid
      * @return void
      */
@@ -900,7 +885,7 @@ class Gateway
     /**
      * 将 client_id 与 uid 解除绑定
      *
-     * @param string        $client_id
+     * @param int        $client_id
      * @param int|string $uid
      * @return void
      */
@@ -912,7 +897,7 @@ class Gateway
     /**
      * 将 client_id 加入组
      *
-     * @param string        $client_id
+     * @param int        $client_id
      * @param int|string $group
      * @return void
      */
@@ -925,7 +910,7 @@ class Gateway
     /**
      * 将 client_id 离开组
      *
-     * @param string        $client_id
+     * @param int        $client_id
      * @param int|string $group
      *
      * @return void
@@ -959,18 +944,14 @@ class Gateway
      *
      * @param int|string|array $uid
      * @param string           $message
-     * @param bool $raw
      *
      * @return void
      */
-    public static function sendToUid($uid, $message, $raw = false)
+    public static function sendToUid($uid, $message)
     {
         $gateway_data         = GatewayProtocol::$empty;
         $gateway_data['cmd']  = GatewayProtocol::CMD_SEND_TO_UID;
         $gateway_data['body'] = $message;
-        if ($raw) {
-            $gateway_data['flag'] |= GatewayProtocol::FLAG_NOT_CALL_ENCODE;
-        }
 
         if (!is_array($uid)) {
             $uid = array($uid);
@@ -1044,7 +1025,7 @@ class Gateway
     /**
      * 更新 session，框架自动调用，开发者不要调用
      *
-     * @param string    $client_id
+     * @param int    $client_id
      * @param string $session_str
      * @return bool
      */
@@ -1056,7 +1037,7 @@ class Gateway
     /**
      * 设置 session，原session值会被覆盖
      *
-     * @param string   $client_id
+     * @param int   $client_id
      * @param array $session
      *
      * @return void
@@ -1073,7 +1054,7 @@ class Gateway
     /**
      * 更新 session，实际上是与老的session合并
      *
-     * @param string   $client_id
+     * @param int   $client_id
      * @param array $session
      *
      * @return void
@@ -1090,7 +1071,7 @@ class Gateway
     /**
      * 获取某个client_id的session
      *
-     * @param string   $client_id
+     * @param int   $client_id
      * @return mixed false表示出错、null表示用户不存在、array表示具体的session信息 
      */
     public static function getSession($client_id)
@@ -1114,14 +1095,13 @@ class Gateway
     /**
      * 向某个用户网关发送命令和消息
      *
-     * @param string    $client_id
+     * @param int    $client_id
      * @param int    $cmd
      * @param string $message
      * @param string $ext_data
-     * @param bool $raw
      * @return boolean
      */
-    protected static function sendCmdAndMessageToClient($client_id, $cmd, $message, $ext_data = '', $raw = false)
+    protected static function sendCmdAndMessageToClient($client_id, $cmd, $message, $ext_data = '')
     {
         // 如果是发给当前用户则直接获取上下文中的地址
         if ($client_id === Context::$client_id || $client_id === null) {
@@ -1142,9 +1122,6 @@ class Gateway
         if (!empty($ext_data)) {
             $gateway_data['ext_data'] = $ext_data;
         }
-        if ($raw) {
-            $gateway_data['flag'] |= GatewayProtocol::FLAG_NOT_CALL_ENCODE;
-        }
 
         return static::sendToGateway($address, $gateway_data);
     }
@@ -1161,8 +1138,10 @@ class Gateway
     {
         $buffer = GatewayProtocol::encode($data);
         $buffer = static::$secretKey ? static::generateAuthBuffer() . $buffer : $buffer;
-        $address = "tcp://$address";
-        $client = static::getGatewayConnection($address);
+        $client = stream_socket_client("tcp://$address", $errno, $errmsg, static::$connectTimeout);
+        if (!$client) {
+            throw new Exception("can not connect to tcp://$address $errmsg");
+        }
         if (strlen($buffer) === stream_socket_sendto($client, $buffer)) {
             $timeout = 5;
             // 阻塞读
@@ -1178,10 +1157,8 @@ class Gateway
                     $all_buffer .= $buf;
                 } else {
                     if (feof($client)) {
-                        unset(static::$gatewayConnections[$address]);
-                        throw new Exception("connection close $address");
+                        throw new Exception("connection close tcp://$address");
                     } elseif (microtime(true) - $time_start > $timeout) {
-                        unset(static::$gatewayConnections[$address]);
                         break;
                     }
                     continue;
@@ -1190,12 +1167,8 @@ class Gateway
                 if (!$pack_len && $recv_len >= 4) {
                     $pack_len= current(unpack('N', $all_buffer));
                 }
-                if (microtime(true) - $time_start > $timeout) {
-                    unset(static::$gatewayConnections[$address]);
-                    break;
-                }
                 // 回复的数据都是以\n结尾
-                if (($pack_len && $recv_len >= $pack_len + 4)) {
+                if (($pack_len && $recv_len >= $pack_len + 4) || microtime(true) - $time_start > $timeout) {
                     break;
                 }
             }
@@ -1235,7 +1208,8 @@ class Gateway
         }
         // 非workerman环境
         $gateway_buffer = static::$secretKey ? static::generateAuthBuffer() . $gateway_buffer : $gateway_buffer;
-        $client = static::getGatewayConnection("tcp://$address");
+        $flag           = static::$persistentConnection ? STREAM_CLIENT_PERSISTENT | STREAM_CLIENT_CONNECT : STREAM_CLIENT_CONNECT;
+        $client         = stream_socket_client("tcp://$address", $errno, $errmsg, static::$connectTimeout, $flag);
         return strlen($gateway_buffer) == stream_socket_sendto($client, $gateway_buffer);
     }
 
@@ -1335,17 +1309,14 @@ class Gateway
     protected static function getAllGatewayAddressesFromRegister()
     {
         static $addresses_cache, $last_update;
-        if (static::$addressesCacheDisable) {
-            $addresses_cache = null;
-        }
         $time_now = time();
         $expiration_time = 1;
         $register_addresses = (array)static::$registerAddress;
         if(empty($addresses_cache) || $time_now - $last_update > $expiration_time) {
             foreach ($register_addresses as $register_address) {
                 $client = stream_socket_client('tcp://' . $register_address, $errno, $errmsg, static::$connectTimeout);
-                if ($client) {
-                    break;
+                if (!$client) {
+                    continue;
                 }
             }
             if (!$client) {
@@ -1382,44 +1353,6 @@ class Gateway
             return false;
         }
         return true;
-    }
-
-    /**
-     * 获取与gateway的连接，用于数据返回
-     *
-     * @param $address
-     * @return mixed
-     * @throws Exception
-     */
-    protected static function getGatewayConnection($address)
-    {
-        $ttl = 50;
-        $time = time();
-        if (isset(static::$gatewayConnections[$address])) {
-            $created_time = static::$gatewayConnections[$address]['created_time'];
-            $connection = static::$gatewayConnections[$address]['connection'];
-            if ($time - $created_time > $ttl || !is_resource($connection) || feof($connection)) {
-                \set_error_handler(function () {});
-                fclose($connection);
-                \restore_error_handler();
-                unset(static::$gatewayConnections[$address]);
-            }
-        }
-        if (!isset(static::$gatewayConnections[$address])) {
-            $client = stream_socket_client($address, $errno, $errmsg, static::$connectTimeout);
-            if (!$client) {
-                throw new Exception("can not connect to $address $errmsg");
-            }
-            static::$gatewayConnections[$address] = [
-                'created_time' => $time,
-                'connection' => $client
-            ];
-        }
-        $client = static::$gatewayConnections[$address]['connection'];
-        if (!static::$persistentConnection) {
-            static::$gatewayConnections = [];
-        }
-        return $client;
     }
 }
 

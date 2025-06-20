@@ -10,12 +10,11 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * @deprecated Use GuzzleHttp\MessageFormatter.
  * Class LogFormatter
  *
  * @package AlibabaCloud\Client\Log
  */
-class LogFormatter
+class LogFormatter extends MessageFormatter
 {
     /**
      * @var float
@@ -37,14 +36,14 @@ class LogFormatter
      */
     public function __construct($template)
     {
-        // parent::__construct($template);
+        parent::__construct($template);
         self::$logStartTime = microtime(true);
         $this->template     = $template;
         $timezone           = new DateTimeZone(date_default_timezone_get() ?: 'UTC');
         if (PHP_VERSION_ID < 70100) {
             self::$ts = DateTime::createFromFormat('U.u', sprintf('%.6F', microtime(true)), $timezone);
         } else {
-            self::$ts = new DateTime('now', $timezone);
+            self::$ts = new DateTime(null, $timezone);
         }
     }
 

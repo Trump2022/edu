@@ -7,12 +7,7 @@
  * @copyright  Copyright (c) 2018 Mark Baker (https://github.com/MarkBaker/PHPMatrix)
  * @license    https://opensource.org/licenses/MIT    MIT
  */
-
 namespace Matrix;
-
-use Generator;
-use Matrix\Decomposition\LU;
-use Matrix\Decomposition\QR;
 
 /**
  * Matrix object.
@@ -28,6 +23,7 @@ use Matrix\Decomposition\QR;
  * @method Matrix diagonal()
  * @method Matrix identity()
  * @method Matrix inverse()
+ * @method Matrix pseudoInverse()
  * @method Matrix minors()
  * @method float trace()
  * @method Matrix transpose()
@@ -36,7 +32,6 @@ use Matrix\Decomposition\QR;
  * @method Matrix multiply(...$matrices)
  * @method Matrix divideby(...$matrices)
  * @method Matrix divideinto(...$matrices)
- * @method Matrix directsum(...$matrices)
  */
 class Matrix
 {
@@ -49,7 +44,7 @@ class Matrix
      *
      * @param array $grid
      */
-    final public function __construct(array $grid)
+    public function __construct(array $grid)
     {
         $this->buildFromArray(array_values($grid));
     }
@@ -59,14 +54,15 @@ class Matrix
      *
      * @param array $grid
      */
-    protected function buildFromArray(array $grid): void
+    protected function buildFromArray(array $grid)
     {
         $this->rows = count($grid);
         $columns = array_reduce(
             $grid,
             function ($carry, $value) {
                 return max($carry, is_array($value) ? count($value) : 1);
-            }
+            },
+            0
         );
         $this->columns = $columns;
 
@@ -86,43 +82,43 @@ class Matrix
     /**
      * Validate that a row number is a positive integer
      *
-     * @param int $row
+     * @param $row
      * @return int
      * @throws Exception
      */
-    public static function validateRow(int $row): int
+    public static function validateRow($row)
     {
         if ((!is_numeric($row)) || (intval($row) < 1)) {
             throw new Exception('Invalid Row');
         }
 
-        return (int)$row;
+        return (int) $row;
     }
 
     /**
      * Validate that a column number is a positive integer
      *
-     * @param int $column
+     * @param $column
      * @return int
      * @throws Exception
      */
-    public static function validateColumn(int $column): int
+    public static function validateColumn($column)
     {
         if ((!is_numeric($column)) || (intval($column) < 1)) {
             throw new Exception('Invalid Column');
         }
 
-        return (int)$column;
+        return (int) $column;
     }
 
     /**
      * Validate that a row number falls within the set of rows for this matrix
      *
-     * @param int $row
+     * @param $row
      * @return int
      * @throws Exception
      */
-    protected function validateRowInRange(int $row): int
+    protected function validateRowInRange($row)
     {
         $row = static::validateRow($row);
         if ($row > $this->rows) {
@@ -135,11 +131,11 @@ class Matrix
     /**
      * Validate that a column number falls within the set of columns for this matrix
      *
-     * @param int $column
+     * @param $column
      * @return int
      * @throws Exception
      */
-    protected function validateColumnInRange(int $column): int
+    protected function validateColumnInRange($column)
     {
         $column = static::validateColumn($column);
         if ($column > $this->columns) {
@@ -156,19 +152,19 @@ class Matrix
      *
      * Note that row numbers start from 1, not from 0
      *
-     * @param int $row
+     * @param $row
      * @param int $rowCount
      * @return static
      * @throws Exception
      */
-    public function getRows(int $row, int $rowCount = 1): Matrix
+    public function getRows($row, $rowCount = 1)
     {
         $row = $this->validateRowInRange($row);
-        if ($rowCount === 0) {
+        if ($rowCount == 0) {
             $rowCount = $this->rows - $row + 1;
         }
 
-        return new static(array_slice($this->grid, $row - 1, (int)$rowCount));
+        return new static(array_slice($this->grid, $row - 1, $rowCount));
     }
 
     /**
@@ -178,12 +174,12 @@ class Matrix
      *
      * Note that column numbers start from 1, not from 0
      *
-     * @param int $column
+     * @param $column
      * @param int $columnCount
-     * @return Matrix
+     * @return static
      * @throws Exception
      */
-    public function getColumns(int $column, int $columnCount = 1): Matrix
+    public function getColumns($column, $columnCount = 1)
     {
         $column = $this->validateColumnInRange($column);
         if ($columnCount < 1) {
@@ -206,20 +202,20 @@ class Matrix
      *
      * Note that row numbers start from 1, not from 0
      *
-     * @param int $row
+     * @param $row
      * @param int $rowCount
      * @return static
      * @throws Exception
      */
-    public function dropRows(int $row, int $rowCount = 1): Matrix
+    public function dropRows($row, $rowCount = 1)
     {
         $this->validateRowInRange($row);
-        if ($rowCount === 0) {
+        if ($rowCount == 0) {
             $rowCount = $this->rows - $row + 1;
         }
 
         $grid = $this->grid;
-        array_splice($grid, $row - 1, (int)$rowCount);
+        array_splice($grid, $row - 1, $rowCount);
 
         return new static($grid);
     }
@@ -232,23 +228,23 @@ class Matrix
      *
      * Note that column numbers start from 1, not from 0
      *
-     * @param int $column
+     * @param $column
      * @param int $columnCount
      * @return static
      * @throws Exception
      */
-    public function dropColumns(int $column, int $columnCount = 1): Matrix
+    public function dropColumns($column, $columnCount = 1)
     {
         $this->validateColumnInRange($column);
         if ($columnCount < 1) {
             $columnCount = $this->columns + $columnCount - $column + 1;
         }
-
+        
         $grid = $this->grid;
         array_walk(
             $grid,
             function (&$row) use ($column, $columnCount) {
-                array_splice($row, $column - 1, (int)$columnCount);
+                array_splice($row, $column - 1, $columnCount);
             }
         );
 
@@ -259,12 +255,12 @@ class Matrix
      * Return a value from this matrix, from the "cell" identified by the row and column numbers
      * Note that row and column numbers start from 1, not from 0
      *
-     * @param int $row
-     * @param int $column
-     * @return mixed
+     * @param $row
+     * @param $column
+     * @return static
      * @throws Exception
      */
-    public function getValue(int $row, int $column)
+    public function getValue($row, $column)
     {
         $row = $this->validateRowInRange($row);
         $column = $this->validateColumnInRange($column);
@@ -274,11 +270,11 @@ class Matrix
 
     /**
      * Returns a Generator that will yield each row of the matrix in turn as a vector matrix
-     *     or the value of each cell if the matrix is a column vector
+     *     or the value of each cell if the matrix is a vector
      *
-     * @return Generator|Matrix[]|mixed[]
+     * @return \Generator|Matrix[]|mixed[]
      */
-    public function rows(): Generator
+    public function rows()
     {
         foreach ($this->grid as $i => $row) {
             yield $i + 1 => ($this->columns == 1)
@@ -289,11 +285,11 @@ class Matrix
 
     /**
      * Returns a Generator that will yield each column of the matrix in turn as a vector matrix
-     *     or the value of each cell if the matrix is a row vector
+     *     or the value of each cell if the matrix is a vector
      *
-     * @return Generator|Matrix[]|mixed[]
+     * @return \Generator|Matrix[]|mixed[]
      */
-    public function columns(): Generator
+    public function columns()
     {
         for ($i = 0; $i < $this->columns; ++$i) {
             yield $i + 1 => ($this->rows == 1)
@@ -308,9 +304,9 @@ class Matrix
      *
      * @return bool
      */
-    public function isSquare(): bool
+    public function isSquare()
     {
-        return $this->rows === $this->columns;
+        return $this->rows == $this->columns;
     }
 
     /**
@@ -319,9 +315,9 @@ class Matrix
      *
      * @return bool
      */
-    public function isVector(): bool
+    public function isVector()
     {
-        return $this->rows === 1 || $this->columns === 1;
+        return $this->rows == 1 || $this->columns == 1;
     }
 
     /**
@@ -329,27 +325,9 @@ class Matrix
      *
      * @return array
      */
-    public function toArray(): array
+    public function toArray()
     {
         return $this->grid;
-    }
-
-    /**
-     * Solve A*X = B.
-     *
-     * @param Matrix $B Right hand side
-     *
-     * @throws Exception
-     *
-     * @return Matrix ... Solution if A is square, least squares solution otherwise
-     */
-    public function solve(Matrix $B): Matrix
-    {
-        if ($this->columns === $this->rows) {
-            return (new LU($this))->solve($B);
-        }
-
-        return (new QR($this))->solve($B);
     }
 
     protected static $getters = [
@@ -360,11 +338,11 @@ class Matrix
     /**
      * Access specific properties as read-only (no setters)
      *
-     * @param string $propertyName
-     * @return mixed
-     * @throws Exception
+     * @param     $propertyName
+     * @return    mixed
+     * @throws    Exception
      */
-    public function __get(string $propertyName)
+    public function __get($propertyName)
     {
         $propertyName = strtolower($propertyName);
 
@@ -377,8 +355,8 @@ class Matrix
     }
 
     protected static $functions = [
-        'adjoint',
         'antidiagonal',
+        'adjoint',
         'cofactors',
         'determinant',
         'diagonal',
@@ -401,22 +379,24 @@ class Matrix
     /**
      * Returns the result of the function call or operation
      *
-     * @param string $functionName
-     * @param mixed[] $arguments
-     * @return Matrix|float
-     * @throws Exception
+     * @param     string $functionName
+     * @param     mixed[] $arguments
+     * @return    Matrix|float
+     * @throws    Exception|\InvalidArgumentException
      */
-    public function __call(string $functionName, $arguments)
+    public function __call($functionName, $arguments)
     {
         $functionName = strtolower(str_replace('_', '', $functionName));
 
         // Test for function calls
-        if (in_array($functionName, self::$functions, true)) {
-            return Functions::$functionName($this, ...$arguments);
+        if (in_array($functionName, self::$functions)) {
+            $functionName = "\\" . __NAMESPACE__ . "\\{$functionName}";
+            return $functionName($this, ...$arguments);
         }
         // Test for operation calls
-        if (in_array($functionName, self::$operations, true)) {
-            return Operations::$functionName($this, ...$arguments);
+        if (in_array($functionName, self::$operations)) {
+            $functionName = "\\" . __NAMESPACE__ . "\\{$functionName}";
+            return $functionName($this, ...$arguments);
         }
         throw new Exception('Function or Operation does not exist');
     }

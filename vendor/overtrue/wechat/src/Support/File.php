@@ -100,15 +100,12 @@ class File
      *
      * @param string $stream
      *
-     * @return string|false
+     * @return string
      */
     public static function getStreamExt($stream)
     {
-        try {
-            if (is_readable($stream)) {
-                $stream = file_get_contents($stream);
-            }
-        } catch (\Exception $e) {
+        if (is_file(pathinfo($stream, PATHINFO_DIRNAME)) && is_readable($stream)) {
+            $stream = file_get_contents($stream);
         }
 
         $finfo = new finfo(FILEINFO_MIME);

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This file is part of workerman.
  *
@@ -19,7 +18,7 @@ use GatewayWorker\Lib\Context;
 use Workerman\Connection\TcpConnection;
 
 use Workerman\Worker;
-use Workerman\Timer;
+use Workerman\Lib\Timer;
 use Workerman\Autoloader;
 use Workerman\Connection\AsyncTcpConnection;
 use GatewayWorker\Protocols\GatewayProtocol;
@@ -34,28 +33,12 @@ use GatewayWorker\Protocols\GatewayProtocol;
  */
 class Gateway extends Worker
 {
-
     /**
-     * 随机负载均衡
-     *
-     *@var string
-     */
-    const ROUTER_RANDOM = 'router_random';
-
-    /**
-     * 最小连接数负载均衡模式
+     * 版本
      *
      * @var string
      */
-    const ROUTER_LEAST_CONNECTIONS = 'router_least_connections';
-
-    /**
-     * Gateway 默认负载均衡模式
-     *
-     * @var  string $selectLoadBalancingMode
-     */
-    public static $selectLoadBalancingMode = self::ROUTER_LEAST_CONNECTIONS;
-
+    const VERSION = '3.0.13';
 
     /**
      * 本机 IP
@@ -65,21 +48,6 @@ class Gateway extends Worker
      */
     public $lanIp = '127.0.0.1';
 
-    /**
-     * 如果宿主机为192.168.1.2 , gatewayworker in  docker container (172.25.0.2)
-     * 此时 lanIp=192.68.1.2 GatewayClientSDK 能连上，但是$this->_innerTcpWorker stream_socket_server(): Unable to connect to tcp://192.168.1.2:2901 (Address not available) in
-     * 此时 lanIp=172.25.0.2 GatewayClientSDK stream_socket_server(): Unable to connect to tcp://172.25.0.2:2901 (Address not available) ， $this->_innerTcpWorker 正常监听
-     *
-     * solution:
-     * $gateway->lanIp=192.168.1.2 ;
-     * $gateway->innerTcpWorkerListen=172.25.0.2; // || 0.0.0.0
-     *
-     * GatewayClientSDK connect  192.168.1.2:lanPort
-     * $this->_innerTcpWorker listen  $gateway->innerTcpWorkerListen:lanPort
-     *
-     */
-    public $innerTcpWorkerListen='';
-	
     /**
      * 本机端口
      *
@@ -100,6 +68,13 @@ class Gateway extends Worker
      * @var string|array
      */
     public $registerAddress = '127.0.0.1:1236';
+
+    /**
+     * 是否可以平滑重启，gateway 不能平滑重启，否则会导致连接断开
+     *
+     * @var bool
+     */
+    public $reloadable = false;
 
     /**
      * 心跳时间间隔
@@ -132,7 +107,7 @@ class Gateway extends Worker
     /**
      * 路由函数
      *
-     * @var callable|null
+     * @var callback
      */
     public $router = null;
 
@@ -157,28 +132,6 @@ class Gateway extends Worker
      * @var bool
      */
     public $protocolAccelerate = false;
-
-    /**
-     * BusinessWorker 连接成功之后触发
-     *
-     * @var callable|null
-     */
-    public $onBusinessWorkerConnected = null;
-
-    /**
-     * BusinessWorker 关闭时触发
-     *
-     * @var callable|null
-     */
-    public $onBusinessWorkerClose = null;
-
-    /**
-     * 最小连接数负载均衡记录表，用于新上线业务服务器负载足够均衡
-     * [ ip+businessworker key => 连接记录, ip+businessworker key => 连接记录, .... ]
-     *
-     * @var array
-     */
-    protected static $leastConnectionsRecord = array();
 
     /**
      * 保存客户端的所有 connection 对象
@@ -216,35 +169,35 @@ class Gateway extends Worker
     /**
      * 当 worker 启动时
      *
-     * @var callable|null
+     * @var callback
      */
     protected $_onWorkerStart = null;
 
     /**
      * 当有客户端连接时
      *
-     * @var callable|null
+     * @var callback
      */
     protected $_onConnect = null;
 
     /**
      * 当客户端发来消息时
      *
-     * @var callable|null
+     * @var callback
      */
     protected $_onMessage = null;
 
     /**
      * 当客户端连接关闭时
      *
-     * @var callable|null
+     * @var callback
      */
     protected $_onClose = null;
 
     /**
      * 当 worker 停止时
      *
-     * @var callable|null
+     * @var callback
      */
     protected $_onWorkerStop = null;
 
@@ -284,7 +237,6 @@ class Gateway extends Worker
     public function __construct($socket_name, $context_option = array())
     {
         parent::__construct($socket_name, $context_option);
-        $this->reloadable = false;
 		$this->_gatewayPort = substr(strrchr($socket_name,':'),1);
         $this->router = array("\\GatewayWorker\\Gateway", 'routerBind');
 
@@ -347,7 +299,7 @@ class Gateway extends Worker
         $connection->id = self::generateConnectionId();
         // 保存该连接的内部通讯的数据包报头，避免每次重新初始化
         $connection->gatewayHeader = array(
-            'local_ip'      => ip2long(gethostbyname($this->lanIp)),
+            'local_ip'      => ip2long($this->lanIp),
             'local_port'    => $this->lanPort,
             'client_ip'     => ip2long($connection->getRemoteIp()),
             'client_port'   => $connection->getRemotePort(),
@@ -367,11 +319,7 @@ class Gateway extends Worker
         // 如果用户有自定义 onConnect 回调，则执行
         if ($this->_onConnect) {
             call_user_func($this->_onConnect, $connection);
-            if (isset($connection->onWebSocketConnect)) {
-                $connection->_onWebSocketConnect = $connection->onWebSocketConnect;
-            }
-        }
-        if ($connection->protocol === '\Workerman\Protocols\Websocket' || $connection->protocol === 'Workerman\Protocols\Websocket') {
+        } elseif ($connection->protocol === '\Workerman\Protocols\Websocket') {
             $connection->onWebSocketConnect = array($this, 'onWebsocketConnect');
         }
 
@@ -382,35 +330,11 @@ class Gateway extends Worker
      * websocket握手时触发
      *
      * @param $connection
-     * @param $request
+     * @param $http_buffer
      */
-    public function onWebsocketConnect($connection, $request)
+    public function onWebsocketConnect($connection, $http_buffer)
     {
-        if (isset($connection->_onWebSocketConnect)) {
-            call_user_func($connection->_onWebSocketConnect, $connection, $request);
-            unset($connection->_onWebSocketConnect);
-        }
-        if (is_object($request)) {
-            $server = [
-                'QUERY_STRING' => $request->queryString(),
-                'REQUEST_METHOD' => $request->method(),
-                'REQUEST_URI' => $request->uri(),
-                'SERVER_PROTOCOL' => "HTTP/" . $request->protocolVersion(),
-                'SERVER_NAME' => $request->host(false),
-                'CONTENT_TYPE' => $request->header('content-type'),
-                'REMOTE_ADDR' => $connection->getRemoteIp(),
-                'REMOTE_PORT' => $connection->getRemotePort(),
-                'SERVER_PORT' => $connection->getLocalPort(),
-            ];
-            foreach ($request->header() as $key => $header) {
-                $key = str_replace('-', '_', strtoupper($key));
-                $server["HTTP_$key"] = $header;
-            }
-            $data = array('get' => $request->get(), 'server' => $server, 'cookie' => $request->cookie());
-        } else {
-            $data = array('get' => $_GET, 'server' => $_SERVER, 'cookie' => $_COOKIE);
-        }
-        $this->sendToWorker(GatewayProtocol::CMD_ON_WEBSOCKET_CONNECT, $connection, $data);
+        $this->sendToWorker(GatewayProtocol::CMD_ON_WEBSOCKET_CONNECT, $connection, array('get' => $_GET, 'server' => $_SERVER, 'cookie' => $_COOKIE));
     }
     
     /**
@@ -451,7 +375,7 @@ class Gateway extends Worker
             $worker_connection = call_user_func($this->router, $this->_workerConnections, $connection, $cmd, $body);
             if (false === $worker_connection->send($gateway_data)) {
                 $msg = "SendBufferToWorker fail. May be the send buffer are overflow. See http://doc2.workerman.net/send-buffer-overflow.html";
-                static::error($msg);
+                static::log($msg);
                 return false;
             }
         } // 没有可用的 worker
@@ -461,7 +385,7 @@ class Gateway extends Worker
             $time_diff = 2;
             if (time() - $this->_startTime >= $time_diff) {
                 $msg = 'SendBufferToWorker fail. The connections between Gateway and BusinessWorker are not ready. See http://doc2.workerman.net/send-buffer-to-worker-fail.html';
-                static::error($msg);
+                static::log($msg);
             }
             $connection->destroy();
             return false;
@@ -470,57 +394,17 @@ class Gateway extends Worker
     }
 
     /**
-     * 随机路由，返回 worker connection 标识
+     * 随机路由，返回 worker connection 对象
      *
      * @param array         $worker_connections
-     * @return string
+     * @param TcpConnection $client_connection
+     * @param int           $cmd
+     * @param mixed         $buffer
+     * @return TcpConnection
      */
-    public static function routerRand(array $worker_connections) : string
+    public static function routerRand($worker_connections, $client_connection, $cmd, $buffer)
     {
-        return array_rand($worker_connections);
-    }
-
-    /**
-     * 返回最少客户端连接数量的业务服务器标识
-     * 新上线服务器由于客户端连接数过低，会先分配给新服务器
-     *
-     * @throws  \Exception
-     * @param array         $leastConnections
-     * @return string
-     */
-    protected static function routerLeastConnectionsRecord(array $leastConnections) : string
-    {
-        if (empty($leastConnections))
-        {
-           throw new \Exception("The routing record is empty.");
-        }
-
-        // 返回最少客户端连接数量的业务服务器地址
-        return array_search(min($leastConnections), $leastConnections, true);
-    }
-
-    /**
-     * @param array $worker_connections
-     * @param string $selectLoadBalancingMode
-     * @return string
-     * @throws \Exception
-     */
-    protected static function businessWorkerAddress(array $worker_connections, string $selectLoadBalancingMode)
-    {
-        switch ($selectLoadBalancingMode)
-        {
-            case static::ROUTER_LEAST_CONNECTIONS:
-                // 选择连接最少的businessWorker 服务器
-                $businessWorkerAddress = static::routerLeastConnectionsRecord(static::$leastConnectionsRecord);
-                // 更新轮询表连接数量
-                static::$leastConnectionsRecord[$businessWorkerAddress]++;
-                return $businessWorkerAddress;
-            case static::ROUTER_RANDOM:
-                // 随机轮询
-                return static::routerRand($worker_connections);
-            default:
-                throw new \Exception("The load balancing mode is not supported.");
-        }
+        return $worker_connections[array_rand($worker_connections)];
     }
 
     /**
@@ -531,12 +415,11 @@ class Gateway extends Worker
      * @param int           $cmd
      * @param mixed         $buffer
      * @return TcpConnection
-     * @throws \Exception
      */
     public static function routerBind($worker_connections, $client_connection, $cmd, $buffer)
     {
         if (!isset($client_connection->businessworker_address) || !isset($worker_connections[$client_connection->businessworker_address])) {
-            $client_connection->businessworker_address = static::businessWorkerAddress($worker_connections, static::$selectLoadBalancingMode);
+            $client_connection->businessworker_address = array_rand($worker_connections);
         }
         return $worker_connections[$client_connection->businessworker_address];
     }
@@ -550,18 +433,6 @@ class Gateway extends Worker
     {
         // 尝试通知 worker，触发 Event::onClose
         $this->sendToWorker(GatewayProtocol::CMD_ON_CLOSE, $connection);
-
-        // 客户端下线,更新路由表数据
-        if(static::$selectLoadBalancingMode === static::ROUTER_LEAST_CONNECTIONS &&
-            isset($connection->businessworker_address))
-        {
-            // 客户端连接数 >0,减少连接数
-            if((static::$leastConnectionsRecord[$connection->businessworker_address])??0 > 0)
-            {
-                static::$leastConnectionsRecord[$connection->businessworker_address]--;
-            }
-        }
-
         unset($this->_clientConnections[$connection->id]);
         // 清理 uid 数据
         if (!empty($connection->uid)) {
@@ -611,23 +482,13 @@ class Gateway extends Worker
             class_alias('GatewayWorker\Protocols\GatewayProtocol', 'Protocols\GatewayProtocol');
         }
 
-         //如为公网IP监听，直接换成0.0.0.0 ，否则用内网IP
-        $listen_ip=filter_var($this->lanIp,FILTER_VALIDATE_IP,FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)?'0.0.0.0':$this->lanIp;
-	    
-	    //Use scenario to see line 64
-        if($this->innerTcpWorkerListen != '') {
-            $listen_ip = $this->innerTcpWorkerListen;
-        }
-
         // 初始化 gateway 内部的监听，用于监听 worker 的连接已经连接上发来的数据
-        $this->_innerTcpWorker = new Worker("GatewayProtocol://{$listen_ip}:{$this->lanPort}");
-        $this->_innerTcpWorker->reusePort = false;
+        $this->_innerTcpWorker = new Worker("GatewayProtocol://{$this->lanIp}:{$this->lanPort}");
         $this->_innerTcpWorker->listen();
-        $this->_innerTcpWorker->name = 'GatewayInnerWorker';
+	$this->_innerTcpWorker->name = 'GatewayInnerWorker';
 
-        if ($this->_autoloadRootPath && class_exists(Autoloader::class)) {
-            Autoloader::setRootPath($this->_autoloadRootPath);
-        }
+        // 重新设置自动加载根目录
+        Autoloader::setRootPath($this->_autoloadRootPath);
 
         // 设置内部监听的相关回调
         $this->_innerTcpWorker->onMessage = array($this, 'onWorkerMessage');
@@ -652,7 +513,7 @@ class Gateway extends Worker
     public function onWorkerConnect($connection)
     {
         $connection->maxSendBufferSize = $this->sendToWorkerBufferSize;
-        $connection->authorized = !$this->secretKey;
+        $connection->authorized = $this->secretKey ? false : true;
     }
 
     /**
@@ -668,7 +529,7 @@ class Gateway extends Worker
     {
         $cmd = $data['cmd'];
         if (empty($connection->authorized) && $cmd !== GatewayProtocol::CMD_WORKER_CONNECT && $cmd !== GatewayProtocol::CMD_GATEWAY_CLIENT_CONNECT) {
-            self::error("Unauthorized request from " . $connection->getRemoteIp() . ":" . $connection->getRemotePort());
+            self::log("Unauthorized request from " . $connection->getRemoteIp() . ":" . $connection->getRemotePort());
             $connection->close();
             return;
         }
@@ -677,33 +538,26 @@ class Gateway extends Worker
             case GatewayProtocol::CMD_WORKER_CONNECT:
                 $worker_info = json_decode($data['body'], true);
                 if ($worker_info['secret_key'] !== $this->secretKey) {
-                    self::error("Gateway: Worker key does not match ".var_export($this->secretKey, true)." !== ". var_export($this->secretKey));
+                    self::log("Gateway: Worker key does not match ".var_export($this->secretKey, true)." !== ". var_export($this->secretKey));
                     $connection->close();
                     return;
                 }
                 $key = $connection->getRemoteIp() . ':' . $worker_info['worker_key'];
                 // 在一台服务器上businessWorker->name不能相同
                 if (isset($this->_workerConnections[$key])) {
-                    self::error("Gateway: Worker->name conflict. Key:{$key}");
-                    // 关闭老的，使用新的
-                    $this->_workerConnections[$key]->close();
+                    self::log("Gateway: Worker->name conflict. Key:{$key}");
+		            $connection->close();
+                    return;
                 }
 		        $connection->key = $key;
                 $this->_workerConnections[$key] = $connection;
                 $connection->authorized = true;
-                // 新上线业务服务器,初始路由表为0
-                if(static::$selectLoadBalancingMode === static::ROUTER_LEAST_CONNECTIONS) {
-                    static::$leastConnectionsRecord[$key] = 0;
-                }
-                if ($this->onBusinessWorkerConnected) {
-                    call_user_func($this->onBusinessWorkerConnected, $connection);
-                }
                 return;
             // GatewayClient连接Gateway
             case GatewayProtocol::CMD_GATEWAY_CLIENT_CONNECT:
                 $worker_info = json_decode($data['body'], true);
                 if ($worker_info['secret_key'] !== $this->secretKey) {
-                    self::error("Gateway: GatewayClient key does not match ".var_export($this->secretKey, true)." !== ".var_export($this->secretKey, true));
+                    self::log("Gateway: GatewayClient key does not match ".var_export($this->secretKey, true)." !== ".var_export($this->secretKey, true));
                     $connection->close();
                     return;
                 }
@@ -712,13 +566,7 @@ class Gateway extends Worker
             // 向某客户端发送数据，Gateway::sendToClient($client_id, $message);
             case GatewayProtocol::CMD_SEND_TO_ONE:
                 if (isset($this->_clientConnections[$data['connection_id']])) {
-                    $raw = (bool)($data['flag'] & GatewayProtocol::FLAG_NOT_CALL_ENCODE);
-                    $body = $data['body'];
-                    if (!$raw && $this->protocolAccelerate && $this->protocol) {
-                        $body = $this->preEncodeForClient($body);
-                        $raw = true;
-                    }
-                    $this->_clientConnections[$data['connection_id']]->send($body, $raw);
+                    $this->_clientConnections[$data['connection_id']]->send($data['body']);
                 }
                 return;
             // 踢出用户，Gateway::closeClient($client_id, $message);
@@ -909,18 +757,12 @@ class Gateway extends Worker
                 return;
             // 发送数据给 uid Gateway::sendToUid($uid, $msg);
             case GatewayProtocol::CMD_SEND_TO_UID:
-                $raw = (bool)($data['flag'] & GatewayProtocol::FLAG_NOT_CALL_ENCODE);
-                $body = $data['body'];
-                if (!$raw && $this->protocolAccelerate && $this->protocol) {
-                    $body = $this->preEncodeForClient($body);
-                    $raw = true;
-                }
                 $uid_array = json_decode($data['ext_data'], true);
                 foreach ($uid_array as $uid) {
                     if (!empty($this->_uidConnections[$uid])) {
                         foreach ($this->_uidConnections[$uid] as $connection) {
                             /** @var TcpConnection $connection */
-                            $connection->send($body, $raw);
+                            $connection->send($data['body']);
                         }
                     }
                 }
@@ -1041,36 +883,6 @@ class Gateway extends Worker
                 }
                 $connection->send(pack('N', strlen($buffer)) . $buffer, true);
                 return;
-            // 批量获取与 uid 绑定的所有 client_id Gateway::batchGetClientIdByUid($uid);
-            case GatewayProtocol::CMD_BATCH_GET_CLIENT_ID_BY_UID:
-                $uids = json_decode($data['ext_data']);
-                $return = [];
-                foreach ($uids as $uid) {
-                    if (empty($this->_uidConnections[$uid])) {
-                        $return[$uid] = [];
-                    } else {
-                        $return[$uid] = array_keys($this->_uidConnections[$uid]);
-                    }
-                }
-                $buffer = serialize($return);
-
-                $connection->send(pack('N', strlen($buffer)) . $buffer, true);
-                return;
-            // 批量获取群组ID内客户端个数
-            case GatewayProtocol::CMD_BATCH_GET_CLIENT_COUNT_BY_GROUP:
-                $groups = json_decode($data['ext_data'], true);
-                $return = [];
-                foreach ($groups as $group) {
-                    if (isset($this->_groupConnections[$group])) {
-                        $return[$group] = count($this->_groupConnections[$group]);
-                    } else {
-                        $return[$group] = 0;
-                    }
-                }
-
-                $buffer = serialize($return);
-                $connection->send(pack('N', strlen($buffer)) . $buffer, true);
-                return;
             default :
                 $err_msg = "gateway inner pack err cmd=$cmd";
                 echo $err_msg;
@@ -1086,15 +898,7 @@ class Gateway extends Worker
     public function onWorkerClose($connection)
     {
         if (isset($connection->key)) {
-            // 业务服务器下线, 清理路由表数据
-            if (static::$selectLoadBalancingMode === static::ROUTER_LEAST_CONNECTIONS)
-            {
-                unset(static::$leastConnectionsRecord[$connection->key]);
-            }
             unset($this->_workerConnections[$connection->key]);
-            if ($this->onBusinessWorkerClose) {
-                call_user_func($this->onBusinessWorkerClose, $connection);
-            }
         }
     }
 
@@ -1204,11 +1008,10 @@ class Gateway extends Worker
     }
 
     /**
-     * error.
+     * Log.
      * @param string $msg
      */
-    public static function error($msg)
-    {
+    public static function log($msg){
         Timer::add(1, function() use ($msg) {
             Worker::log($msg);
         }, null, false);

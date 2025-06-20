@@ -14,7 +14,7 @@
 namespace GatewayWorker;
 
 use Workerman\Worker;
-use Workerman\Timer;
+use Workerman\Lib\Timer;
 
 /**
  *
@@ -25,7 +25,16 @@ use Workerman\Timer;
  */
 class Register extends Worker
 {
+    /**
+     * {@inheritdoc}
+     */
+    public $name = 'Register';
 
+    /**
+     * {@inheritdoc}
+     */
+    public $reloadable = false;
+    
     /**
      * 秘钥
      * @var string
@@ -53,18 +62,10 @@ class Register extends Worker
      */
     protected $_startTime = 0;
 
-
-    public function __construct(string $socketName = null, array $contextOption = [])
-    {
-        $this->name = 'Register';
-        $this->reloadable = false;
-        parent::__construct($socketName, $contextOption);
-    }
-
     /**
      * {@inheritdoc}
      */
-    public function run(): void
+    public function run()
     {
         // 设置 onMessage 连接回调
         $this->onConnect = array($this, 'onConnect');
@@ -80,9 +81,6 @@ class Register extends Worker
         
         // 强制使用text协议
         $this->protocol = '\Workerman\Protocols\Text';
-
-        // reusePort
-        $this->reusePort = false;
         
         // 运行父方法
         parent::run();
@@ -160,8 +158,6 @@ class Register extends Worker
      */
     public function onClose($connection)
     {
-        // 删除定时器
-        Timer::del($connection->timeout_timerid);
         if (isset($this->_gatewayConnections[$connection->id])) {
             unset($this->_gatewayConnections[$connection->id]);
             $this->broadcastAddresses();

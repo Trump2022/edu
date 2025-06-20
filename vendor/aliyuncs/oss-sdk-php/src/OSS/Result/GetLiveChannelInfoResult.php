@@ -7,7 +7,7 @@ use OSS\Model\GetLiveChannelInfo;
 class GetLiveChannelInfoResult extends Result
 {
     /**
-     * @return GetLiveChannelInfo
+     * @return
      */
     protected function parseDataFromResponse()
     {

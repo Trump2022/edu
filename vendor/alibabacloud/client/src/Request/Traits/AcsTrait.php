@@ -2,14 +2,14 @@
 
 namespace AlibabaCloud\Client\Request\Traits;
 
+use GuzzleHttp\Psr7\Uri;
+use AlibabaCloud\Client\SDK;
 use AlibabaCloud\Client\AlibabaCloud;
-use AlibabaCloud\Client\Exception\ClientException;
-use AlibabaCloud\Client\Exception\ServerException;
+use AlibabaCloud\Client\Request\Request;
 use AlibabaCloud\Client\Filter\ApiFilter;
 use AlibabaCloud\Client\Regions\LocationService;
-use AlibabaCloud\Client\Request\Request;
-use AlibabaCloud\Client\SDK;
-use GuzzleHttp\Psr7\Uri;
+use AlibabaCloud\Client\Exception\ClientException;
+use AlibabaCloud\Client\Exception\ServerException;
 
 /**
  * Trait AcsTrait
@@ -200,24 +200,8 @@ trait AcsTrait
             $host = $this->endpointMap[$region_id];
         }
 
-        if (!$host) {
-            $this->hostResolver($host, $region_id);
-        }
-    }
-
-    /**
-     * @codeCoverageIgnore
-     *
-     * @param string $host
-     * @param string $region_id
-     *
-     * @throws ClientException
-     * @throws ServerException
-     */
-    private function hostResolver(&$host, $region_id)
-    {
         // 2. Find host by rules.
-        if ($this->endpointRegional !== null) {
+        if (!$host && $this->endpointRegional !== null) {
             $host = AlibabaCloud::resolveHostByRule($this);
         }
 
@@ -248,10 +232,6 @@ trait AcsTrait
 
         if (AlibabaCloud::getDefaultRegionId() !== null) {
             return AlibabaCloud::getDefaultRegionId();
-        }
-
-        if ($this->product && AlibabaCloud::isGlobalProduct($this->product)) {
-            return 'global';
         }
 
         throw new ClientException("Missing required 'RegionId' for Request", SDK::INVALID_REGION_ID);

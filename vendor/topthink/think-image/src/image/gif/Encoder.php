@@ -48,7 +48,7 @@ class Encoder
         for ($i = 0; $i < count($GIF_src); $i++) {
             if (strtolower($GIF_mod) == "url") {
                 $this->BUF[] = fread(fopen($GIF_src[$i], "rb"), filesize($GIF_src[$i]));
-            } elseif (strtolower($GIF_mod) == "bin") {
+            } else if (strtolower($GIF_mod) == "bin") {
                 $this->BUF[] = $GIF_src[$i];
             } else {
                 printf("%s: %s ( %s )!", $this->VER, $this->ERR['ERR02'], $GIF_mod);
@@ -74,7 +74,7 @@ class Encoder
         }
         $this->addHeader();
         for ($i = 0; $i < count($this->BUF); $i++) {
-            isset($GIF_dly[$i]) && $this->addFrames($i, $GIF_dly[$i]);
+            $this->addFrames($i, $GIF_dly[$i]);
         }
         $this->addFooter();
     }
@@ -118,9 +118,9 @@ class Encoder
         if ($this->COL > -1 && ord($this->BUF[$i]{10}) & 0x80) {
             for ($j = 0; $j < (2 << (ord($this->BUF[$i]{10}) & 0x07)); $j++) {
                 if (
-                    ord(Locals_rgb[3 * $j + 0]) == (($this->COL >> 16) & 0xFF) &&
-                    ord(Locals_rgb[3 * $j + 1]) == (($this->COL >> 8) & 0xFF) &&
-                    ord(Locals_rgb[3 * $j + 2]) == (($this->COL >> 0) & 0xFF)
+                    ord($Locals_rgb{3 * $j + 0}) == (($this->COL >> 16) & 0xFF) &&
+                    ord($Locals_rgb{3 * $j + 1}) == (($this->COL >> 8) & 0xFF) &&
+                    ord($Locals_rgb{3 * $j + 2}) == (($this->COL >> 0) & 0xFF)
                 ) {
                     $Locals_ext = "!\xF9\x04" . chr(($this->DIS << 2) + 1) .
                         chr(($d >> 0) & 0xFF) . chr(($d >> 8) & 0xFF) . chr($j) . "\x0";
@@ -128,7 +128,7 @@ class Encoder
                 }
             }
         }
-        switch (Locals_tmp[0]) {
+        switch ($Locals_tmp{0}) {
             case "!":
                 /**
                  * @var string $Locals_img ;
@@ -146,19 +146,19 @@ class Encoder
                 if ($this->blockCompare($Global_rgb, $Locals_rgb, $Global_len)) {
                     $this->GIF .= ($Locals_ext . $Locals_img . $Locals_tmp);
                 } else {
-                    $byte = ord(Locals_img[9]);
+                    $byte = ord($Locals_img{9});
                     $byte |= 0x80;
                     $byte &= 0xF8;
                     $byte |= (ord($this->BUF[0]{10}) & 0x07);
-                    Locals_img[9] = chr($byte);
+                    $Locals_img{9} = chr($byte);
                     $this->GIF .= ($Locals_ext . $Locals_img . $Locals_rgb . $Locals_tmp);
                 }
             } else {
-                $byte = ord(Locals_img[9]);
+                $byte = ord($Locals_img{9});
                 $byte |= 0x80;
                 $byte &= 0xF8;
                 $byte |= (ord($this->BUF[$i]{10}) & 0x07);
-                Locals_img[9] = chr($byte);
+                $Locals_img{9} = chr($byte);
                 $this->GIF .= ($Locals_ext . $Locals_img . $Locals_rgb . $Locals_tmp);
             }
         } else {
@@ -188,9 +188,9 @@ class Encoder
     {
         for ($i = 0; $i < $Len; $i++) {
             if (
-                GlobalBlock[3 * $i + 0] != LocalBlock[3 * $i + 0] ||
-                GlobalBlock[3 * $i + 1] != LocalBlock[3 * $i + 1] ||
-                GlobalBlock[3 * $i + 2] != LocalBlock[3 * $i + 2]
+                $GlobalBlock{3 * $i + 0} != $LocalBlock{3 * $i + 0} ||
+                $GlobalBlock{3 * $i + 1} != $LocalBlock{3 * $i + 1} ||
+                $GlobalBlock{3 * $i + 2} != $LocalBlock{3 * $i + 2}
             ) {
                 return (0);
             }

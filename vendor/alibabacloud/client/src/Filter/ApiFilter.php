@@ -111,13 +111,6 @@ class ApiFilter
             );
         }
 
-        if (!preg_match("/^[a-zA-Z0-9_-]+$/", $endpointSuffix)) {
-            throw new ClientException(
-                'Invalid Endpoint Suffix',
-                SDK::INVALID_ARGUMENT
-            );
-        }
-
         return $endpointSuffix;
     }
 
@@ -141,13 +134,6 @@ class ApiFilter
         if ($network === '') {
             throw new ClientException(
                 'Network Suffix cannot be empty',
-                SDK::INVALID_ARGUMENT
-            );
-        }
-
-        if (!preg_match("/^[a-zA-Z0-9_-]+$/", $network)) {
-            throw new ClientException(
-                'Invalid Network Suffix',
                 SDK::INVALID_ARGUMENT
             );
         }

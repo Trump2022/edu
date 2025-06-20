@@ -18,7 +18,6 @@ abstract class VersionResolver
      * @param array  $arguments
      *
      * @return mixed
-     * @throws ClientException
      */
     public static function __callStatic($name, $arguments)
     {
@@ -62,7 +61,7 @@ abstract class VersionResolver
     {
         $array = \explode('\\', \get_class($this));
 
-        if (is_array($array) && isset($array[1])) {
+        if (isset($array[1])) {
             return $array[1];
         }
 

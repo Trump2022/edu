@@ -2,7 +2,7 @@
 
 namespace AlibabaCloud\Client\Exception;
 
-use AlibabaCloud\Client\Support\Stringy;
+use Stringy\Stringy;
 use RuntimeException;
 use AlibabaCloud\Client\SDK;
 use AlibabaCloud\Client\Result\Result;
@@ -83,7 +83,7 @@ class ServerException extends AlibabaCloudException
     private function distinguishSignatureErrors()
     {
         if ($this->result->getRequest()
-            && Stringy::contains($this->errorMessage, $this->result->getRequest()->stringToSign())) {
+            && Stringy::create($this->errorMessage)->contains($this->result->getRequest()->stringToSign())) {
             $this->errorCode    = 'InvalidAccessKeySecret';
             $this->errorMessage = 'Specified Access Key Secret is not valid.';
         }

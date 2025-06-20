@@ -2,14 +2,11 @@
 
 namespace clagiordano\weblibs\configmanager;
 
-use Exception;
-use RuntimeException;
-
 /**
  * Class ConfigManager, class for easily read and access to php config array file.
  * @package clagiordano\weblibs\configmanager
  */
-class ConfigManager implements IConfigurable
+class ConfigManager
 {
     /** @var array $configData */
     private $configData = null;
@@ -21,7 +18,7 @@ class ConfigManager implements IConfigurable
      * from argument $configFilePath
      *
      * @param string $configFilePath
-     * @return IConfigurable
+     * @return ConfigManager
      */
     public function __construct($configFilePath = null)
     {
@@ -33,7 +30,7 @@ class ConfigManager implements IConfigurable
      *
      * @param null|string $configFilePath
      *
-     * @return IConfigurable
+     * @return ConfigManager
      */
     public function loadConfig($configFilePath = null)
     {
@@ -54,8 +51,8 @@ class ConfigManager implements IConfigurable
      * @param null|string $configFilePath
      * @param bool $autoReloadConfig
      *
-     * @return IConfigurable
-     * @throws RuntimeException
+     * @return ConfigManager
+     * @throws \RuntimeException
      */
     public function saveConfigFile($configFilePath = null, $autoReloadConfig = false)
     {
@@ -70,15 +67,8 @@ class ConfigManager implements IConfigurable
 
         try {
             file_put_contents($configFilePath, $configFileContent);
-
-            if (is_callable('opcache_invalidate')) {
-                /**
-                 * Invalidate opcache for writed file if opcache is available
-                 */
-                opcache_invalidate($configFilePath, true);
-            }
-        } catch (Exception $exc) {
-            throw new RuntimeException(
+        } catch (\Exception $exc) {
+            throw new \RuntimeException(
                 __METHOD__ . ": Failed to write config file to path '{$configFilePath}'"
             );
         }
@@ -107,7 +97,6 @@ class ConfigManager implements IConfigurable
             if (!isset($configData[ $parts[ $i ] ])) {
                 $configData[ $parts[ $i ] ] = ($i === $length) ? [] : null;
             }
-
             $configData = &$configData[ $parts[ $i ] ];
         }
 
@@ -126,9 +115,7 @@ class ConfigManager implements IConfigurable
     {
         $stored = $this->getValuePointer($configPath);
 
-        return (is_null($stored)
-            ? $defaultValue
-            : $stored);
+        return is_null($stored) ? $defaultValue : $stored;
     }
 
     /**
@@ -149,7 +136,7 @@ class ConfigManager implements IConfigurable
      * @param string $configPath
      * @param mixed $newValue
      *
-     * @return IConfigurable
+     * @return ConfigManager
      */
     public function setValue($configPath, $newValue)
     {

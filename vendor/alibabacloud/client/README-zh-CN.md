@@ -6,8 +6,9 @@
 [![composer.lock](https://poser.pugx.org/alibabacloud/client/composerlock)](https://packagist.org/packages/alibabacloud/client)
 [![Total Downloads](https://poser.pugx.org/alibabacloud/client/downloads)](https://packagist.org/packages/alibabacloud/client)
 [![License](https://poser.pugx.org/alibabacloud/client/license)](https://packagist.org/packages/alibabacloud/client)
-[![codecov](https://codecov.io/gh/aliyun/openapi-sdk-php-client/branch/master/graph/badge.svg?token=90Yd5Bne3S)](https://codecov.io/gh/aliyun/openapi-sdk-php-client)
-[![PHP Version Require](http://poser.pugx.org/alibabacloud/client/require/php)](https://packagist.org/packages/alibabacloud/client)
+[![codecov](https://codecov.io/gh/aliyun/openapi-sdk-php-client/branch/master/graph/badge.svg)](https://codecov.io/gh/aliyun/openapi-sdk-php-client)
+[![Travis Build Status](https://travis-ci.org/aliyun/openapi-sdk-php-client.svg?branch=master)](https://travis-ci.org/aliyun/openapi-sdk-php-client)
+[![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/qb8j3lhg8349k0hk/branch/master?svg=true)](https://ci.appveyor.com/project/aliyun/openapi-sdk-php-client/branch/master)
 
 
 ![](https://aliyunsdk-pages.alicdn.com/icons/AlibabaCloud.svg)
@@ -16,11 +17,8 @@
 Alibaba Cloud Client for PHP 是帮助 PHP 开发者管理凭据、发送请求的客户端工具，[Alibaba Cloud SDK for PHP][SDK] 由本工具提供底层支持。
 
 
-## 使用诊断
-[Troubleshoot](https://troubleshoot.api.aliyun.com/?source=github_sdk) 提供 OpenAPI 使用诊断服务，通过 `RequestID` 或 `报错信息` ，帮助开发者快速定位，为开发者提供解决方案。
-
 ## 在线示例
-[阿里云 OpenAPI 开发者门户]https://next.api.aliyun.com/) 提供在线调用阿里云产品，并动态生成 SDK 代码和快速检索接口等能力，能显著降低使用云 API 的难度。
+[API Explorer](https://api.aliyun.com) 提供在线调用阿里云产品，并动态生成 SDK 代码和快速检索接口等能力，能显著降低使用云 API 的难度。
 
 
 ## 先决条件
@@ -48,12 +46,7 @@ use AlibabaCloud\Client\AlibabaCloud;
 AlibabaCloud::accessKeyClient('accessKeyId', 'accessKeySecret')->asDefaultClient();
 ```
 
-
-## 请求
-> 请求风格分为 `ROA` 和 `RPC`，不同产品风格不同，使用前，请参考产品文档。推荐使用 [Alibaba Cloud SDK for PHP][SDK] ，细节已被封装，无需关心风格。
-
-
-### ROA 请求
+## ROA 请求
 ```php
 <?php
 
@@ -84,7 +77,7 @@ try {
 }
 ```
 
-### RPC 请求
+## RPC 请求
 ```php
 <?php
 
@@ -113,7 +106,7 @@ try {
 ## 文档
 * [先决条件](/docs/zh-CN/0-Prerequisites.md)
 * [安装](/docs/zh-CN/1-Installation.md)
-* [客户端和凭证](/docs/zh-CN/2-Client.md)
+* [客户端](/docs/zh-CN/2-Client.md)
 * [请求](/docs/zh-CN/3-Request.md)
 * [结果](/docs/zh-CN/4-Result.md)
 * [区域](/docs/zh-CN/5-Region.md)
@@ -138,7 +131,7 @@ try {
 
 ## 相关
 * [阿里云服务 Regions & Endpoints][endpoints]
-* [阿里云 OpenAPI 开发者门户][open-api]
+* [OpenAPI Explorer][open-api]
 * [Packagist][packagist]
 * [Composer][composer]
 * [Guzzle中文文档][guzzle-docs]
@@ -148,11 +141,11 @@ try {
 ## 许可证
 [Apache-2.0](/LICENSE.md)
 
-Copyright (c) 2009-present, Alibaba Cloud All rights reserved.
+版权所有 1999-2019 阿里巴巴集团
 
 
 [SDK]: https://github.com/aliyun/openapi-sdk-php
-[open-api]: https://next.api.aliyun.com/
+[open-api]: https://api.aliyun.com
 [latest-release]: https://github.com/aliyun/openapi-sdk-php-client
 [guzzle-docs]: https://guzzle-cn.readthedocs.io/zh_CN/latest/request-options.html
 [composer]: https://getcomposer.org

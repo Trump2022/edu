@@ -3,13 +3,12 @@
 namespace clagiordano\weblibs\configmanager\tests;
 
 use clagiordano\weblibs\configmanager\ConfigManager;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Class ConfigManagerTest
  * @package clagiordano\weblibs\configmanager\tests
  */
-class ConfigManagerTest extends TestCase
+class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ConfigManager $config */
     private $config = null;
@@ -17,8 +16,6 @@ class ConfigManagerTest extends TestCase
 
     public function setUp()
     {
-        parent::setUp();
-
         $this->config = new ConfigManager("TestConfigData.php");
         $this->assertInstanceOf('clagiordano\weblibs\configmanager\ConfigManager', $this->config);
 
