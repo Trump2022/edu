@@ -149,7 +149,7 @@ class Index extends AuthController
         try {
             //获取推荐列表
             $exists_recommend_reids = $this->redisModel->HEXISTS($this->subjectUrl . "web_index_has", "recommend_list");
-            var_dump($exists_recommend_reids);exit;
+            var_dump($exists_recommend_reids);
             if (!$exists_recommend_reids) {
                 $is_member = isset($this->userInfo['level']) ? $this->userInfo['level'] : 0;
                 $recommend_list = json_encode(WebRecommend::getContentRecommend($is_member));
