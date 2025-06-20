@@ -51,10 +51,10 @@ class AuthController extends WapBasic
     {
         parent::_initialize();
 
-        $config = config('redis');
+        $config = config('cache.redis');
         var_dump($config, 11111);
         exit;
-        
+
         $pc_on_display = SystemConfigService::get('pc_on_display');
         if (request()->isMobile() || $pc_on_display == 0) {
             $path = $this->getJumpPath();
@@ -62,7 +62,7 @@ class AuthController extends WapBasic
         }
         try {
             // $this->redisModel = new Redis();
-            $config = config('redis');
+            $config = config('cache.redis');
             $this->redisModel = (new Redis($config))->handler();;
         } catch (\Exception $e) {
             parent::serRedisPwd($e->getMessage());

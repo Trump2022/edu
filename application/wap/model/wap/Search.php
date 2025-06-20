@@ -77,7 +77,7 @@ class Search extends ModelBasic
         }
         try {
             // $redisModel = new Redis();
-            $config = config('redis');
+            $config = config('cache.redis');
             $redisModel = (new Redis($config))->handler();;
             $subjectUrl = getUrlToDomain();
             $exists_search_reids = $redisModel->HEXISTS($subjectUrl . "wap_index_has", "search_history_" . $uid);
