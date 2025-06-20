@@ -5380,20 +5380,20 @@ class Xls extends BaseReader
                 case 'tSub': // subtraction
                     $op2 = array_pop($formulaStrings);
                     $op1 = array_pop($formulaStrings);
-                    $formulaStrings[] = "$op1$space1$space0{$token['data']}$op2";
+                    $formulaStrings[] = "$op1$space1space0[$token['data']]$op2";
                     unset($space0, $space1);
 
                     break;
                 case 'tUplus': // unary plus
                 case 'tUminus': // unary minus
                     $op = array_pop($formulaStrings);
-                    $formulaStrings[] = "$space1$space0{$token['data']}$op";
+                    $formulaStrings[] = "$space1space0[$token['data']]$op";
                     unset($space0, $space1);
 
                     break;
                 case 'tPercent': // percent sign
                     $op = array_pop($formulaStrings);
-                    $formulaStrings[] = "$op$space1$space0{$token['data']}";
+                    $formulaStrings[] = "$op$space1space0[$token['data']]";
                     unset($space0, $space1);
 
                     break;
@@ -5449,7 +5449,7 @@ class Xls extends BaseReader
                             $ops[] = array_pop($formulaStrings);
                         }
                         $ops = array_reverse($ops);
-                        $formulaStrings[] = "$space1$space0{$token['data']['function']}(" . implode(',', $ops) . ')';
+                        $formulaStrings[] = "$space1space0[$token['data']['function']](" . implode(',', $ops) . ')';
                         unset($space0, $space1);
                     } else {
                         // add-in function
@@ -5481,7 +5481,7 @@ class Xls extends BaseReader
                     // bite off chunk of additional data
                     $cellRangeAddressList = $this->readBIFF8CellRangeAddressList($additionalData);
                     $additionalData = substr($additionalData, $cellRangeAddressList['size']);
-                    $formulaStrings[] = "$space1$space0{$token['data']}";
+                    $formulaStrings[] = "$space1space0[$token['data']]";
                     unset($space0, $space1);
 
                     break;
@@ -5501,7 +5501,7 @@ class Xls extends BaseReader
                 case 'tRefN':
                 case 'tAreaN':
                 case 'tStr': // string
-                    $formulaStrings[] = "$space1$space0{$token['data']}";
+                    $formulaStrings[] = "$space1space0[$token['data']]";
                     unset($space0, $space1);
 
                     break;
