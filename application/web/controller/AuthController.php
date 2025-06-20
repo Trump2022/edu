@@ -51,10 +51,6 @@ class AuthController extends WapBasic
     {
         parent::_initialize();
 
-        $config = config('cache.redis');
-        var_dump($config, 11111);
-        exit;
-
         $pc_on_display = SystemConfigService::get('pc_on_display');
         if (request()->isMobile() || $pc_on_display == 0) {
             $path = $this->getJumpPath();
