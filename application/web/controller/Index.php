@@ -146,27 +146,14 @@ class Index extends AuthController
      */
     public function get_content_recommend()
     {
-        $redis = new Redis();
-        $redis->connect('127.0.0.1', 6379);
-        var_dump($redis->hExists('test_key', 'test_field'));
-
         try {
-            $redisHandler = $this->redisModel->handler();
-            try {
-                $connected = $redisHandler->ping();  // 如果成功，会返回 +PONG
-                var_dump($connected);
-            } catch (\Exception $e) {
-                echo "Redis connection error: " . $e->getMessage();
-            }
-
+            $redisModel = new \think\cache\driver\Redis();
+            $exists_recommend_reids = $this->redisModel->HExists($this->subjectUrl . "web_index_has", "recommend_list");
+            var_dump($exists_recommend_reids);exit;
+            $exists_recommend_redis = $redisModel->HEXISTS($name, $key);
             //获取推荐列表
             $this->redisModel = new \think\cache\driver\Redis();
-            var_dump(method_exists($this->redisModel, 'hExists'));    // 期望 true
-            var_dump(method_exists($this->redisModel, 'HEXISTS'));    // 期望 false
-            $redisHandler = $this->redisModel->handler();
-            var_dump(get_class($redisHandler));
-            exit;
-            $exists_recommend_reids = $this->redisModel->hExists($this->subjectUrl . "web_index_has", "recommend_list");
+            $exists_recommend_reids = $this->redisModel->HExists($this->subjectUrl . "web_index_has", "recommend_list");
             // $exists_recommend_reids = $this->redisModel->HEXISTS($this->subjectUrl . "web_index_has", "recommend_list");
             if (!$exists_recommend_reids) {
                 $is_member = isset($this->userInfo['level']) ? $this->userInfo['level'] : 0;
