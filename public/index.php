@@ -10,7 +10,7 @@
 // 定义应用目录
 
 error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
-ini_set("display_errors", "On");
+ini_set("display_errors", "off");
 
 // 检测PHP环境
 if (version_compare(PHP_VERSION, '5.5.9', '<')) die('require PHP > 5.5.9 !');
