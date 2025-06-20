@@ -148,7 +148,6 @@ class Index extends AuthController
     {
         try {
             //获取推荐列表
-            var_dump(method_exists($this->redisModel, 'HEXISTS'));exit;
             $exists_recommend_reids = $this->redisModel->HEXISTS($this->subjectUrl . "web_index_has", "recommend_list");
             if (!$exists_recommend_reids) {
                 $is_member = isset($this->userInfo['level']) ? $this->userInfo['level'] : 0;
