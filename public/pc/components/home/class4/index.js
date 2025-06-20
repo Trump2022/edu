@@ -9,7 +9,13 @@ define([
                 default: function () {
                     return {};
                 }
-            }
+            },
+			showMore: {
+				type: Boolean,
+				default: function () {
+				    return true;
+				}
+			}
         },
         template: html
     };

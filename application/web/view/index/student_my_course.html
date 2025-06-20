@@ -1,14 +1,14 @@
 {extend name="public/container"}
-{block name="title"}{$title}{/block}
+{block name="title"}我的课程{/block}
 {block name="app"}
 <div v-cloak id="app" class="home">
     <div class="main">
 		<div v-for="item in contentRecommend" :key="item.id">
 			<div v-if="item.show_count <= 2" >
-				<class2 :recommend="item" :article-list="articleList" :rank-list="rankList" :good-list="goodList" :new-list="newList"></class2>
+				<class2 :recommend="item"></class2>
 			</div>
 			<div v-else>
-				<class4 :recommend="item" :article-list="articleList" :rank-list="rankList" :good-list="goodList" :new-list="newList"></class4>
+				<class4 :recommend="item" :show-more="false"></class4>
 			</div>
 		</div>
     </div>
@@ -40,90 +40,24 @@
         var vm = new Vue({
             el: '#app',
             components: {
-                'recommend0': Recommend0,
+                'class2': class2,
+                'class4': class4,
             },
             mixins: [baseMixin],
             data: {
-                bannerList: [],
-                advertList: [],
-                advert: '',
-                advertLink: '',
                 contentRecommend: [],
-                rankList: [],
-                newList: [],
-                articleList: [],
-                articleNewList: [],
-                goodList: [],
-                automatic_recommend: '',
-                news_recommend: ''
             },
             created: function () {
-                this.index_data();
-                this.get_content_recommend();
+                this.student_my_course();
             },
             methods: {
-                getHotSearch: function () {
-                    homeApi.hotSearch().then(function (res) {
-                        vm.hotSearch = res.data;
-                    });
-                },
-                index_data: function () {
-                    homeApi.index_data().then(function (res) {
-                        var data = res.data;
-                        vm.bannerList = data.pc_rotation_diagram;
-                        vm.advertList = data.pc_home_page_advertisement;
-                        vm.advert = data.pc_home_bottom_img;
-                        vm.advertLink = data.pc_home_bottom_figure_link;
-                        vm.automatic_recommend = data.pc_automatic_recommend;
-                        vm.news_recommend = data.pc_news_recommend;
-                    }).catch(function (err) {
-                        vm.$message.error(err.msg);
-                    });
-                },
-                get_content_recommend: function () {
-                    homeApi.get_content_recommend().then(function (res) {
-                        var recommend = res.data.recommend;
-                        recommend.forEach(function (item) {
-                            if (item.type == 4) {
-                                vm.getArticleList({
-                                    type: 2,
-                                    limit: 9
-                                });
-                            } else if (item.type == 5) {
-                                vm.getCourseRanking();
-                                vm.getNewCourseFirst();
-                                vm.get_good_class_recommend();
-                            }
-                        });
+                student_my_course: function () {
+                    homeApi.student_my_course().then(function (res) {
                         vm.contentRecommend = res.data.recommend;
                     }).catch(function (err) {
                         vm.$message.error(err.msg);
                     });
                 },
-                // 课程排行
-                getCourseRanking: function () {
-                    homeApi.courseRanking().then(function (res) {
-                        vm.rankList = res.data;
-                    });
-                },
-                // 好课推荐
-                get_good_class_recommend: function (params) {
-                    homeApi.get_good_class_recommend().then(function (res) {
-                        vm.goodList = res.data;
-                    });
-                },
-                // 新课首推
-                getNewCourseFirst: function () {
-                    homeApi.newCourseFirst().then(function (res) {
-                        vm.newList = res.data;
-                    });
-                },
-                // 最新资讯
-                getArticleList: function (params) {
-                    homeApi.articleList(params).then(function (res) {
-                        vm.articleList = res.data;
-                    });
-                }
             }
         });
     });

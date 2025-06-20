@@ -2,7 +2,7 @@
     <div class="head">
         <div>{{ recommend.title }}<span>{{ recommend.explain }}</span></div>
         <!-- <el-link :href="$router.more_list + '?type=' + recommend.type + '&recommend_id=' + recommend.id + '&name=' + recommend.title" :underline="false">更多<i class="el-icon-arrow-right el-icon--right"></i></el-link> -->
-        <el-link :href="$router.special_cate" :underline="false">更多<i class="el-icon-arrow-right el-icon--right"></i></el-link>
+        <el-link :href="$router.special_cate" :underline="false" v-if="showMore">更多<i class="el-icon-arrow-right el-icon--right"></i></el-link>
     </div>
     <el-row :gutter="20">
         <el-col v-for="item in recommend.list" :key="item.id" :span="6">
