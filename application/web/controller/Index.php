@@ -148,7 +148,8 @@ class Index extends AuthController
     {
         try {
             $redisModel = new \think\cache\driver\Redis();
-            $exists_recommend_reids = $redisModel->HExists($this->subjectUrl . "web_index_has", "recommend_list");
+            $this->redisModel = $redisModel->handler();
+            $exists_recommend_reids = $this->redisModel->HExists($this->subjectUrl . "web_index_has", "recommend_list");
             var_dump($exists_recommend_reids);exit;
             $exists_recommend_redis = $redisModel->HEXISTS($name, $key);
             //获取推荐列表
