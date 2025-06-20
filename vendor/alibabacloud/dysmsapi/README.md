@@ -1,4 +1,4 @@
-ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ | [English](./README-EN.md)
+¼òÌåÖĞÎÄ | [English](./README-EN.md)
 
 <p align="center">
 <a href=" https://www.aliyun.com"><img src="https://aliyunsdk-pages.alicdn.com/icons/Aliyun.svg"></a>
@@ -6,20 +6,20 @@
 
 <h1 align="center">Alibaba Cloud Dysmsapi SDK for PHP</h1>
 
-ï¿½ï¿½ï¿½Ñ°ï¿½×° [Alibaba Cloud SDK for PHP][sdk] ï¿½ï¿½ï¿½ï¿½ï¿½è°²×°ï¿½ï¿½ï¿½ï¿½Æ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö»ï¿½Ç´ï¿½ [Alibaba Cloud SDK for PHP][sdk] ï¿½ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ö£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ä¡¢ï¿½Ã·ï¿½ï¿½ï¿½ [Alibaba Cloud SDK for PHP][sdk] Ò»ï¿½Â¡ï¿½
+ÈôÒÑ°²×° [Alibaba Cloud SDK for PHP][sdk] ÔòÎŞĞè°²×°±¾²úÆ·ÒÀÀµ°ü¡£±¾²úÆ·ÒÀÀµ°üÖ»ÊÇ´Ó [Alibaba Cloud SDK for PHP][sdk] ÖĞÍ¬²½³öÀ´µÄÒ»²¿·Ö£¬ÆäÃüÃû¿Õ¼ä¡¢ÓÃ·¨Óë [Alibaba Cloud SDK for PHP][sdk] Ò»ÖÂ¡£
 
-ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Úºï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×° [Alibaba Cloud SDK for PHP][sdk] ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â£ï¿½ï¿½Ô±ã±£ï¿½ï¿½ï¿½ï¿½ï¿½Â¡ï¿½ï¿½ï¿½È«ï¿½Ä²ï¿½Æ·Ö§ï¿½Ö£ï¿½
+Èç¹ûÄú²»ÔÚºõÎÄ¼şÌå»ı£¬½¨ÒéÄú°²×° [Alibaba Cloud SDK for PHP][sdk] ²¢¾­³£¸üĞÂ£¬ÒÔ±ã±£³Ö×îĞÂ¡¢×îÈ«µÄ²úÆ·Ö§³Ö£º
 ```
 composer require alibabacloud/sdk
 ```
 
-Ò²ï¿½É½ï¿½ï¿½ï¿½×°ï¿½ï¿½ï¿½ï¿½Æ·ï¿½ï¿½
-> ï¿½ï¿½ï¿½ï¿½Æ·ï¿½Ä°æ±¾Ê¼ï¿½Õºï¿½ [Alibaba Cloud SDK for PHP][sdk] ï¿½ï¿½ï¿½ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½Ô±ï¿½Ö¤ï¿½Ú²ï¿½ï¿½Ä±ï¿½Òµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ [Alibaba Cloud SDK for PHP][sdk] ï¿½à»¥ï¿½Ğ»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü±ï¿½ï¿½ï¿½Æ·ï¿½ï¿½Í¬ï¿½æ±¾Ö®ï¿½ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½Ğ±ä»¯ï¿½ï¿½
+Ò²¿É½ö°²×°±¾²úÆ·£º
+> ±¾²úÆ·µÄ°æ±¾Ê¼ÖÕºÍ [Alibaba Cloud SDK for PHP][sdk] ±£³ÖÍ¬²½£¬ÒÔ±£Ö¤ÔÚ²»¸Ä±äÒµÎñ´úÂëµÄÇé¿öÏÂËæÊ±ºÍ [Alibaba Cloud SDK for PHP][sdk] Ïà»¥ÇĞ»»£¬¾¡¹Ü±¾²úÆ·²»Í¬°æ±¾Ö®¼äµÄ´úÂë¿ÉÄÜÃ»ÓĞ±ä»¯¡£
 ```
 composer require alibabacloud/dysmsapi
 ```
 
 ***
-ï¿½ï¿½ï¿½ï¿½ SDK ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½Î¿ï¿½ [Alibaba Cloud SDK for PHP][sdk] ï¿½Äµï¿½ï¿½ï¿½
+¸ü¶à SDK µÄÊ¹ÓÃÇë²Î¿¼ [Alibaba Cloud SDK for PHP][sdk] ÎÄµµ¡£
 
 [sdk]: https://github.com/aliyun/openapi-sdk-php
