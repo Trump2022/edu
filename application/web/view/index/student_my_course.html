@@ -1,10 +1,65 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-<div>学员-我的课程 ...</div>
-</body>
-</html>
+{extend name="public/container"}
+{block name="title"}我的课程{/block}
+{block name="app"}
+<div v-cloak id="app" class="home">
+    <div class="main">
+		<div v-for="item in contentRecommend" :key="item.id">
+			<div v-if="item.show_count <= 2" >
+				<class2 :recommend="item"></class2>
+			</div>
+			<div v-else>
+				<class4 :recommend="item" :show-more="false"></class4>
+			</div>
+		</div>
+    </div>
+</div>
+{/block}
+{block name="vm"}
+<script>
+    require([
+        'vue',
+        'ELEMENT',
+        'components/home/class2/index',
+        'components/home/class4/index',
+        'swiper',
+        'api/home',
+        'mixins/base',
+        'router/index',
+    ], function (
+        Vue,
+        ELEMENT,
+		class2,
+		class4,
+        Swiper,
+        homeApi,
+        baseMixin,
+        router
+    ) {
+        Vue.use(ELEMENT);
+        Vue.use(router);
+        var vm = new Vue({
+            el: '#app',
+            components: {
+                'class2': class2,
+                'class4': class4,
+            },
+            mixins: [baseMixin],
+            data: {
+                contentRecommend: [],
+            },
+            created: function () {
+                this.student_my_course();
+            },
+            methods: {
+                student_my_course: function () {
+                    homeApi.student_my_course().then(function (res) {
+                        vm.contentRecommend = res.data.recommend;
+                    }).catch(function (err) {
+                        vm.$message.error(err.msg);
+                    });
+                },
+            }
+        });
+    });
+</script>
+{/block}
