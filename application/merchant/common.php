@@ -32,7 +32,7 @@ function del_redis_hash($name, $key)
     if (!$name || !$key) return false;
     try {
         $config = config('redis');
-        $redisModel = new \think\cache\driver\Redis($config);
+        $redisModel = (new \think\cache\driver\Redis($config))->handler();
         $exists_recommend_redis = $redisModel->HEXISTS($name, $key);
         if ($exists_recommend_redis) $redisModel->hdel($name, $key);
         return true;
