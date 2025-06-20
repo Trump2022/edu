@@ -210,9 +210,9 @@ return [
             // 驱动方式
             'type'   => 'redis',
             // 服务器地址
-            'host'  => Env::get('redis.redis_hostname', '127.0.0.1'),
-            'password'   => Env::get('redis.redis_password', ''),
-            'port'   => Env::get('redis.port', '6379'),
+            'host'  => Env::get('redis.REDIS_HOSTNAME', '127.0.0.1'),
+            'password'   => Env::get('redis.REDIS_PASSWORD', ''),
+            'port'   => Env::get('redis.PORT', '6379'),
         ],
     ],
 
