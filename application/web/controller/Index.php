@@ -147,13 +147,8 @@ class Index extends AuthController
     public function get_content_recommend()
     {
         try {
-            $redisModel = new \think\cache\driver\Redis();
-            $this->redisModel = $redisModel->handler();
-            $exists_recommend_reids = $this->redisModel->HExists($this->subjectUrl . "web_index_has", "recommend_list");
             //获取推荐列表
-            // $this->redisModel = new \think\cache\driver\Redis();
-            // $exists_recommend_reids = $this->redisModel->HExists($this->subjectUrl . "web_index_has", "recommend_list");
-            // $exists_recommend_reids = $this->redisModel->HEXISTS($this->subjectUrl . "web_index_has", "recommend_list");
+            $exists_recommend_reids = $this->redisModel->HEXISTS($this->subjectUrl . "web_index_has", "recommend_list");
             if (!$exists_recommend_reids) {
                 $is_member = isset($this->userInfo['level']) ? $this->userInfo['level'] : 0;
                 $recommend_list = json_encode(WebRecommend::getContentRecommend($is_member));

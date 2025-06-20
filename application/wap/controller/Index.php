@@ -215,7 +215,6 @@ class Index extends AuthController
     {
         try {
             //获取推荐列表
-            $this->redisModel = new \think\cache\driver\Redis();
             $exists_recommend_reids = $this->redisModel->HEXISTS($this->subjectUrl . "wap_index_has", "recommend_list");
             if (!$exists_recommend_reids) {
                 $is_member = isset($this->userInfo['level']) ? $this->userInfo['level'] : 0;

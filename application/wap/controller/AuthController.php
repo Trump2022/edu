@@ -60,7 +60,9 @@ class AuthController extends WapBasic
             return $this->redirect($path);
         }
         try {
-            $this->redisModel = new Redis();
+            // $this->redisModel = new Redis();
+            $config = config('redis');
+            $this->redisModel = (new Redis($config))->handler();;
         } catch (\Exception $e) {
             parent::serRedisPwd($e->getMessage());
         }
