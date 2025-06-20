@@ -2,7 +2,6 @@
 /.user.ini
 /public/.user.ini
 /runtime
-/vendor
 /.env
 /update/sh
 /public/uploads
