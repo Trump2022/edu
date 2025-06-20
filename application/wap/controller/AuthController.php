@@ -54,6 +54,11 @@ class AuthController extends WapBasic
     protected function _initialize()
     {
         parent::_initialize();
+
+        $config = config('redis');
+        var_dump($config, 11111);
+        exit;
+        
         $pc_on_display = SystemConfigService::get('pc_on_display');
         if (!request()->isMobile() && is_dir(APP_PATH . 'web') && $pc_on_display) {
             $path = $this->getJumpPath();
