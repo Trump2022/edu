@@ -146,6 +146,10 @@ class Index extends AuthController
      */
     public function get_content_recommend()
     {
+        $redis = new Redis();
+        $redis->connect('127.0.0.1', 6379);
+        var_dump($redis->hExists('test_key', 'test_field'));
+
         try {
             $redisHandler = $this->redisModel->handler();
             try {
@@ -154,7 +158,7 @@ class Index extends AuthController
             } catch (\Exception $e) {
                 echo "Redis connection error: " . $e->getMessage();
             }
-            
+
             //获取推荐列表
             $this->redisModel = new \think\cache\driver\Redis();
             var_dump(method_exists($this->redisModel, 'hExists'));    // 期望 true
