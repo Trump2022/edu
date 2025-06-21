@@ -9,6 +9,11 @@
 // | Author: CRMEB Team <admin@crmeb.com>
 // +----------------------------------------------------------------------
 
+use think\Db;
+
+// 取消 ONLY_FULL_GROUP_BY 模式（只对当前连接生效）
+Db::execute("SET SESSION sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
+
 
 // 应用公共文件
 
