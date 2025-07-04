@@ -5,10 +5,10 @@
     <div class="main">
 		<div v-for="item in contentRecommend" :key="item.id">
 			<div v-if="item.show_count <= 2" >
-				<class2 :recommend="item" :show-more="false"></class2>
+				<class2 :recommend="item" :show-more="false" from="student"></class2>
 			</div>
 			<div v-else>
-				<class4 :recommend="item" :show-more="false"></class4>
+				<class4 :recommend="item" :show-more="false" from="student"></class4>
 			</div>
 		</div>
     </div>

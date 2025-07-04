@@ -15,6 +15,12 @@ define([
 				default: function () {
 				    return true;
 				}
+			},
+			from: {
+				type: String,
+				default: function () {
+				    return '';
+				}
 			}
         },
         data: function () {

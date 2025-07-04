@@ -20,7 +20,7 @@
     </div>
     <el-row :gutter="20">
         <el-col v-for="item in recommend.list" :key="item.id" :span="12">
-            <a :href="$router.special_detail + '?id=' + item.id">
+            <a :href="$router.special_detail + '?id=' + item.id + '&from=' + from">
                 <el-image :src="item.image" fit="cover"></el-image>
                 <div>
                     <div>{{ item.title }}</div>
