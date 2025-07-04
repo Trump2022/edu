@@ -149,12 +149,16 @@
     <div class="layout">
         <div class="container">
             <el-breadcrumb separator-class="el-icon-arrow-right">
-                <el-breadcrumb-item><a :href="$router.home">首页</a></el-breadcrumb-item>
+                <el-breadcrumb-item v-if="from != 'student'"><a :href="$router.home">首页</a></el-breadcrumb-item>
                 <el-breadcrumb-item v-if="from == 'live'"><a :href="$router.special_live">直播课</a></el-breadcrumb-item>
                 <el-breadcrumb-item v-else-if="from == 'special_cate'">
 					<a v-if="title != ''" :href="$router.more_list + '?type=' + type + '&recommend_id=' + recommend_id + '&name=' + title">{{title}}</a>
 					<a v-else :href="$router.special_cate">全部</a>
-				</el-breadcrumb-item> 
+				</el-breadcrumb-item>
+				<el-breadcrumb-item v-if="from == 'student'">
+					<a v-if="title != ''" href="/web/index/student_my_course">{{title}}</a>
+					<a v-else :href="$router.special_cate">全部</a>
+				</el-breadcrumb-item>
                 <el-breadcrumb-item v-else>
 					<a v-if="title != ''" :href="$router.more_list + '?type=' + type + '&recommend_id=' + recommend_id + '&name=' + title">{{title}}</a>
 					<a v-else :href="$router.special_cate">全部</a>
@@ -713,7 +717,6 @@
                 this.from = util.getParmas('from');
                 this.type = util.getParmas('type');
                 this.title = util.getParmas('name') || '';
-				console.log('this.title======>', this.title)
                 this.recommend_id = util.getParmas('recommend_id');
                 this.lecturer_details();
                 this.special_data_download();
@@ -764,7 +767,6 @@
                     }
                 });
 				this.get_view_list()
-				console.log('vm.$router=======>', vm.$route);
             },
             methods: {
 				get_view_list: function() {
