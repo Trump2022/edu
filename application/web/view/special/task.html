@@ -32,7 +32,12 @@
             <el-breadcrumb separator-class="el-icon-arrow-right">
                 <el-breadcrumb-item v-if="from != 'student'"><a :href="$router.home">首页</a></el-breadcrumb-item>
                 <!-- <el-breadcrumb-item><a :href="$router.special_cate">{{title}}</a></el-breadcrumb-item> -->
-                <el-breadcrumb-item v-if="title"><a :href="$router.more_list + '?type=' + type + '&recommend_id=' + recommend_id + '&name=' + title">{{title}}</a></el-breadcrumb-item>
+				<template v-if="from == 'student'">
+					<el-breadcrumb-item v-if="title"><a href="/web/index/student_my_course.html">{{title}}</a></el-breadcrumb-item>
+				</template>
+				<template v-else>
+					<el-breadcrumb-item v-if="title"><a :href="$router.more_list + '?type=' + type + '&recommend_id=' + recommend_id + '&name=' + title">{{title}}</a></el-breadcrumb-item>
+				</template>
 				<el-breadcrumb-item v-else><a :href="$router.special_cate">全部</a></el-breadcrumb-item>
                 <el-breadcrumb-item>课程详情</el-breadcrumb-item>
             </el-breadcrumb>
