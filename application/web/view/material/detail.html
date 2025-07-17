@@ -34,11 +34,11 @@
                             <div class="collect" @click="collect">
                                 <i :class="['iconfont', details.collect ? 'iconshoucang2' : 'iconshoucang11']"></i><span>{{ details.collect ? '已收藏' : '收藏' }}</span>
                             </div>
-                            <el-popover v-if="mobileUrl" trigger="hover" width="140" popper-class="phone-popper">
+                            <!-- <el-popover v-if="mobileUrl" trigger="hover" width="140" popper-class="phone-popper">
                                 <div ref="qrcode" class="qrcode"></div>
                                 <div class="tip">扫一扫，手机继续学</div>
                                 <el-button slot="reference" type="text"><i class="iconfont iconshouji"></i><span>手机端访问</span></el-button>
-                            </el-popover>
+                            </el-popover> -->
                         </div>
                         <el-button v-if="!details.pay_type || isPay || (!details.member_pay_type && isMember)" class="download" @click="download">立即下载</el-button>
                         <el-button v-else class="buy" @click="buy">立即购买</el-button>
