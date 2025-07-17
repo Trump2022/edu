@@ -1020,7 +1020,7 @@
                             }
                             return;
                         }
-                        window.location.assign(vm.$router.task_info + '?specialId=' + vm.id + '&task_id=' + vm.courseList[0].id + '&special_title=' + vm.special.title + '&name=' + vm.title + '&recommend_id=' + vm.recommend_id);
+                        window.location.assign(vm.$router.task_info + '?specialId=' + vm.id + '&task_id=' + vm.courseList[0].id + '&special_title=' + vm.special.title + '&name=' + vm.title + '&recommend_id=' + vm.recommend_id + '&from=' + vm.from);
                     }).catch(function (err) {
                         store.setLoginAction(true);
                     });

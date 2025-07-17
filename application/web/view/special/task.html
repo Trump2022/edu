@@ -30,7 +30,7 @@
     <div class="layout">
         <div class="container">
             <el-breadcrumb separator-class="el-icon-arrow-right">
-                <el-breadcrumb-item><a :href="$router.home">首页</a></el-breadcrumb-item>
+                <el-breadcrumb-item v-if="from != 'student'"><a :href="$router.home">首页</a></el-breadcrumb-item>
                 <!-- <el-breadcrumb-item><a :href="$router.special_cate">{{title}}</a></el-breadcrumb-item> -->
                 <el-breadcrumb-item v-if="title"><a :href="$router.more_list + '?type=' + type + '&recommend_id=' + recommend_id + '&name=' + title">{{title}}</a></el-breadcrumb-item>
 				<el-breadcrumb-item v-else><a :href="$router.special_cate">全部</a></el-breadcrumb-item>
@@ -156,7 +156,8 @@
                 dialogVisible: false,
 				title: '',
 				type: 0,
-				recommend_id: 0
+				recommend_id: 0,
+				from: ''
             },
             computed: {
               taskName: function () {
@@ -169,6 +170,7 @@
                 this.title = util.getParmas('name') || '';
                 this.type = util.getParmas('type') || '';
                 this.recommend_id = util.getParmas('recommend_id') || '';
+                this.from = util.getParmas('from') || '';
                 var viewing_time = this.getTime(this.taskName)
                 // this.viewing_time = util.getParmas('viewing_time') / 1e3;
                 this.viewing_time = viewing_time ? parseInt(viewing_time) : parseInt(util.getParmas('viewing_time') / 1000)
