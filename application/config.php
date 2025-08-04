@@ -175,7 +175,7 @@ return [
         // 日志保存目录
         'path' => LOG_PATH,
         // 日志记录级别
-        'level' => [],
+        'level' => ['notice', 'warning', 'error', 'critical', 'alert', 'emergency'],//只会记录这几个级别的日志，忽略 debug、info、sql 等，有效减少日志量
     ],
 
     // +----------------------------------------------------------------------
