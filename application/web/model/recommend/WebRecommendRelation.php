@@ -17,6 +17,8 @@ use app\web\model\article\Article;
 use app\web\model\material\DataDownload;
 use app\wap\model\topic\TestPaper;
 use basic\ModelBasic;
+use PDOStatement;
+use think\Collection;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\ModelNotFoundException;
 use think\Exception;
@@ -39,7 +41,7 @@ class WebRecommendRelation extends ModelBasic
      * @param $limit |   显示多少条
      * @param $is_member
      * @param array $labels
-     * @return array
+     * @return array|bool|PDOStatement|string|Collection
      * @throws DataNotFoundException
      * @throws DbException
      * @throws Exception
@@ -48,7 +50,7 @@ class WebRecommendRelation extends ModelBasic
      * @date : 2025/10/18 16:32
      * @author: Trump
      */
-    public static function getRelationList($recommend_id, $type, $limit, $is_member, array $labels = []): array
+    public static function getRelationList($recommend_id, $type, $limit, $is_member, array $labels = [])
     {
         $limit = $limit ?: 4;
         if ($type == 0) {
