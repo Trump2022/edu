@@ -594,7 +594,7 @@
                     if (this.label) {
                         if (this.label.length > 6) return layList.msg('您输入的标签字数太长');
                         var length = this.formData.label.length;
-                        if (length >= 2) return layList.msg('标签最多添加2个');
+                        if (length >= 5) return layList.msg('标签最多添加5个');
                         for (var i = 0; i < length; i++) {
                             if (this.formData.label[i] == this.label) return layList.msg('请勿重复添加');
                         }

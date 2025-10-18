@@ -183,7 +183,7 @@ class Index extends AuthController
         }
         $labels = input('labels', '', 'trim');
         $labels = parse_comma_input($labels);
-        $is_member = isset($this->userInfo['level']) ? $this->userInfo['level'] : 0;
+        $is_member = $this->userInfo['level'] ?? 0;
         $recommend_list = json_encode(WebRecommend::getContentRecommendStudentMyCourse($is_member, $labels));
         return JsonService::successful(json_decode($recommend_list, true));
     }
