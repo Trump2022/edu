@@ -181,6 +181,8 @@ class Index extends AuthController
             return $this->fetch();
         }
         $curriculum_short_name = input('curriculum_short_name', '', 'trim');
+        echo $curriculum_short_name;
+        echo '|||||||||||||||||||aaaaaaaaaaaaaaaaa|||||||||||||';exit;
         $curriculum_short_names = parse_comma_input($curriculum_short_name);
         $is_member = isset($this->userInfo['level']) ? $this->userInfo['level'] : 0;
         $recommend_list = json_encode(WebRecommend::getContentRecommendStudentMyCourse($is_member, $curriculum_short_names));
