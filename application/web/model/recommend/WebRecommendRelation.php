@@ -55,14 +55,16 @@ class WebRecommendRelation extends ModelBasic
         $limit = $limit ?: 4;
         if ($type == 0) {
             $model = self::where('a.recommend_id', $recommend_id)
-                ->alias('a')->order('a.sort desc,a.add_time desc')
+                ->alias('a')
+                // ->order('a.sort desc,a.add_time desc')
+                ->order('p.sort desc,p.add_time desc')
                 ->join("__SPECIAL__ p", 'p.id=a.link_id')
                 ->join('__SPECIAL_SUBJECT__ j', 'j.id=p.subject_id', 'LEFT')
                 ->where(['p.is_show' => 1, 'p.status' => 1, 'p.is_del' => 0]);
             if (!$is_member) $model = $model->where(['p.is_mer_visible' => 0]);
             if ($labels) unicode_like_condition($model, 'p.label', $labels);
             $list = $model->limit($limit)->field(['p.id', 'p.pink_money', 'p.status', 'p.is_light', 'p.light_type', 'p.is_mer_visible', 'p.is_pink', 'p.sort', 'p.title', 'p.image', 'p.abstract', 'p.label', 'p.image', 'p.money', 'p.pay_type', 'p.type as special_type', 'a.link_id', 'a.add_time', 'p.browse_count', 'p.member_pay_type', 'p.fake_sales', 'p.member_money'])
-                ->order('p.sort desc,p.add_time desc')
+
                 ->select();
         } elseif ($type == 1) {
             $model = self::where('a.recommend_id', $recommend_id)
