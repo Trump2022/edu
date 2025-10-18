@@ -79,16 +79,19 @@ class WebRecommend extends ModelBasic
      * 学员PC端获取我的课程
      *
      * @param $is_member
+     * @param array $curriculum_short_names
      * @return array
      * @throws DataNotFoundException
-     * @throws ModelNotFoundException
      * @throws DbException
+     * @throws ModelNotFoundException
      * @descr: I am on my way to future,where you are there.
      * @date : 6/9/25 3:54 PM
      * @author: Trump
      */
-    public static function getContentRecommendStudentMyCourse($is_member): array
+    public static function getContentRecommendStudentMyCourse($is_member, array $curriculum_short_names = []): array
     {
+        // import('');
+
         // $idsAll = self::getRecommendIdAll();
         $model = self::where(['title' => '我的课程'])
             // ->where('id', 'in', $idsAll)
@@ -97,7 +100,7 @@ class WebRecommend extends ModelBasic
         $recommend = count($recommend) ? $recommend->toArray() : [];
         foreach ($recommend as &$item) {
             $item['sum_count'] = WebRecommendRelation::getRelationCount($item['id'], (int)$item['type']);
-            $item['list'] = WebRecommendRelation::getRelationList($item['id'], (int)$item['type'], $item['show_count'], $is_member);
+            $item['list'] = WebRecommendRelation::getRelationList($item['id'], (int)$item['type'], $item['show_count'], $is_member, $curriculum_short_names);
             $item['courseIndex'] = 1;
         }
         return compact('recommend');

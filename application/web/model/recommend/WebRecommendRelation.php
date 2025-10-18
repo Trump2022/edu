@@ -17,6 +17,10 @@ use app\web\model\article\Article;
 use app\web\model\material\DataDownload;
 use app\wap\model\topic\TestPaper;
 use basic\ModelBasic;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
+use think\Exception;
+use think\exception\DbException;
 use traits\ModelTrait;
 
 /**推荐内容
@@ -29,14 +33,24 @@ class WebRecommendRelation extends ModelBasic
 
     /**
      * 获取主页推荐列表下的专题和图文内容
-     * @param int $recommend_id 推荐id
-     * @param int $type 类型 0=专题,1=直播 2=讲师 3=资料
-     * @param int $limit 显示多少条
+     *
+     * @param $recommend_id |   推荐id
+     * @param $type |   类型 0=专题,1=直播 2=讲师 3=资料
+     * @param $limit    |   显示多少条
+     * @param $is_member
+     * @param array $curriculum_short_names
      * @return array
-     * */
-    public static function getRelationList($recommend_id, $type, $limit, $is_member)
+     * @throws Exception
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
+     * @descr: I am on my way to future,where you are there.
+     * @date : 2025/10/18 16:32
+     * @author: Trump
+     */
+    public static function getRelationList($recommend_id, $type, $limit, $is_member, array $curriculum_short_names = []): array
     {
-        $limit = $limit ? $limit : 4;
+        $limit = $limit ?: 4;
         if ($type == 0) {
             $model = self::where('a.recommend_id', $recommend_id)
                 ->alias('a')->order('a.sort desc,a.add_time desc')
@@ -44,6 +58,7 @@ class WebRecommendRelation extends ModelBasic
                 ->join('__SPECIAL_SUBJECT__ j', 'j.id=p.subject_id', 'LEFT')
                 ->where(['p.is_show' => 1, 'p.status' => 1, 'p.is_del' => 0]);
             if (!$is_member) $model = $model->where(['p.is_mer_visible' => 0]);
+            if ($curriculum_short_names) unicode_like_condition($model, 'p.label', $curriculum_short_names);
             $list = $model->limit($limit)->field(['p.id', 'p.pink_money', 'p.status', 'p.is_light', 'p.light_type', 'p.is_mer_visible', 'p.is_pink', 'p.sort', 'p.title', 'p.image', 'p.abstract', 'p.label', 'p.image', 'p.money', 'p.pay_type', 'p.type as special_type', 'a.link_id', 'a.add_time', 'p.browse_count', 'p.member_pay_type', 'p.fake_sales', 'p.member_money'])
                 ->select();
         } elseif ($type == 1) {

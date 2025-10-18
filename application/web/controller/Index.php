@@ -70,7 +70,7 @@ class Index extends AuthController
     public function index_data()
     {
         $data['pc_rotation_diagram'] = GroupDataService::getData('pc_rotation_diagram');//pc端首页轮播图
-        $data['pc_home_page_advertisement'] = GroupDataService::getData('pc_home_page_advertisement', 3);//pc端首页广告
+        // $data['pc_home_page_advertisement'] = GroupDataService::getData('pc_home_page_advertisement', 3);//pc端首页广告
         $data['pc_home_page_advertisement'] = [];
         $data['pc_home_bottom_img'] = SystemConfigService::get('pc_home_bottom_img');//pc端首页底部图
         $data['pc_home_bottom_figure_link'] = SystemConfigService::get('pc_home_bottom_figure_link');//pc端首页底部图链接
@@ -180,8 +180,10 @@ class Index extends AuthController
         if ( ! request()->isAjax()) {
             return $this->fetch();
         }
+        $curriculum_short_name = input('curriculum_short_name', '', 'trim');
+        $curriculum_short_names = parse_comma_input($curriculum_short_name);
         $is_member = isset($this->userInfo['level']) ? $this->userInfo['level'] : 0;
-        $recommend_list = json_encode(WebRecommend::getContentRecommendStudentMyCourse($is_member));
+        $recommend_list = json_encode(WebRecommend::getContentRecommendStudentMyCourse($is_member, $curriculum_short_names));
         return JsonService::successful(json_decode($recommend_list, true));
     }
 

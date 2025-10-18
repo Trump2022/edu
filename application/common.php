@@ -307,3 +307,48 @@ if (!function_exists('friendlyDate')){
     }
 
 }
+
+if (!function_exists('unicode_like_condition')) {
+    /**
+     * 给查询对象添加中文匹配条件（Unicode 转义形式）
+     */
+    function unicode_like_condition($query, $field, array $keywords)
+    {
+        $query->where(function ($q) use ($field, $keywords) {
+            foreach ($keywords as $kw) {
+                $unicode = preg_replace_callback('/./u', function ($m) {
+                    return sprintf("\\u%04x", mb_ord($m[0], 'UTF-8'));
+                }, $kw);
+                $q->whereOr($field, 'like', "%{$unicode}%");
+            }
+        });
+    }
+}
+
+
+
+if (!function_exists('parse_comma_input')) {
+    /**
+     * 解析以英文逗号分隔的输入字符串
+     *
+     * @param string $input
+     * @return array
+     */
+    function parse_comma_input($input): array
+    {
+        if (empty($input)) {
+            return [];
+        }
+
+        // 拆分、去空格、过滤空值
+        $items = array_filter(array_map(function ($v) {
+            return trim($v);
+        }, explode(',', $input)), function ($v) {
+            return $v !== '';
+        });
+
+        return array_values($items); // 重新索引
+    }
+}
+
+
