@@ -72,6 +72,7 @@ define([
 		 * @returns
 		 */
 		student_my_course: function (params) {
+			console.log('params=====>', params);
 		    return request({
 		        url: '/index/student_my_course',
                 params: params
