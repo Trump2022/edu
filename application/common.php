@@ -310,25 +310,34 @@ if (!function_exists('friendlyDate')){
 
 if (!function_exists('unicode_like_condition')) {
     /**
-     * 给查询对象添加中文匹配条件（Unicode 转义形式）
+     * 给查询对象添加中文/英文匹配条件（支持 Unicode 转义形式）
      */
     function unicode_like_condition($query, $field, array $keywords)
     {
         $query->where(function ($q) use ($field, $keywords) {
             foreach ($keywords as $kw) {
-                // 将中文转为 \uXXXX 形式
-                $unicode = preg_replace_callback('/./u', function ($m) {
-                    return sprintf("\\u%04x", mb_ord($m[0], 'UTF-8'));
-                }, $kw);
 
-                // ⚠️ 在 SQL 中需要再转义一次反斜杠（否则 MySQL 解析时被吃掉）
-                $escaped = str_replace('\\', '\\\\', $unicode);
+                // 如果是中文，则转成 \uXXXX 形式
+                if (preg_match('/[\x{4e00}-\x{9fa5}]/u', $kw)) {
+                    $unicode = preg_replace_callback('/./u', function ($m) {
+                        return sprintf("\\u%04x", mb_ord($m[0], 'UTF-8'));
+                    }, $kw);
 
-                $q->whereOr($field, 'like', "%{$escaped}%");
+                    // ⚠️ MySQL 中的反斜杠需要双重转义
+                    $escaped = str_replace('\\', '\\\\\\\\', $unicode);
+
+                    // 匹配中文的转义内容
+                    $q->whereOr($field, 'like', "%{$escaped}%");
+
+                } else {
+                    // 英文/数字/符号等直接匹配原值
+                    $q->whereOr($field, 'like', "%{$kw}%");
+                }
             }
         });
     }
 }
+
 
 
 
