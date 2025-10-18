@@ -15,6 +15,7 @@ use app\web\model\user\User;
 use basic\ModelBasic;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\ModelNotFoundException;
+use think\Exception;
 use think\exception\DbException;
 use traits\ModelTrait;
 
@@ -83,7 +84,7 @@ class WebRecommend extends ModelBasic
      * @return array
      * @throws DataNotFoundException
      * @throws DbException
-     * @throws ModelNotFoundException
+     * @throws ModelNotFoundException|Exception
      * @descr: I am on my way to future,where you are there.
      * @date : 6/9/25 3:54 PM
      * @author: Trump
@@ -100,7 +101,7 @@ class WebRecommend extends ModelBasic
         $recommend = count($recommend) ? $recommend->toArray() : [];
         foreach ($recommend as &$item) {
             $item['sum_count'] = WebRecommendRelation::getRelationCount($item['id'], (int)$item['type']);
-            $item['list'] = WebRecommendRelation::getRelationList($item['id'], (int)$item['type'], $item['show_count'], $is_member, $curriculum_short_names);
+            $item['list'] = WebRecommendRelation::getRelationList($item['id'], (int) $item['type'], $item['show_count'], $is_member, $curriculum_short_names);
             $item['courseIndex'] = 1;
         }
         return compact('recommend');
