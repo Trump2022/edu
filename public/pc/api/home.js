@@ -71,9 +71,10 @@ define([
 		 * 我的课程数据
 		 * @returns
 		 */
-		student_my_course: function () {
+		student_my_course: function (params) {
 		    return request({
-		        url: '/index/student_my_course'
+		        url: '/index/student_my_course',
+                params: params
 		    });
 		},
     };
