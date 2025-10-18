@@ -316,10 +316,15 @@ if (!function_exists('unicode_like_condition')) {
     {
         $query->where(function ($q) use ($field, $keywords) {
             foreach ($keywords as $kw) {
+                // 将中文转为 \uXXXX 形式
                 $unicode = preg_replace_callback('/./u', function ($m) {
                     return sprintf("\\u%04x", mb_ord($m[0], 'UTF-8'));
                 }, $kw);
-                $q->whereOr($field, 'like', "%{$unicode}%");
+
+                // ⚠️ 在 SQL 中需要再转义一次反斜杠（否则 MySQL 解析时被吃掉）
+                $escaped = str_replace('\\', '\\\\', $unicode);
+
+                $q->whereOr($field, 'like', "%{$escaped}%");
             }
         });
     }
