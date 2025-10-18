@@ -25,6 +25,7 @@ use app\web\model\recommend\WebRecommendRelation;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\ModelNotFoundException;
 use think\Env;
+use think\Exception;
 use think\exception\DbException;
 use think\Url;
 
@@ -169,7 +170,7 @@ class Index extends AuthController
      * @return null
      * @throws DataNotFoundException
      * @throws ModelNotFoundException
-     * @throws DbException
+     * @throws DbException|Exception
      * @descr: I am on my way to future,where you are there.
      * @date : 6/9/25 4:30 PM
      * @author: Trump
@@ -180,12 +181,10 @@ class Index extends AuthController
         if ( ! request()->isAjax()) {
             return $this->fetch();
         }
-        $curriculum_short_name = input('curriculum_short_name', '', 'trim');
-        echo $curriculum_short_name;
-        echo '|||||||||||||||||||aaaaaaaaaaaaaaaaa|||||||||||||';exit;
-        $curriculum_short_names = parse_comma_input($curriculum_short_name);
+        $labels = input('labels', '', 'trim');
+        $labels = parse_comma_input($labels);
         $is_member = isset($this->userInfo['level']) ? $this->userInfo['level'] : 0;
-        $recommend_list = json_encode(WebRecommend::getContentRecommendStudentMyCourse($is_member, $curriculum_short_names));
+        $recommend_list = json_encode(WebRecommend::getContentRecommendStudentMyCourse($is_member, $labels));
         return JsonService::successful(json_decode($recommend_list, true));
     }
 
