@@ -91,7 +91,7 @@ class WebRecommend extends ModelBasic
      */
     public static function getContentRecommendStudentMyCourse($is_member, array $curriculum_short_names = []): array
     {
-        import('');
+        // import('');
 
         // $idsAll = self::getRecommendIdAll();
         $model = self::where(['title' => '我的课程'])
