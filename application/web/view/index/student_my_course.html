@@ -52,7 +52,7 @@
             },
             methods: {
                 student_my_course: function () {
-                    homeApi.student_my_course({ labels: this.GetQueryString('labels') }).then(function (res) {
+                    homeApi.student_my_course({ labels: decodeURI(this.GetQueryString('labels')) }).then(function (res) {
                         vm.contentRecommend = res.data.recommend;
                     }).catch(function (err) {
                         vm.$message.error(err.msg);
