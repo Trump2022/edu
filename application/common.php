@@ -316,23 +316,8 @@ if (!function_exists('unicode_like_condition')) {
     {
         $query->where(function ($q) use ($field, $keywords) {
             foreach ($keywords as $kw) {
-
-                // 如果是中文，则转成 \uXXXX 形式
-                if (preg_match('/[\x{4e00}-\x{9fa5}]/u', $kw)) {
-                    $unicode = preg_replace_callback('/./u', function ($m) {
-                        return sprintf("\\u%04x", mb_ord($m[0], 'UTF-8'));
-                    }, $kw);
-
-                    // ⚠️ MySQL 中的反斜杠需要双重转义
-                    $escaped = str_replace('\\', '\\\\\\\\', $unicode);
-
-                    // 匹配中文的转义内容
-                    $q->whereOr($field, 'like', "%{$escaped}%");
-
-                } else {
-                    // 英文/数字/符号等直接匹配原值
-                    $q->whereOr($field, 'like', "%{$kw}%");
-                }
+                $json = json_decode($kw);
+                $q->whereOr($field, 'like', "%{$json}%");
             }
         });
     }
