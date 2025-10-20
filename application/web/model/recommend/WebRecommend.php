@@ -100,7 +100,7 @@ class WebRecommend extends ModelBasic
         $recommend = $model->order('sort desc,add_time desc')->select();
         $recommend = count($recommend) ? $recommend->toArray() : [];
         foreach ($recommend as &$item) {
-            $item['sum_count'] = WebRecommendRelation::getRelationCount($item['id'], (int)$item['type']);
+            $item['sum_count'] = WebRecommendRelation::getRelationCount($item['id'], (int)$item['type'], $labels);
             $item['list'] = WebRecommendRelation::getRelationList($item['id'], (int) $item['type'], $item['show_count'], $is_member, $labels);
             $item['courseIndex'] = 1;
         }
