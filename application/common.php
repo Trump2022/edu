@@ -308,36 +308,38 @@ if (!function_exists('friendlyDate')){
 
 }
 
+
 if (!function_exists('unicode_like_condition')) {
     /**
-     * 给查询对象添加中文/英文匹配条件（支持存储为 \\uXXXX 的 JSON 格式）
+     * 给查询对象添加中文/英文匹配条件（MySQL 存的是 \\uXXXX）
      */
     function unicode_like_condition($query, $field, array $keywords)
     {
         $query->where(function ($q) use ($field, $keywords) {
             foreach ($keywords as $kw) {
 
-                // 检测是否包含中文
+                // 中文 -> \uXXXX
                 if (preg_match('/[\x{4e00}-\x{9fa5}]/u', $kw)) {
-
-                    // 转成 \uXXXX
                     $unicode = preg_replace_callback('/./u', function ($m) {
                         return sprintf("\\u%04x", mb_ord($m[0], 'UTF-8'));
                     }, $kw);
 
-                    // ⚠️ 数据库中是双反斜杠 => \\uXXXX
-                    // ThinkPHP 拼 SQL 时还会自动加一层 => 需要再加两层
-                    $escaped = str_replace('\\', '\\\\\\\\', $unicode);
+                    // 数据库存的是双反斜杠 \\uXXXX
+                    $escaped = str_replace('\\', '\\\\', $unicode); // 单纯两层
+                    $like = "%{$escaped}%";
 
-                    $q->whereOr($field, 'like', "%{$escaped}%");
+                    // ⚠️ 用 whereRaw 避免 TP 自动多转义
+                    $q->whereOrRaw("{$field} LIKE " . $q->getConnection()->quote($like));
+
                 } else {
-                    // 非中文直接匹配
-                    $q->whereOr($field, 'like', "%{$kw}%");
+                    $like = "%{$kw}%";
+                    $q->whereOrRaw("{$field} LIKE " . $q->getConnection()->quote($like));
                 }
             }
         });
     }
 }
+
 
 
 
