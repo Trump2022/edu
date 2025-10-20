@@ -310,17 +310,30 @@ if (!function_exists('friendlyDate')){
 
 if (!function_exists('unicode_like_condition')) {
     /**
-     * 给查询对象添加中文/英文匹配条件（支持 Unicode 转义形式）
+     * 给查询对象添加中文/英文匹配条件（支持存储为 \\uXXXX 的 JSON 格式）
      */
     function unicode_like_condition($query, $field, array $keywords)
     {
         $query->where(function ($q) use ($field, $keywords) {
             foreach ($keywords as $kw) {
-                // json_encode 结果中中文会自动转为 \uXXXX
-                $encoded = json_encode($kw);
-                // 去掉 json_encode 自动加的双引号
-                $encoded = trim($encoded, '"');
-                $q->whereOr($field, 'like', "%{$encoded}%");
+
+                // 检测是否包含中文
+                if (preg_match('/[\x{4e00}-\x{9fa5}]/u', $kw)) {
+
+                    // 转成 \uXXXX
+                    $unicode = preg_replace_callback('/./u', function ($m) {
+                        return sprintf("\\u%04x", mb_ord($m[0], 'UTF-8'));
+                    }, $kw);
+
+                    // ⚠️ 数据库中是双反斜杠 => \\uXXXX
+                    // ThinkPHP 拼 SQL 时还会自动加一层 => 需要再加两层
+                    $escaped = str_replace('\\', '\\\\\\\\', $unicode);
+
+                    $q->whereOr($field, 'like', "%{$escaped}%");
+                } else {
+                    // 非中文直接匹配
+                    $q->whereOr($field, 'like', "%{$kw}%");
+                }
             }
         });
     }
