@@ -65,7 +65,8 @@ class WebRecommendRelation extends ModelBasic
             if (!$is_member) $model = $model->where(['p.is_mer_visible' => 0]);
             if ($labels) unicode_like_condition($model, 'p.label', $labels);
             if ($school_id) {
-                $model->whereRaw("p.label LIKE " . $model->getConnection()->quote('%"'.$school_id.'"%'));
+                $like = '%"'.$school_id.'"%';
+                $model->whereRaw("p.label LIKE " . $model->getConnection()->quote($like));
             }
             $list = $model->limit($limit)->field(['p.id', 'p.pink_money', 'p.status', 'p.is_light', 'p.light_type', 'p.is_mer_visible', 'p.is_pink', 'p.sort', 'p.title', 'p.image', 'p.abstract', 'p.label', 'p.image', 'p.money', 'p.pay_type', 'p.type as special_type', 'a.link_id', 'a.add_time', 'p.browse_count', 'p.member_pay_type', 'p.fake_sales', 'p.member_money'])
 
