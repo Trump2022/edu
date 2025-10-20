@@ -316,8 +316,12 @@ if (!function_exists('unicode_like_condition')) {
     {
         $query->where(function ($q) use ($field, $keywords) {
             foreach ($keywords as $kw) {
-                $json = json_decode($kw);
-                $q->whereOr($field, 'like', "%{$json}%");
+                // json_encode 结果中中文会自动转为 \uXXXX
+                $encoded = json_encode($kw, JSON_UNESCAPED_UNICODE);
+                // 去掉 json_encode 自动加的双引号
+                $encoded = trim($encoded, '"');
+
+                $q->whereOr($field, 'like', "%{$encoded}%");
             }
         });
     }
