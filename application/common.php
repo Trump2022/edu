@@ -320,8 +320,6 @@ if (!function_exists('unicode_like_condition')) {
                 $encoded = json_encode($kw);
                 // 去掉 json_encode 自动加的双引号
                 $encoded = trim($encoded, '"');
-                var_dump($encoded);
-
                 $q->whereOr($field, 'like', "%{$encoded}%");
             }
         });
