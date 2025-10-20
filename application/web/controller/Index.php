@@ -181,10 +181,11 @@ class Index extends AuthController
         if ( ! request()->isAjax()) {
             return $this->fetch();
         }
+        $school_id = input('school_id', '', 'intval');
         $labels = input('labels', '', 'trim');
         $labels = parse_comma_input($labels);
         $is_member = $this->userInfo['level'] ?? 0;
-        $recommend_list = json_encode(WebRecommend::getContentRecommendStudentMyCourse($is_member, $labels));
+        $recommend_list = json_encode(WebRecommend::getContentRecommendStudentMyCourse($is_member, $labels, $school_id));
         return JsonService::successful(json_decode($recommend_list, true));
     }
 

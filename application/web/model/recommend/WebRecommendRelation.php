@@ -41,6 +41,7 @@ class WebRecommendRelation extends ModelBasic
      * @param $limit |   显示多少条
      * @param $is_member
      * @param array $labels
+     * @param int $school_id
      * @return array|bool|PDOStatement|string|Collection
      * @throws DataNotFoundException
      * @throws DbException
@@ -50,7 +51,7 @@ class WebRecommendRelation extends ModelBasic
      * @date : 2025/10/18 16:32
      * @author: Trump
      */
-    public static function getRelationList($recommend_id, $type, $limit, $is_member, array $labels = [])
+    public static function getRelationList($recommend_id, $type, $limit, $is_member, array $labels = [], int $school_id = 0)
     {
         $limit = $limit ?: 4;
         if ($type == 0) {
@@ -63,6 +64,7 @@ class WebRecommendRelation extends ModelBasic
                 ->where(['p.is_show' => 1, 'p.status' => 1, 'p.is_del' => 0]);
             if (!$is_member) $model = $model->where(['p.is_mer_visible' => 0]);
             if ($labels) unicode_like_condition($model, 'p.label', $labels);
+            if ($school_id) $model->where('p.label', 'like', '%"'.$school_id.'"%');
             $list = $model->limit($limit)->field(['p.id', 'p.pink_money', 'p.status', 'p.is_light', 'p.light_type', 'p.is_mer_visible', 'p.is_pink', 'p.sort', 'p.title', 'p.image', 'p.abstract', 'p.label', 'p.image', 'p.money', 'p.pay_type', 'p.type as special_type', 'a.link_id', 'a.add_time', 'p.browse_count', 'p.member_pay_type', 'p.fake_sales', 'p.member_money'])
 
                 ->select();
@@ -170,16 +172,24 @@ class WebRecommendRelation extends ModelBasic
 
     /**
      * 获取主页推荐下图文或者专题的总条数
-     * @param int $recommend_id 推荐id
-     * @param int $type 类型
-     * @return int
-     * */
-    public static function getRelationCount($recommend_id, $type, array $labels = [])
+     *
+     * @param $recommend_id | 推荐id
+     * @param $type |   类型
+     * @param array $labels
+     * @param int $school_id
+     * @return int|string
+     * @throws Exception
+     * @descr: I am on my way to future,where you are there.
+     * @date : 2025/10/20 15:47
+     * @author: Trump
+     */
+    public static function getRelationCount($recommend_id, $type, array $labels = [], int $school_id = 0)
     {
         if ($type == 0) {
             $model = self::where('a.recommend_id', $recommend_id)->alias('a')->join("__SPECIAL__ p", 'p.id=a.link_id')
                 ->join('__SPECIAL_SUBJECT__ j', 'j.id=p.subject_id', 'LEFT')->where(['p.is_show' => 1, 'p.status' => 1, 'p.is_del' => 0]);
             if ($labels) unicode_like_condition($model, 'p.label', $labels);
+            if ($school_id) $model->where('p.label', 'like', '%"'.$school_id.'"%');
             $count = $model->count();
         } else if ($type == 1) {
             $count = self::where('a.recommend_id', $recommend_id)->alias('a')->join("__SPECIAL__ p", 'p.id=a.link_id')
