@@ -174,11 +174,13 @@ class WebRecommendRelation extends ModelBasic
      * @param int $type 类型
      * @return int
      * */
-    public static function getRelationCount($recommend_id, $type)
+    public static function getRelationCount($recommend_id, $type, array $labels = [])
     {
         if ($type == 0) {
-            $count = self::where('a.recommend_id', $recommend_id)->alias('a')->join("__SPECIAL__ p", 'p.id=a.link_id')
-                ->join('__SPECIAL_SUBJECT__ j', 'j.id=p.subject_id', 'LEFT')->where(['p.is_show' => 1, 'p.status' => 1, 'p.is_del' => 0])->count();
+            $model = self::where('a.recommend_id', $recommend_id)->alias('a')->join("__SPECIAL__ p", 'p.id=a.link_id')
+                ->join('__SPECIAL_SUBJECT__ j', 'j.id=p.subject_id', 'LEFT')->where(['p.is_show' => 1, 'p.status' => 1, 'p.is_del' => 0]);
+            if ($labels) unicode_like_condition($model, 'p.label', $labels);
+            $count = $model->count();
         } else if ($type == 1) {
             $count = self::where('a.recommend_id', $recommend_id)->alias('a')->join("__SPECIAL__ p", 'p.id=a.link_id')
                 ->join('__SPECIAL_SUBJECT__ j', 'j.id=p.subject_id', 'LEFT')->where(['p.is_show' => 1, 'p.status' => 1, 'p.type' => 4, 'p.is_del' => 0])->count();
