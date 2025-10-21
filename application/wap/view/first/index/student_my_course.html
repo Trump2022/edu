@@ -125,7 +125,6 @@
             created: function () {
                 // this.getCateList();
                 this.getSpecialList();
-				console.log('router=======>', this.route);
             },
             mounted: function () {
                 this.$nextTick(function () {
@@ -245,6 +244,12 @@
                         });
                     });
                 },
+				GetQueryString: function(name) {
+					var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+					var r = decodeURI(window.location.search).substr(1).match(reg);
+					if (r != null) return unescape(r[2]);
+					return null;
+				},
                 // 课程列表
                 getSpecialList: function () {
                     if (this.loading || this.loadend) {
@@ -254,8 +259,8 @@
                     this.loadTitle = '';
                     axios.get("{:url('/web/index/student_my_course')}", {
                         params: {
-                            labels: this.labels,
-                            school_id: this.school_id,
+                            labels: this.GetQueryString('labels'),
+                            school_id: this.GetQueryString('school_id'),
                         }
                     }).then(function (res) {
                         vm.loading = false;
