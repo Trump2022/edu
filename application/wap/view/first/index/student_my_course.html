@@ -257,7 +257,7 @@
                     };
                     this.loading = true;
                     this.loadTitle = '';
-                    axios.get("{:url('/web/index/student_my_course')}", {
+                    axios.get("{:url('student_my_course')}", {
                         params: {
                             labels: this.GetQueryString('labels'),
                             school_id: this.GetQueryString('school_id'),
