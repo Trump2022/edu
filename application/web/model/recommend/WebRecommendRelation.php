@@ -68,7 +68,6 @@ class WebRecommendRelation extends ModelBasic
                 $model->whereRaw("p.label LIKE " . $model->getConnection()->quote('%"' . $school_id . '"%'));
             }
             $list = $model->limit($limit)->field(['p.id', 'p.pink_money', 'p.status', 'p.is_light', 'p.light_type', 'p.is_mer_visible', 'p.is_pink', 'p.sort', 'p.title', 'p.image', 'p.abstract', 'p.label', 'p.image', 'p.money', 'p.pay_type', 'p.type as special_type', 'a.link_id', 'a.add_time', 'p.browse_count', 'p.member_pay_type', 'p.fake_sales', 'p.member_money'])
-
                 ->select();
         } elseif ($type == 1) {
             $model = self::where('a.recommend_id', $recommend_id)
@@ -78,6 +77,10 @@ class WebRecommendRelation extends ModelBasic
                 ->join('__LIVE_STUDIO__ l', 'p.id=l.special_id', 'LEFT')
                 ->where(['p.is_show' => 1, 'p.status' => 1, 'p.type' => 4, 'p.is_del' => 0]);
             if (!$is_member) $model = $model->where(['p.is_mer_visible' => 0]);
+            if ($labels) unicode_like_condition($model, 'p.label', $labels);
+            if ($school_id) {
+                $model->whereRaw("p.label LIKE " . $model->getConnection()->quote('%"' . $school_id . '"%'));
+            }
             $list = $model->limit($limit)->field(['p.id', 'p.pink_money', 'p.status', 'p.is_light', 'p.lecturer_id', 'p.light_type', 'p.is_mer_visible', 'p.is_pink', 'p.sort', 'p.title', 'p.image', 'p.abstract', 'p.label', 'p.image', 'p.money', 'p.pay_type', 'p.type as special_type', 'a.link_id', 'a.add_time', 'p.browse_count', 'p.member_pay_type', 'p.fake_sales', 'p.member_money', 'l.is_play', 'l.playback_record_id', 'l.start_play_time'])
                 ->select();
         } elseif ($type == 2) {
@@ -194,8 +197,11 @@ class WebRecommendRelation extends ModelBasic
             if ($school_id) $model->where('p.label', 'like', '%"'.$school_id.'"%');
             $count = $model->count();
         } else if ($type == 1) {
-            $count = self::where('a.recommend_id', $recommend_id)->alias('a')->join("__SPECIAL__ p", 'p.id=a.link_id')
-                ->join('__SPECIAL_SUBJECT__ j', 'j.id=p.subject_id', 'LEFT')->where(['p.is_show' => 1, 'p.status' => 1, 'p.type' => 4, 'p.is_del' => 0])->count();
+            $model = self::where('a.recommend_id', $recommend_id)->alias('a')->join("__SPECIAL__ p", 'p.id=a.link_id')
+                ->join('__SPECIAL_SUBJECT__ j', 'j.id=p.subject_id', 'LEFT')->where(['p.is_show' => 1, 'p.status' => 1, 'p.type' => 4, 'p.is_del' => 0]);
+            if ($labels) unicode_like_condition($model, 'p.label', $labels);
+            if ($school_id) $model->where('p.label', 'like', '%"'.$school_id.'"%');
+            $count = $model->count();
         } else if ($type == 2) {
             $count = self::where('a.recommend_id', $recommend_id)->alias('a')->join("Lecturer l", 'l.id=a.link_id')
                 ->where(['l.is_del' => 0, 'l.is_show' => 1,])->where('l.mer_id','>',0)->count();
