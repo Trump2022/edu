@@ -261,7 +261,10 @@
                         params: {
                             labels: this.GetQueryString('labels'),
                             school_id: this.GetQueryString('school_id'),
-                        }
+                        },
+						headers: {
+							'x-requested-with': 'XMLHttpRequest'
+						}
                     }).then(function (res) {
                         vm.loading = false;
                         var resData = res.data;
