@@ -22,6 +22,7 @@ use app\wap\model\special\SpecialSubject;
 use app\wap\model\user\PhoneUser;
 use app\wap\model\user\User;
 use app\wap\model\wap\Search;
+use app\web\model\recommend\WebRecommend;
 use service\GroupDataService;
 use service\JsonService;
 use service\SystemConfigService;
@@ -29,6 +30,10 @@ use service\UploadService as Upload;
 use service\UtilService;
 use think\cache\driver\Redis;
 use think\Config;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
+use think\Exception;
+use think\exception\DbException;
 use think\Session;
 use think\Cookie;
 use think\Url;
@@ -228,6 +233,31 @@ class Index extends AuthController
         } catch (\Exception $e) {
             return JsonService::fail(parent::serRedisPwd($e->getMessage()));
         }
+    }
+
+    /**
+     * 学员端获取我的课程
+     *
+     * @return null
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException|Exception
+     * @descr: I am on my way to future,where you are there.
+     * @date : 6/9/25 4:30 PM
+     * @author: Trump
+     */
+    public function student_my_course()
+    {
+        header('Access-Control-Allow-Origin: *');
+        if ( ! request()->isAjax()) {
+            return $this->fetch();
+        }
+        $school_id = input('school_id', '', 'intval');
+        $labels = input('labels', '', 'trim');
+        $labels = parse_comma_input($labels);
+        $is_member = $this->userInfo['level'] ?? 0;
+        $recommend_list = json_encode(WebRecommend::getContentRecommendStudentMyCourse($is_member, $labels, $school_id));
+        return JsonService::successful(json_decode($recommend_list, true));
     }
 
     /**
