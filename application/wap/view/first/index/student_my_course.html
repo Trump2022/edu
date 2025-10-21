@@ -269,7 +269,7 @@
                         vm.loading = false;
                         var resData = res.data;
                         if (resData.code === 200) {
-                            var data = resData.data;
+                            var data = resData.data.recommend[0].list;
                             vm.specialList = vm.specialList.concat(data);
                             vm.loadend = vm.limit > data.length;
                             vm.loadTitle = vm.loadend ? '已全部加载完' : '上拉加载更多';
