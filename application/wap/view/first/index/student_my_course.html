@@ -91,8 +91,8 @@
 {/block}
 {block name="foot"}
 <script>
-    var cate_id = {$cate_id};
-    var subject_id = {$subject_id};
+    var cate_id = 0;
+    var subject_id = 0;
     require(['vue', 'axios', 'helper', 'special-type'], function (Vue, axios, $h, specialType) {
         var vm = new Vue({
             el: '#app',
