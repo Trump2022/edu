@@ -234,8 +234,8 @@ class AuthController extends WapBasic
             case 'web/my/about_us':
                 $path = '/wap/my/about_us';
                 break;
-            // default:
-            //     $path = '/wap/index/index';
+            default:
+                $path = '/wap/index/index';
         }
         return $path;
     }
