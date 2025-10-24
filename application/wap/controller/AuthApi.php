@@ -246,7 +246,7 @@ class AuthApi extends AuthController
         try {
             FastknifeService::aj_captcha_check_two($data['captchaType'], $data['captchaVerification']);
         } catch (\Throwable $e) {
-            return JsonService::fail('滑块验证失败');
+            return JsonService::fail('滑块验证失败'.$e->getMessage());
         }
         $time = Session::get($name, 'wap');
         if ($time < time() + 60) Session::delete($name, 'wap');
