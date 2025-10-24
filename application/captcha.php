@@ -30,9 +30,10 @@ return [
     ],
     'cache' => [
         // 'constructor' => \think\Cache::class
-        'constructor' => function () {
-            $config = config('cache.redis');
-            return new \think\cache\driver\Redis($config); // ✅ 原生驱动，支持 rm()
-        }
+        'constructor' => \service\FastknifeCacheAdapter::class
+        // 'constructor' => function () {
+        //     $config = config('cache.redis');
+        //     return new \think\cache\driver\Redis($config); // ✅ 原生驱动，支持 rm()
+        // }
     ]
 ];
