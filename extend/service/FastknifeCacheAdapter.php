@@ -1,41 +1,33 @@
 <?php
-
 namespace service;
 
-use think\cache\driver\Redis;
+use think\Cache;
 
 class FastknifeCacheAdapter
 {
-    protected $redis;
-
-    public function __construct()
-    {
-        $config = config('cache.redis');
-        $this->redis = (new Redis($config))->handler(); // 原生 Redis 实例
-    }
-
     public function get($key, $default = null)
     {
-        return $this->redis->get($key) ?? $default;
+        return Cache::get($key) ?? $default;
     }
 
     public function set($key, $value, $ttl = null)
     {
-        return $this->redis->set($key, $value, $ttl);
+        return Cache::set($key, $value, $ttl);
     }
 
     public function rm($key)
     {
-        return $this->redis->del($key); // ✅ 使用 del()，不触发 deprecated
+        return Cache::rm($key);
     }
 
     public function has($key)
     {
-        return $this->redis->exists($key);
+        return Cache::has($key);
     }
 
+    // ✅ Fastknife 会调用这个方法，你必须兜住
     public function delete($key)
     {
-        return $this->rm($key); // ✅ 映射 delete → rm → del()
+        return $this->rm($key); // ✅ 映射到 ThinkPHP 的 rm()
     }
 }
