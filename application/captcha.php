@@ -29,6 +29,7 @@ return [
         'text' => 'ZSFF'
     ],
     'cache' => [
-        'constructor' => \think\Cache::class
+        // 'constructor' => \think\Cache::class
+        'constructor' => \think\cache\driver\Redis::class
     ]
 ];
