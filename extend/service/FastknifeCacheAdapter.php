@@ -25,9 +25,19 @@ class FastknifeCacheAdapter
         return Cache::has($key);
     }
 
-    // ✅ Fastknife 会调用这个方法，你必须兜住
     public function delete($key)
     {
-        return $this->rm($key); // ✅ 映射到 ThinkPHP 的 rm()
+        $originalLevel = error_reporting();
+        error_reporting($originalLevel & ~E_DEPRECATED);
+
+        try {
+            // ✅ 只 suppress 这一行
+            $result = \think\Cache::rm($key);
+        } finally {
+            error_reporting($originalLevel);
+        }
+
+        return $result;
     }
+
 }
