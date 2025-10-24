@@ -29,6 +29,10 @@ return [
         'text' => 'ZSFF'
     ],
     'cache' => [
-        'constructor' => \think\Cache::class
+        // 'constructor' => \think\Cache::class
+        'constructor' => function () {
+            $config = config('cache.redis');
+            return new \think\cache\driver\Redis($config); // ✅ 原生驱动，支持 rm()
+        }
     ]
 ];
