@@ -736,7 +736,7 @@
                                     return "<input type='checkbox' name='pay_status' lay-skin='switch' value='"+d.id+"' lay-filter='pay_status' lay-text='收费|免费' "+is_checked+">";
                                 }},
                             {field: 'right', title: '操作',align: 'center',templet:function(d){
-                                    return `<div><a class="layui-btn layui-btn-danger layui-btn-xs"  lay-event="edit" href="javascript:;" >
+                                    return `<div><a class="layui-btn layui-btn-danger layui-btn-xs" style="margin-right: 10px;" lay-event="edit" href="javascript:;" >
                                             <i class="iconfont icon-bianji"></i> 编辑
                                         </a><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon">&#xe640;</i> 移除</a></div>`;
                                 }}
@@ -772,6 +772,16 @@
 						        ,content: `/admin/special.special_type/addsources.html?id=${data.id}`
 						        ,end:function () {
 						            // location.reload();
+									$.ajax({
+										url: `/admin/special.special_type/get_check_source_sure?special_id=${id}&special_type=${special_type}&id=${data.id}`,
+										success: function (res) {
+											if(res.data.length) {
+												let index = that.formData.check_source_sure.findIndex(item => item.id == data.id)
+												that.formData.check_source_sure.splice(index,1, res.data[0]);
+												that.show_source_list();
+											}
+										},
+									})
 						        }
 						    });
 						}
