@@ -775,9 +775,9 @@
 									$.ajax({
 										url: `/admin/special.special_type/get_check_source_sure?id=${id}&special_type=${special_type}&source_id=${data.id}`,
 										success: function (res) {
-											if(res.data.length) {
+											if(res.data.sourceCheckList.length) {
 												let index = that.formData.check_source_sure.findIndex(item => item.id == data.id)
-												that.formData.check_source_sure.splice(index,1, res.data[0]);
+												that.formData.check_source_sure.splice(index,1, res.data.sourceCheckList[0]);
 												that.show_source_list();
 											}
 										},
