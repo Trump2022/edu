@@ -560,7 +560,7 @@ class SpecialType extends AuthController
      *
      * @param $id
      * @param $special_type
-     * @param string $add_source_id
+     * @param string $source_id
      * @return null
      * @throws DataNotFoundException
      * @throws DbException
