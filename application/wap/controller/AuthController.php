@@ -222,21 +222,24 @@ class AuthController extends WapBasic
                 }
                 break;
             case 'wap/article/news_list':
-                $path = '/web/article/news_list';
+                $url = $this->request->url();
+                $path = str_replace('wap/article/news_list', 'web/article/news_list', $url);
                 break;
             case 'wap/article/news_detail':
                 $url = $this->request->url();
                 $path = str_replace('wap/article/news_detail', 'web/article/news_detail', $url);
                 break;
             case 'wap/material/material_list':
-                $path = '/web/material/material_list';
+                $url = $this->request->url();
+                $path = str_replace('wap/material/material_list', 'web/material/material_list', $url);
                 break;
             case 'wap/special/data_details':
                 $url = $this->request->url();
                 $path = str_replace('wap/special/data_details', 'web/material/details', $url);
                 break;
             case 'wap/activity/index':
-                $path = '/web/activity/index';
+                $url = $this->request->url();
+                $path = str_replace('wap/activity/index', 'web/activity/index', $url);
                 break;
             case 'wap/special/activity_details':
                 $url = $this->request->url();
@@ -264,7 +267,8 @@ class AuthController extends WapBasic
                 $path = '/web/topic/question_category?type=1';
                 break;
             case 'wap/merchant/teacher_list':
-                $path = '/web/merchant/teacher_list';
+                $url = $this->request->url();
+                $path = str_replace('wap/merchant/teacher_list', 'web/merchant/teacher_list', $url);
                 break;
             case 'wap/merchant/teacher_detail':
                 $url = $this->request->url();
