@@ -560,14 +560,14 @@ class SpecialType extends AuthController
      *
      * @param $id
      * @param $special_type
-     * @param string $source_id
+     * @param string $add_source_id
      * @return null
      * @throws DataNotFoundException
      * @throws DbException
      * @throws Exception
      * @throws ModelNotFoundException
      */
-    public function get_check_source_sure($id, $special_type, string $source_id = '0')
+    public function get_check_source_sure($id, $special_type, string $add_source_id = '0')
     {
         if (!$id) {
             $data['sourceCheckList'] = [];
@@ -581,7 +581,7 @@ class SpecialType extends AuthController
                 $specialSourceId = count($specialSourceId) > 0 ? $specialSourceId->toArray() : [];
 
                 //单独拿这一条。
-                $specialSourceId2 = SpecialSource::getSpecialSource(0, (int) $source_id, $special->sort_order);
+                $specialSourceId2 = SpecialSource::getSpecialSource(0, (int) $add_source_id, $special->sort_order);
                 $specialSourceId2 = count($specialSourceId2) > 0 ? $specialSourceId2->toArray() : [];
 
                 $specialSourceId = array_merge($specialSourceId, $specialSourceId2);
