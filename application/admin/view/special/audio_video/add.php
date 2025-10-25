@@ -683,8 +683,10 @@
                             layer.closeAll();
                             var source_tmp = $("#check_source_tmp").val();
                             that.source_tmp_list = JSON.parse(source_tmp);
+							let arr = JSON.parse(source_tmp)
+							arr.forEach(item => item.isAdd = true)
                             var array=that.formData.check_source_sure;
-                            that.formData.check_source_sure=array.concat(JSON.parse(source_tmp));
+                            that.formData.check_source_sure=array.concat(arr);
                             that.formData.check_source_sure=that.duplicate_removal(that.formData.check_source_sure);
                             that.show_source_list();
                         }
@@ -736,9 +738,14 @@
                                     return "<input type='checkbox' name='pay_status' lay-skin='switch' value='"+d.id+"' lay-filter='pay_status' lay-text='收费|免费' "+is_checked+">";
                                 }},
                             {field: 'right', title: '操作',align: 'center',templet:function(d){
-                                    return `<div><a class="layui-btn layui-btn-danger layui-btn-xs" style="margin-right: 10px;" lay-event="edit" href="javascript:;" >
+									let dom = `<div>`
+									if(!d.isAdd) {
+										dom += `<a class="layui-btn layui-btn-danger layui-btn-xs" style="margin-right: 10px;" lay-event="edit" href="javascript:;" >
                                             <i class="iconfont icon-bianji"></i> 编辑
-                                        </a><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon">&#xe640;</i> 移除</a></div>`;
+                                        </a>`
+									}
+									dom += `<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon">&#xe640;</i> 移除</a></div>`
+                                    return dom;
                                 }}
                         ]]
                         ,data: that.formData.check_source_sure
