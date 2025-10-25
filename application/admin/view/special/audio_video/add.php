@@ -683,10 +683,8 @@
                             layer.closeAll();
                             var source_tmp = $("#check_source_tmp").val();
                             that.source_tmp_list = JSON.parse(source_tmp);
-							let arr = JSON.parse(source_tmp)
-							arr.forEach(item => item.isAdd = true)
                             var array=that.formData.check_source_sure;
-                            that.formData.check_source_sure=array.concat(arr);
+                            that.formData.check_source_sure=array.concat(JSON.parse(source_tmp));
                             that.formData.check_source_sure=that.duplicate_removal(that.formData.check_source_sure);
                             that.show_source_list();
                         }
@@ -738,14 +736,9 @@
                                     return "<input type='checkbox' name='pay_status' lay-skin='switch' value='"+d.id+"' lay-filter='pay_status' lay-text='收费|免费' "+is_checked+">";
                                 }},
                             {field: 'right', title: '操作',align: 'center',templet:function(d){
-									let dom = `<div>`
-									if(!d.isAdd) {
-										dom += `<a class="layui-btn layui-btn-danger layui-btn-xs" style="margin-right: 10px;" lay-event="edit" href="javascript:;" >
+                                    return `<div><a class="layui-btn layui-btn-danger layui-btn-xs" style="margin-right: 10px;" lay-event="edit" href="javascript:;" >
                                             <i class="iconfont icon-bianji"></i> 编辑
-                                        </a>`
-									}
-									dom += `<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon">&#xe640;</i> 移除</a></div>`
-                                    return dom;
+                                        </a><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon">&#xe640;</i> 移除</a></div>`;
                                 }}
                         ]]
                         ,data: that.formData.check_source_sure
@@ -779,14 +772,16 @@
 						        ,content: `/admin/special.special_type/addsources.html?id=${data.id}`
 						        ,end:function () {
 						            // location.reload();
-									// $.ajax({
-									// 	url: `/admin/special.special_type/get_check_source_sure?id=${id}&special_type=${special_type}`,
-									// 	success: function (res) {
-									// 		that.formData.check_source_sure = res.data.sourceCheckList
-									// 		that.show_source_list();
-									// 	},
-									// })
-									that.get_check_source_sure()
+									$.ajax({
+										url: `/admin/special.special_type/get_check_source_sure?special_id=${id}&special_type=${special_type}&source_id=${data.id}`,
+										success: function (res) {
+											if(res.data.length) {
+												let index = that.formData.check_source_sure.findIndex(item => item.id == data.id)
+												that.formData.check_source_sure.splice(index,1, res.data[0]);
+												that.show_source_list();
+											}
+										},
+									})
 						        }
 						    });
 						}
