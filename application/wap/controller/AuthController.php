@@ -145,7 +145,8 @@ class AuthController extends WapBasic
             'business' => isset($this->userInfo['business']) ? $this->userInfo['business'] : 0,//是否是讲师
             'now_money' => $now_money,
             'phone' => $this->phone,
-            'isWechat' => $this->isWechat,
+            // 'isWechat' => $this->isWechat,
+            'isWechat' => false,
             'overallShareWechat' => json_encode($overallShareWechat),
             'Auth_site_name' => SystemConfigService::get('site_name'),
             'menus' => GroupDataService::getData('bottom_navigation')
