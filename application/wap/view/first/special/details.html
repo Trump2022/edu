@@ -1193,6 +1193,21 @@
     <!-- 分享返佣 -->
     <rebate-guide v-if="rebateMoney && isShareDisplaySwitch" :rebate-money="rebateMoney" @rebate-action="rebateAction">
     </rebate-guide>
+    
+    <!-- ↓↓↓ 新增：付费课程引导弹窗 -->
+    <div id="channel-qrcode-popup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center;">
+        <div @click.stop style="background: white; border-radius: 10px; padding: 20px; width: 90%; max-width: 400px; text-align: center; position: relative;">
+            <div @click="closeWechatQrcodePopup" style="position: absolute; top: 10px; right: 15px; font-size: 28px; color: #999; cursor: pointer; line-height: 1;">×</div>
+            <div style="font-size: 20px; font-weight: bold; margin-bottom: 10px;">💬 专属咨询</div>
+            <div style="font-size: 14px; color: #666; margin-bottom: 20px; line-height: 1.6;">
+                想了解课程详情或有任何疑问？<br>
+                添加专属课程顾问微信，一对一为您解答！
+            </div>
+            <img src="https://video-script.jacky.onl/%E7%BD%91%E9%A1%B5%E5%B1%95%E7%A4%BA/%E9%BA%92%E9%BA%9F%E8%AF%BE%E7%A8%8B/%E9%A2%86%E6%92%AD%E5%BE%AE%E4%BF%A1%E4%BA%8C%E7%BB%B4%E7%A0%81.png" style="width: 200px; height: 200px; margin: 0 auto;">
+            <div style="font-size: 12px; color: #999; margin-top: 15px;">长按识别二维码添加课程顾问微信</div>
+        </div>
+    </div>
+    <!-- ↑↑↑ 新增结束 -->
 </div>
 {/block}
 {block name='foot'}
@@ -2360,6 +2375,13 @@
                             if (!item.is_free || item.is_try || vm.is_pay || (!vm.special.member_pay_type && vm.isMember)) {
                                 vm.goPlayTsak(item);
                             } else {
+                                // ↓↓↓ 新增：有channel参数弹二维码
+                                var urlParams = new URLSearchParams(window.location.search);
+                                if (urlParams.has('channel')) {
+                                    vm.showWechatQrcodePopup();
+                                    return;
+                                }
+                                // ↑↑↑ 新增结束
                                 layer.confirm('购买后可操作，是否购买？', {
                                     title: false,
                                     btn: ['购买', '取消'],
@@ -2915,7 +2937,15 @@
                             this.createPoster();
                             break;
                     }
+                },
+                // ↓↓↓ 新增：显示付费课程引导弹窗
+                showWechatQrcodePopup: function () {
+                    document.getElementById('channel-qrcode-popup').style.display = 'flex';
+                },
+                closeWechatQrcodePopup: function () {
+                    document.getElementById('channel-qrcode-popup').style.display = 'none';
                 }
+                // ↑↑↑ 新增结束
             },
         });
     });

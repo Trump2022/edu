@@ -299,6 +299,7 @@
             {field: 'user_type', title: '用户类型',width:'6%',align:'center'},
             {field: 'phone', title: '手机号',align: 'center'},
             {field: 'spread', title: '推荐人',templet:'#spread',align: 'center'},
+            {field: 'channel_source', title: '渠道来源',align: 'center'},
             {field: 'now_money', title: '余额',align: 'center'},
             {field: 'gold_num', title: "{$gold_name}",align: 'center'},
             {field: 'levelType', title: '会员',align: 'center',width:'6%'},

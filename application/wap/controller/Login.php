@@ -118,6 +118,13 @@ class Login extends WapBasic
                     }
                 }
             }
+            // ↓↓↓ 新增：记录渠道来源
+            $channel = input('channel', '');
+            if (empty($channel)) $channel = Session::get('channel_source', 'wap');
+            if (!empty($channel)) {
+                User::where('uid', $info['userinfo']['uid'])->update(['channel_source' => $channel]);
+            }
+            // ↑↑↑ 新增结束
             return JsonService::successful('登录成功', $info);
         } else
             return JsonService::fail(PhoneUser::getErrorInfo('登录失败'));
@@ -239,6 +246,13 @@ class Login extends WapBasic
                 }
             }
         }
+        // ↓↓↓ 新增：记录渠道来源
+        $channel = input('channel', '');
+        if (empty($channel)) $channel = Session::get('channel_source', 'wap');
+        if (!empty($channel)) {
+            User::where('uid', $userinfo['uid'])->update(['channel_source' => $channel]);
+        }
+        // ↑↑↑ 新增结束
         $info = ['userinfo' => $userinfo, 'url' => $qrcode_url, 'qcode_id' => 0, 'isfollow' => false];
         return JsonService::successful('登录成功', $info);
     }
@@ -260,7 +274,7 @@ class Login extends WapBasic
         ], $request, true);
         if (!$code) return JsonService::fail('请输入验证码');
         if (!$account || !$pwd) return JsonService::fail('参数有误！');
-        if ($type != 3 && $code != '106275') {
+        if ($type != 3) {
             $code = md5('is_phone_code' . $code);
             if (!SmsCode::CheckCode($account, $code)) return JsonService::fail('验证码验证失败');
             SmsCode::setCodeInvalid($account, $code);

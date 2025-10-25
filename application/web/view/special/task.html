@@ -104,6 +104,67 @@
         <div v-if="taskInfo.light_type == 1 && taskInfo.singleProfile.is_try && !isPay" class="try-btn">
             <a :href="$router.payment + '?type=1&id=' + special_id">已试看，去购买</a>
         </div>
+        
+        <!-- ↓↓↓ 新增：笔记功能区域 -->
+        <div style="margin-top: 30px; padding: 20px; background: #f5f5f5; border-radius: 8px;">
+            <div style="background: white; border-radius: 8px; padding: 25px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+                <!-- 笔记标题 -->
+                <div style="font-size: 20px; font-weight: bold; color: #333; margin-bottom: 20px; display: flex; align-items: center;">
+                    <span style="margin-right: 8px;">📝</span> 我的笔记
+                </div>
+                
+                <!-- 笔记输入框 -->
+                <div style="margin-bottom: 20px;">
+                    <el-input
+                        type="textarea"
+                        v-model="noteContent"
+                        :rows="4"
+                        placeholder="在这里记录学习心得..."
+                        maxlength="500"
+                        show-word-limit
+                    ></el-input>
+                    <div style="text-align: right; margin-top: 12px;">
+                        <el-button type="primary" @click="saveNote">保存笔记</el-button>
+                    </div>
+                </div>
+                
+                <!-- 笔记列表 -->
+                <div v-if="noteList.length > 0" style="border-top: 1px solid #e0e0e0; padding-top: 20px;">
+                    <div style="font-size: 16px; color: #666; margin-bottom: 15px; font-weight: 500;">笔记列表：</div>
+                    <el-card 
+                        v-for="note in noteList" 
+                        :key="note.id" 
+                        style="margin-bottom: 15px;"
+                        shadow="hover"
+                    >
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div style="flex: 1;">
+                                <div style="font-size: 14px; color: #2C8EFF; font-weight: bold; margin-bottom: 8px;">
+                                    ⏱️ {{ note.time_str }}
+                                </div>
+                                <div style="font-size: 15px; color: #333; line-height: 1.6; margin-bottom: 10px;">
+                                    {{ note.note_content }}
+                                </div>
+                                <div style="font-size: 13px; color: #999;">
+                                    {{ note.add_time_str }}
+                                </div>
+                            </div>
+                            <div>
+                                <el-button 
+                                    type="text" 
+                                    style="color: #ff4d4f;" 
+                                    @click="deleteNote(note.id)"
+                                >
+                                    删除
+                                </el-button>
+                            </div>
+                        </div>
+                    </el-card>
+                </div>
+                <el-empty v-else description="暂无笔记，快来记录第一条吧～" :image-size="100"></el-empty>
+            </div>
+        </div>
+        <!-- ↑↑↑ 笔记功能结束 -->
     </div>
     <base-footer :public-data="publicData"></base-footer>
     <base-login :public-data="publicData" :agree-content="agreeContent"></base-login>
@@ -115,6 +176,37 @@
             <el-button type="primary" @click="handleBuy">购 买</el-button>
         </span>
     </el-dialog>
+    
+    <!-- ↓↓↓ 新增：视频完成弹窗 -->
+    <div id="wechat-qrcode-popup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center;">
+        <div @click.stop style="background: white; border-radius: 10px; padding: 30px; width: 500px; text-align: center; position: relative;">
+            <div @click="closeWechatQrcodePopup" style="position: absolute; top: 15px; right: 20px; font-size: 32px; color: #999; cursor: pointer; line-height: 1;">×</div>
+            <div style="font-size: 24px; font-weight: bold; margin-bottom: 15px;">🎉 恭喜您完成学习！</div>
+            <div style="font-size: 16px; color: #666; margin-bottom: 25px; line-height: 1.8;">
+                想深入了解如何通过短视频变现吗？<br>
+                立即添加老师微信，获取一对一咨询学习方向！
+            </div>
+            <img src="https://video-script.jacky.onl/%E7%BD%91%E9%A1%B5%E5%B1%95%E7%A4%BA/%E9%BA%92%E9%BA%9F%E8%AF%BE%E7%A8%8B/%E9%A2%86%E6%92%AD%E5%BE%AE%E4%BF%A1%E4%BA%8C%E7%BB%B4%E7%A0%81.png" style="width: 250px; height: 250px; margin: 0 auto;">
+            <div style="font-size: 14px; color: #999; margin-top: 20px;">扫描二维码添加老师微信</div>
+        </div>
+    </div>
+    <!-- ↑↑↑ 新增结束 -->
+    
+    <!-- ↓↓↓ 新增：离开挽留弹窗 -->
+    <div id="leave-retention-popup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center;">
+        <div @click.stop style="background: white; border-radius: 10px; padding: 30px; width: 500px; text-align: center; position: relative;">
+            <div @click="closeLeaveRetentionPopup" style="position: absolute; top: 15px; right: 20px; font-size: 32px; color: #999; cursor: pointer; line-height: 1;">×</div>
+            <div style="font-size: 24px; font-weight: bold; margin-bottom: 15px;">⏸️ 等等！</div>
+            <div style="font-size: 16px; color: #666; margin-bottom: 25px; line-height: 1.8;">
+                学习中是遇到问题了吗？<br>
+                别自己瞎琢磨，让专业的老师为你解答！<br>
+                马上添加老师微信，我们聊一聊！
+            </div>
+            <img src="https://video-script.jacky.onl/%E7%BD%91%E9%A1%B5%E5%B1%95%E7%A4%BA/%E9%BA%92%E9%BA%9F%E8%AF%BE%E7%A8%8B/%E9%A2%86%E6%92%AD%E5%BE%AE%E4%BF%A1%E4%BA%8C%E7%BB%B4%E7%A0%81.png" style="width: 250px; height: 250px; margin: 0 auto;">
+            <div style="font-size: 14px; color: #999; margin-top: 20px;">扫描二维码添加老师微信</div>
+        </div>
+    </div>
+    <!-- ↑↑↑ 新增结束 -->
 </div>
 {/block}
 {block name="vm"}
@@ -188,10 +280,28 @@
             },
             mounted: function () {
               var vm = this;
-              window.addEventListener('beforeunload', function () {
+              window.addEventListener('beforeunload', function (e) {
                 if (vm.player && vm.player.getCurrentTime() !== 0) {
                   vm.saveTime(vm.taskName, vm.player.getCurrentTime())
                 }
+                // ↓↓↓ 新增：免费课程离开挽留
+                if (vm.specialInfo && vm.specialInfo.pay_type == 0 && vm.player) {
+                  var currentTime = vm.player.getCurrentTime();
+                  var duration = vm.player.getDuration();
+                  var progress = (currentTime / duration) * 100;
+                  // 视频未看完 且 播放超过30秒 且 未弹过挽留窗
+                  if (progress < 100 && currentTime > 30 && !sessionStorage.getItem('leave_popup_' + vm.task_id)) {
+                    sessionStorage.setItem('leave_popup_' + vm.task_id, '1');
+                    e.preventDefault();
+                    e.returnValue = '学习中是遇到问题了吗？';
+                    // 用户选择留下后，显示自定义弹窗
+                    setTimeout(function() {
+                      vm.showLeaveRetentionPopup();
+                    }, 100);
+                    return '学习中是遇到问题了吗？';
+                  }
+                }
+                // ↑↑↑ 新增结束
               })
             },
             methods: {
@@ -339,6 +449,13 @@
                 },
                 onPlayerEnded: function () {
                     var vm = this;
+                    // ↓↓↓ 新增：免费课程弹微信二维码
+                    if (this.specialInfo.pay_type == 0) {
+                        this.showWechatQrcodePopup();
+                        this.viewing(this.duration);
+                        return;
+                    }
+                    // ↑↑↑ 新增结束
                     if (this.isPay || this.isSourcePay) {
                         this.viewing(this.duration);
                     } else {
@@ -383,6 +500,100 @@
                     });
                     this.saveTime(this.taskName, currentTime)
                 },
+                // ↓↓↓ 新增：显示视频完成弹窗
+                showWechatQrcodePopup: function () {
+                    document.getElementById('wechat-qrcode-popup').style.display = 'flex';
+                },
+                closeWechatQrcodePopup: function () {
+                    document.getElementById('wechat-qrcode-popup').style.display = 'none';
+                },
+                // ↓↓↓ 新增：显示离开挽留弹窗
+                showLeaveRetentionPopup: function () {
+                    document.getElementById('leave-retention-popup').style.display = 'flex';
+                },
+                closeLeaveRetentionPopup: function () {
+                    document.getElementById('leave-retention-popup').style.display = 'none';
+                },
+                // ↑↑↑ 新增结束
+                
+                // ↓↓↓ 新增：笔记功能
+                noteContent: '', // 笔记输入内容
+                noteList: [], // 笔记列表
+                
+                // 加载笔记列表
+                loadNotes: function () {
+                    var that = this;
+                    $.post('/web/note/getList', {
+                        task_id: that.taskInfo.id
+                    }, function (res) {
+                        if (res.code === 200) {
+                            that.noteList = res.data || [];
+                        }
+                    }, 'json');
+                },
+                
+                // 保存笔记
+                saveNote: function () {
+                    var that = this;
+                    if (!that.noteContent.trim()) {
+                        that.$message.warning('请输入笔记内容');
+                        return;
+                    }
+                    
+                    // 获取当前视频播放时间
+                    var currentTime = 0;
+                    try {
+                        if (typeof player !== 'undefined' && player.getCurrentTime) {
+                            currentTime = Math.floor(player.getCurrentTime());
+                        }
+                    } catch (e) {
+                        console.log('获取播放时间失败', e);
+                    }
+                    
+                    $.post('/web/note/save', {
+                        task_id: that.taskInfo.id,
+                        special_id: that.taskInfo.special_id,
+                        video_time: currentTime,
+                        note_content: that.noteContent
+                    }, function (res) {
+                        if (res.code === 200) {
+                            that.$message.success('保存成功');
+                            that.noteContent = '';
+                            that.loadNotes(); // 重新加载笔记列表
+                        } else {
+                            that.$message.error(res.msg || '保存失败');
+                        }
+                    }, 'json');
+                },
+                
+                // 删除笔记
+                deleteNote: function (noteId) {
+                    var that = this;
+                    that.$confirm('确定要删除这条笔记吗？', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(function() {
+                        $.post('/web/note/delete', {
+                            note_id: noteId
+                        }, function (res) {
+                            if (res.code === 200) {
+                                that.$message.success('删除成功');
+                                that.loadNotes(); // 重新加载笔记列表
+                            } else {
+                                that.$message.error(res.msg || '删除失败');
+                            }
+                        }, 'json');
+                    }).catch(function() {});
+                },
+                // ↑↑↑ 笔记功能结束
+            },
+            mounted: function() {
+                // ↓↓↓ 页面加载完成后，加载笔记列表
+                if (typeof this.loadNotes === 'function') {
+                    this.loadNotes();
+                }
+                // ↑↑↑ 加载笔记结束
             }
         });
     });
