@@ -736,7 +736,9 @@
                                     return "<input type='checkbox' name='pay_status' lay-skin='switch' value='"+d.id+"' lay-filter='pay_status' lay-text='收费|免费' "+is_checked+">";
                                 }},
                             {field: 'right', title: '操作',align: 'center',templet:function(d){
-                                    return '<div><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon">&#xe640;</i> 移除</a></div>';
+                                    return `<div><a class="layui-btn layui-btn-danger layui-btn-xs"  lay-event="edit" href="javascript:;" >
+                                            <i class="iconfont icon-bianji"></i> 编辑
+                                        </a><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon">&#xe640;</i> 移除</a></div>`;
                                 }}
                         ]]
                         ,data: that.formData.check_source_sure
@@ -759,6 +761,20 @@
                                 that.del_source_sure(data.id);
                             }
                         }
+						if(obj.event === 'edit'){
+						    layer.open({
+						        type: 2 //Page层类型
+						        ,area: ['100%', '100%']
+						        ,title: '编辑素材'
+						        ,shade: 0.6 //遮罩透明度
+						        ,maxmin: true //允许全屏最小化
+						        ,anim: 1 //0-6的动画形式，-1不开启
+						        ,content: `/admin/special.special_type/addsources.html?id=${data.id}`
+						        ,end:function () {
+						            // location.reload();
+						        }
+						    });
+						}
                     });
                     table.on('edit(showSourceList)', function(obj){
                         var id=obj.data.id,values=obj.value;
