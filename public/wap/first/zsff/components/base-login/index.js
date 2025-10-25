@@ -81,10 +81,10 @@ define([
         },
         created: function () {
             var ua = navigator.userAgent.toLowerCase();
-            if (ua.match(/MicroMessenger/i) == 'micromessenger') {
-                this.isWeChat = true;
-                this.type = 2;
-            }
+            // if (ua.match(/MicroMessenger/i) == 'micromessenger') {
+            //     this.isWeChat = true;
+            //     this.type = 2;
+            // }
             this.getCopyright();
         },
         mounted: function () {
