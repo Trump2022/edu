@@ -560,7 +560,7 @@ class SpecialType extends AuthController
      *
      * @param $id
      * @param $special_type
-     * @param string $source_id
+     * @param string $add_source_id
      * @return null
      * @throws DataNotFoundException
      * @throws DbException
@@ -577,24 +577,17 @@ class SpecialType extends AuthController
             $special = SpecialModel::get($id);
             if (!$special) return Json::fail('专题不存在');
             if ($special_type != SPECIAL_LIVE) {
-                $specialSourceId = SpecialSource::getSpecialSource($id, false, $special->sort_order);
-                $specialSourceId = count($specialSourceId) > 0 ? $specialSourceId->toArray() : [];
-
-                //单独拿这一条。
-                $specialSourceId2 = SpecialSource::getSpecialSource(0, (int) $source_id, $special->sort_order);
-                $specialSourceId2 = count($specialSourceId2) > 0 ? $specialSourceId2->toArray() : [];
-
-                $specialSourceId = array_merge($specialSourceId, $specialSourceId2);
+                if ($source_id) {
+                    //单独拿这一条。
+                    $specialSourceId = SpecialSource::getSpecialSource(0, (int) $source_id, $special->sort_order);
+                    $specialSourceId = count($specialSourceId) > 0 ? $specialSourceId->toArray() : [];
+                } else {
+                    $specialSourceId = SpecialSource::getSpecialSource($id, false, $special->sort_order);
+                    $specialSourceId = count($specialSourceId) > 0 ? $specialSourceId->toArray() : [];
+                }
                 $sourceCheckList = [];
                 if ($specialSourceId) {
-
-                    $existsIds = [];
                     foreach ($specialSourceId as $k => $v) {
-                        if ( ! in_array($v['source_id'], $existsIds)) {
-                            $existsIds[] = $v['source_id'];
-                        } else {
-                            continue;
-                        }
                         if ($special_type == SPECIAL_COLUMN) {
                             $task_list = SpecialModel::where(['id' => $v['source_id'], 'is_del' => 0, 'is_show' => 1])->find();
                         } else {
