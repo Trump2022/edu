@@ -736,9 +736,9 @@
                                     return "<input type='checkbox' name='pay_status' lay-skin='switch' value='"+d.id+"' lay-filter='pay_status' lay-text='收费|免费' "+is_checked+">";
                                 }},
                             {field: 'right', title: '操作',align: 'center',templet:function(d){
-                                    return '<div><a href="javascript:;" onclick="action.open_add('{:Url('special.special_type/addSources')}?id={{d.id}}','编辑')" >
+                                    return `<div><a href="javascript:;" onclick="action.open_add('{:Url('special.special_type/addSources')}?id=${d.id}','编辑')" >
                                             <i class="iconfont icon-bianji"></i> 编辑素材
-                                        </a><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon">&#xe640;</i> 移除</a></div>';
+                                        </a><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon">&#xe640;</i> 移除</a></div>`;
                                 }}
                         ]]
                         ,data: that.formData.check_source_sure
