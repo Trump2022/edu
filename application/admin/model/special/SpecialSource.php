@@ -14,6 +14,10 @@ namespace app\admin\model\special;
 use app\admin\model\special\Special as SpecialModel;
 use app\admin\model\special\SpecialTask;
 use app\admin\model\system\RecommendRelation;
+use think\Collection;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
+use think\exception\DbException;
 use traits\ModelTrait;
 use basic\ModelBasic;
 
@@ -122,11 +126,14 @@ class SpecialSource extends ModelBasic
     }
 
     /**获取专题素材
-     * @param bool $special_id
-     * @return false|\PDOStatement|string|\think\Collection
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     *
+     * @param mixed|bool $special_id
+     * @param mixed|false $source_id
+     * @param mixed|int $order
+     * @return bool|\PDOStatement|string|Collection
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public static function getSpecialSource($special_id = false, $source_id = false, $order = 0)
     {

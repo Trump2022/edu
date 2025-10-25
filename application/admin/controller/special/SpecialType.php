@@ -38,9 +38,12 @@ use service\JsonService as Json;
 use service\SystemConfigService;
 use service\VodService;
 use think\Db;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
 use think\Exception;
 use service\FormBuilder as Form;
 use Api\AliyunLive as ApiAliyunLive;
+use think\exception\DbException;
 use think\Url;
 use app\admin\model\special\SpecialTaskCategory;
 use app\admin\model\merchant\Merchant;
@@ -552,15 +555,19 @@ class SpecialType extends AuthController
         return Json::successlayui($data);
     }
 
-    /**获取编辑数据
+    /**
+     * 获取编辑数据
+     *
      * @param $id
      * @param $special_type
+     * @param string $source_id
+     * @return null
+     * @throws DataNotFoundException
+     * @throws DbException
      * @throws Exception
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws ModelNotFoundException
      */
-    public function get_check_source_sure($id, $special_type)
+    public function get_check_source_sure($id, $special_type, string $source_id = '0')
     {
         if (!$id) {
             $data['sourceCheckList'] = [];
@@ -570,7 +577,7 @@ class SpecialType extends AuthController
             $special = SpecialModel::get($id);
             if (!$special) return Json::fail('专题不存在');
             if ($special_type != SPECIAL_LIVE) {
-                $specialSourceId = SpecialSource::getSpecialSource($id, false, $special->sort_order);
+                $specialSourceId = SpecialSource::getSpecialSource($id, (int) $source_id, $special->sort_order);
                 $specialSourceId = count($specialSourceId) > 0 ? $specialSourceId->toArray() : [];
                 $sourceCheckList = [];
                 if ($specialSourceId) {
