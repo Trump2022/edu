@@ -773,7 +773,7 @@
 						        ,end:function () {
 						            // location.reload();
 									$.ajax({
-										url: `/admin/special.special_type/get_check_source_sure?special_id=${id}&special_type=${special_type}&source_id=${data.id}`,
+										url: `/admin/special.special_type/get_check_source_sure?id=${id}&special_type=${special_type}&source_id=${data.id}`,
 										success: function (res) {
 											if(res.data.length) {
 												let index = that.formData.check_source_sure.findIndex(item => item.id == data.id)
