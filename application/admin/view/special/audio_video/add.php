@@ -769,7 +769,7 @@
 						        ,shade: 0.6 //遮罩透明度
 						        ,maxmin: true //允许全屏最小化
 						        ,anim: 1 //0-6的动画形式，-1不开启
-						        ,content: `'{:Url('special.special_type/addSources')}?id=${data.id}'`
+						        ,content: `/admin/special.special_type/addsources.html?id=${data.id}`
 						        ,end:function () {
 						            // location.reload();
 						        }
