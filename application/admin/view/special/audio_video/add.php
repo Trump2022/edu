@@ -773,13 +773,10 @@
 						        ,end:function () {
 						            // location.reload();
 									$.ajax({
-										url: `/admin/special.special_type/source_list.html?special_id=${id}&special_type=${special_type}&id=${data.id}`,
+										url: `/admin/special.special_type/get_check_source_sure?special_id=${id}&special_type=${special_type}`,
 										success: function (res) {
-											if(res.data.length) {
-												let index = that.formData.check_source_sure.findIndex(item => item.id == data.id)
-												that.formData.check_source_sure.splice(index,1, res.data[0]);
-												that.show_source_list();
-											}
+											that.formData.check_source_sure = res.data.sourceCheckList
+											that.show_source_list();
 										},
 									})
 						        }
