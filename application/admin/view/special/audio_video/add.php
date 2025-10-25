@@ -773,7 +773,7 @@
 						        ,end:function () {
 						            // location.reload();
 									$.ajax({
-										url: `/admin/special.special_type/get_check_source_sure?special_id=${id}&special_type=${special_type}`,
+										url: `/admin/special.special_type/get_check_source_sure?id=${id}&special_type=${special_type}`,
 										success: function (res) {
 											that.formData.check_source_sure = res.data.sourceCheckList
 											that.show_source_list();
