@@ -208,7 +208,12 @@ class AuthController extends WapBasic
             case 'wap/special/details':
                 if ($this->request->has('id') && $this->request->get('id')) {
                     $id = $this->request->get('id');
-                    $path = '/web/special/details.html?from=special_cate&id=' . $id;
+
+                    // <-- 修改（保留其它参数）：合并原有所有 query 参数，覆盖/设置 from 和 id
+                    $query = $this->request->get();                     // 原有所有参数
+                    $query['from'] = 'special_cate';                    // 强制设置 from
+                    $query['id']   = $id;                               // 强制设置 id
+                    $path = '/web/special/details.html?' . http_build_query($query);
                 } else {
                     $path = '/web/special/special_cate';
                 }
@@ -216,7 +221,11 @@ class AuthController extends WapBasic
             case 'wap/special/single_details':
                 if ($this->request->has('id') && $this->request->get('id')) {
                     $id = $this->request->get('id');
-                    $path = '/web/special/single_details.html?from=special_cate&id=' . $id;
+                    // <-- 修改（保留其它参数）：合并原有所有 query 参数，覆盖/设置 from 和 id
+                    $query = $this->request->get();
+                    $query['from'] = 'special_cate';
+                    $query['id']   = $id;
+                    $path = '/web/special/single_details.html?' . http_build_query($query);
                 } else {
                     $path = '/web/special/special_cate';
                 }
