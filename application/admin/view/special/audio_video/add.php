@@ -807,7 +807,39 @@
                 // 上一步、下一步
                 tabChange: function (value) {
                     layui.element.tabChange('tab', this.tabIndex + value);
-                }
+                },
+				//自定义方法
+				var action= {
+				    set_value: function (field, id, value, model_type) {
+				        layList.baseGet(layList.Url({
+				            a: 'set_value',
+				            q: {field: field, id: id, value: value, model_type:model_type}
+				        }), function (res) {
+				            layList.msg(res.msg,function () {
+				                location.reload();
+				            });
+				        },function (res) {
+				            layList.msg(res.msg,function () {
+				                location.reload();
+				            });
+				        });
+				    },
+				    //打开新添加页面
+				    open_add: function (url,title) {
+				        layer.open({
+				            type: 2 //Page层类型
+				            ,area: ['100%', '100%']
+				            ,title: title
+				            ,shade: 0.6 //遮罩透明度
+				            ,maxmin: true //允许全屏最小化
+				            ,anim: 1 //0-6的动画形式，-1不开启
+				            ,content: url
+				            ,end:function () {
+				                location.reload();
+				            }
+				        });
+				    }
+				};
             },
             mounted: function () {
                 var that = this;
