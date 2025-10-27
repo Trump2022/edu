@@ -737,9 +737,8 @@
                     store.basePost($h.U({c: 'note', a: 'getList'}), {
                         task_id: that.taskInfo.id
                     }, function (res) {
-                        var data = res.data.data;
-                        if (data && data.code === 200) {
-                            that.noteList = data.data || [];
+                        if (res.data.code === 200) {
+                            that.noteList = res.data.data || [];
                         }
                     });
                 },
@@ -758,13 +757,12 @@
                         video_time: 0,
                         note_content: that.noteContent
                     }, function (res) {
-                        var data = res.data.data;
-                        if (data && data.code === 200) {
+                        if (res.data.code === 200) {
                             layer.msg('保存成功');
                             that.noteContent = '';
                             that.loadNotes();
                         } else {
-                            layer.msg((data && data.msg) || '保存失败');
+                            layer.msg(res.data.msg || '保存失败');
                         }
                     });
                 },
@@ -779,12 +777,11 @@
                     store.basePost($h.U({c: 'note', a: 'delete'}), {
                         note_id: noteId
                     }, function (res) {
-                        var data = res.data.data;
-                        if (data && data.code === 200) {
+                        if (res.data.code === 200) {
                             layer.msg('删除成功');
                             that.loadNotes();
                         } else {
-                            layer.msg((data && data.msg) || '删除失败');
+                            layer.msg(res.data.msg || '删除失败');
                         }
                     });
                 },
