@@ -284,41 +284,50 @@
             },
             mounted: function () {
               var vm = this;
-              var popupShown = false; // 标记弹窗是否已显示
+              vm.userConfirmedLeave = false; // 标记用户是否已确认离开
               
-              // ↓↓↓ 新增：离开挽留弹窗（提前拦截策略）
+              // ↓↓↓ 新增：强制拦截返回（history劫持）
               
-              // 核心策略：鼠标移向页面顶部时立即弹窗（用户还在页面上）
+              // 1. 添加一个假的历史记录
+              history.pushState(null, null, window.location.href);
+              
+              // 2. 监听返回事件
+              window.addEventListener('popstate', function(e) {
+                if (!vm.userConfirmedLeave) {
+                  // 用户还没确认，阻止返回并显示弹窗
+                  history.pushState(null, null, window.location.href);
+                  vm.showLeaveRetentionPopup();
+                }
+              });
+              
+              // 3. 鼠标移到页面顶部时弹窗（准备点关闭/标签页）
+              var topHoverTimer = null;
               document.addEventListener('mousemove', function(e) {
-                // 鼠标移到页面顶部10px区域（准备点关闭/后退/标签页）
-                if (e.clientY < 10 && !popupShown) {
-                  popupShown = true;
-                  setTimeout(function() {
-                    vm.showLeaveRetentionPopup();
-                  }, 200); // 200ms延迟，避免误触
+                if (e.clientY < 10 && !vm.userConfirmedLeave) {
+                  if (!topHoverTimer) {
+                    topHoverTimer = setTimeout(function() {
+                      vm.showLeaveRetentionPopup();
+                    }, 300);
+                  }
+                } else {
+                  if (topHoverTimer) {
+                    clearTimeout(topHoverTimer);
+                    topHoverTimer = null;
+                  }
                 }
               });
               
-              // 备用策略1：鼠标完全离开页面
-              document.addEventListener('mouseleave', function() {
-                if (!popupShown) {
-                  popupShown = true;
-                  vm.showLeaveRetentionPopup();
-                }
-              });
-              
-              // 备用策略2：窗口失去焦点（最后防线）
-              window.addEventListener('blur', function() {
-                if (!popupShown) {
-                  popupShown = true;
-                  vm.showLeaveRetentionPopup();
-                }
-              });
-              
-              // 保存播放进度
+              // 4. beforeunload最后防线（关闭标签页）
               window.addEventListener('beforeunload', function (e) {
+                // 保存播放进度
                 if (vm.player && vm.player.getCurrentTime() !== 0) {
                   vm.saveTime(vm.taskName, vm.player.getCurrentTime())
+                }
+                // 如果用户还没确认，显示浏览器原生确认框
+                if (!vm.userConfirmedLeave) {
+                  e.preventDefault();
+                  e.returnValue = '';
+                  return '';
                 }
               });
               
@@ -537,7 +546,12 @@
                     document.getElementById('leave-retention-popup').style.display = 'flex';
                 },
                 closeLeaveRetentionPopup: function () {
+                    var vm = this;
                     document.getElementById('leave-retention-popup').style.display = 'none';
+                    // 用户看过弹窗了，标记为已确认，允许离开
+                    vm.userConfirmedLeave = true;
+                    // 可以选择：点关闭后自动返回上一页
+                    // history.back();
                 },
                 // ↑↑↑ 新增结束
                 

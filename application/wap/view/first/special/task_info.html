@@ -263,27 +263,32 @@
             mounted: function () {
                 this.$nextTick(function () {
                     var vm = this;
-                    var popupShown = false; // 标记弹窗是否已显示
+                    vm.userConfirmedLeave = false; // 标记用户是否已确认离开
                     
                     this.getTaskInfo();
                     $h.EventUtil.listenTouchDirection(document, function () {
                         vm.getTaskList();
                     });
                     
-                    // ↓↓↓ 新增：离开挽留弹窗（移动端策略）
+                    // ↓↓↓ 新增：强制拦截返回（history劫持 - 移动端专用）
                     
-                    // 策略1：页面失去焦点时立即弹窗（用户还没离开）
-                    window.addEventListener('blur', function() {
-                      if (!popupShown) {
-                        popupShown = true;
+                    // 1. 添加一个假的历史记录
+                    history.pushState(null, null, window.location.href);
+                    
+                    // 2. 监听返回事件（左滑返回也会触发！）
+                    window.addEventListener('popstate', function(e) {
+                      if (!vm.userConfirmedLeave) {
+                        // 用户还没确认，阻止返回并显示弹窗
+                        history.pushState(null, null, window.location.href);
                         vm.showLeaveRetentionPopup();
                       }
                     });
                     
-                    // 策略2：页面即将隐藏时弹窗（备用）
-                    window.addEventListener('pagehide', function() {
-                      if (!popupShown) {
-                        popupShown = true;
+                    // 3. 页面失去焦点时弹窗（切换App）
+                    var blurCount = 0;
+                    window.addEventListener('blur', function() {
+                      blurCount++;
+                      if (blurCount === 1 && !vm.userConfirmedLeave) {
                         vm.showLeaveRetentionPopup();
                       }
                     });
@@ -716,7 +721,12 @@
                     document.getElementById('leave-retention-popup').style.display = 'flex';
                 },
                 closeLeaveRetentionPopup: function () {
+                    var vm = this;
                     document.getElementById('leave-retention-popup').style.display = 'none';
+                    // 用户看过弹窗了，标记为已确认，允许离开
+                    vm.userConfirmedLeave = true;
+                    // 可以选择：点关闭后自动返回上一页
+                    // history.back();
                 }
                 // ↑↑↑ 新增结束
                 
