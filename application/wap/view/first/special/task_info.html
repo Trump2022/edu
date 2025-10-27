@@ -722,7 +722,7 @@
                 loadNotes: function () {
                     var that = this;
                     $h.post($h.U({c: 'note', a: 'getList'}), {
-                        task_id: that.id
+                        task_id: that.taskInfo.id
                     }, function (res) {
                         if (res.code === 200) {
                             that.noteList = res.data || [];
@@ -749,7 +749,7 @@
                     }
                     
                     $h.post($h.U({c: 'note', a: 'save'}), {
-                        task_id: that.id,
+                        task_id: that.taskInfo.id,
                         special_id: that.specialId,
                         video_time: currentTime,
                         note_content: that.noteContent
