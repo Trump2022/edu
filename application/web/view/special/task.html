@@ -319,6 +319,8 @@
                   }
                 } else {
                   console.log('用户已确认，允许离开');
+                  // 主动返回上一页（因为这次popstate被监听器消耗了）
+                  history.back();
                 }
               });
               

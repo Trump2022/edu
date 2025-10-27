@@ -281,6 +281,9 @@
                         // 用户还没确认，阻止返回并显示弹窗
                         history.pushState(null, null, window.location.href);
                         vm.showLeaveRetentionPopup();
+                      } else {
+                        // 用户已确认，主动返回上一页
+                        history.back();
                       }
                     });
                     
