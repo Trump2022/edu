@@ -337,6 +337,11 @@
                         vm.isSourcePay = data.isSourcePay;
                         vm.specialInfo = data.specialInfo;
                         vm.taskInfo = data.taskInfo;
+                        // ↓↓↓ 新增：加载笔记列表
+                        if (vm.taskInfo && vm.taskInfo.id) {
+                            vm.loadNotes();
+                        }
+                        // ↑↑↑ 新增结束
                         if (vm.taskInfo.type == 1 || vm.taskInfo.light_type == 1) {
                             vm.duration = 100;
                             vm.viewing(100);

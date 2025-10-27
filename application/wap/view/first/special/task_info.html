@@ -323,6 +323,11 @@
                         vm.linkUrl = data.link_url;
                         vm.specialInfo = data.specialInfo;
                         vm.taskInfo = data.taskInfo;
+                        // ↓↓↓ 新增：加载笔记列表
+                        if (vm.taskInfo && vm.taskInfo.id) {
+                            vm.loadNotes();
+                        }
+                        // ↑↑↑ 新增结束
                         if (vm.taskInfo.videoId) {
                             vm.getPlayAuth();
                         } else if (vm.taskInfo.link && (vm.taskInfo.type == 2 || vm.taskInfo.type == 3)) {
