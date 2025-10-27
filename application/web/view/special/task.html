@@ -254,7 +254,11 @@
 				title: '',
 				type: 0,
 				recommend_id: 0,
-				from: ''
+				from: '',
+                // ↓↓↓ 新增：笔记功能数据
+                noteContent: '', // 笔记输入内容
+                noteList: [] // 笔记列表
+                // ↑↑↑ 笔记数据结束
             },
             computed: {
               taskName: function () {
@@ -516,10 +520,7 @@
                 },
                 // ↑↑↑ 新增结束
                 
-                // ↓↓↓ 新增：笔记功能
-                noteContent: '', // 笔记输入内容
-                noteList: [], // 笔记列表
-                
+                // ↓↓↓ 新增：笔记功能方法
                 // 加载笔记列表
                 loadNotes: function () {
                     var that = this;

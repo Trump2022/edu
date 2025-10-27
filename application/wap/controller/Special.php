@@ -165,6 +165,12 @@ class Special extends AuthController
     public function details($id = 0, $pinkId = 0, $gift_uid = 0, $gift_order_id = null, $link_pay_uid = 0, $partake = 0, $gift = 0, $link_pay = 0, $spread_uid = 0)
     {
         if (!$id) $this->failed('缺少参数,无法访问', Url::build('index/index'));
+        // ↓↓↓ 新增：记录渠道来源到Session（用于登录时写入数据库）
+        $channel = input('channel', '');
+        if (!empty($channel)) {
+            Session::set('channel_source', $channel);
+        }
+        // ↑↑↑ 新增结束
         if ($gift_uid && $gift_order_id) {
             if ($gift_uid == $this->uid) $this->failed('您不能领取自己的礼物', Url::build('special/grade_special'));
             if (!User::get($gift_uid)) $this->failed('赠送礼物的用户不存在', Url::build('my/my_gift'));

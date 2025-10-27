@@ -13,6 +13,7 @@ namespace app\wap\controller;
 
 use service\JsonService;
 use think\Db;
+use think\response\Json;
 
 /**
  * 课程笔记控制器（移动端）

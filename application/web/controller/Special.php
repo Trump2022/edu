@@ -119,6 +119,12 @@ class Special extends AuthController
     public function details($id = 0)
     {
         if (!$id) $this->failed('缺少参数,无法访问', Url::build('web/index/index'));
+        // ↓↓↓ 新增：记录渠道来源到Session（用于登录时写入数据库）
+        $channel = input('channel', '');
+        if (!empty($channel)) {
+            Session::set('channel_source', $channel);
+        }
+        // ↑↑↑ 新增结束
         $comment_switch = SystemConfigService::get('special_comment_switch');//专题评论开关
         $special = SpecialModel::getOneSpecial($this->uid, $id);
         if ($special === false) $this->failed(SpecialModel::getErrorInfo('无法访问'), Url::build('web/index/index'));
