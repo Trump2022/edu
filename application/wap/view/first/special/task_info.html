@@ -267,29 +267,47 @@
                     $h.EventUtil.listenTouchDirection(document, function () {
                         vm.getTaskList();
                     });
+                    
+                    // ↓↓↓ 新增：多种离开检测，最大化拦截
+                    
+                    // 1. 切换标签页/切换App时触发（移动端最可靠）
+                    document.addEventListener('visibilitychange', function() {
+                      if (document.hidden && vm.specialInfo && vm.specialInfo.pay_type == 0) {
+                        if (!sessionStorage.getItem('leave_popup_' + vm.taskId)) {
+                          sessionStorage.setItem('leave_popup_' + vm.taskId, '1');
+                          vm.showLeaveRetentionPopup();
+                        }
+                      }
+                    });
+                    
+                    // 2. 页面即将卸载（最后防线）
+                    window.addEventListener('pagehide', function() {
+                      if (vm.specialInfo && vm.specialInfo.pay_type == 0) {
+                        if (!sessionStorage.getItem('leave_popup_' + vm.taskId)) {
+                          sessionStorage.setItem('leave_popup_' + vm.taskId, '1');
+                          vm.showLeaveRetentionPopup();
+                        }
+                      }
+                    });
+                    
+                    // 3. 页面失去焦点
+                    window.addEventListener('blur', function() {
+                      if (vm.specialInfo && vm.specialInfo.pay_type == 0) {
+                        if (!sessionStorage.getItem('leave_popup_' + vm.taskId)) {
+                          sessionStorage.setItem('leave_popup_' + vm.taskId, '1');
+                          vm.showLeaveRetentionPopup();
+                        }
+                      }
+                    });
+                    
+                    // 4. 保存播放进度
                     window.addEventListener('beforeunload', function (e) {
                       if (vm.player && vm.player.getCurrentTime() !== 0) {
                         vm.saveTime(vm.taskName, vm.player.getCurrentTime())
                       }
-                      // ↓↓↓ 新增：免费课程离开挽留
-                      if (vm.specialInfo && vm.specialInfo.pay_type == 0 && vm.player) {
-                        var currentTime = vm.player.getCurrentTime();
-                        var duration = vm.player.getDuration();
-                        var progress = (currentTime / duration) * 100;
-                        // 视频未看完 且 播放超过30秒 且 未弹过挽留窗
-                        if (progress < 100 && currentTime > 30 && !sessionStorage.getItem('leave_popup_' + vm.taskId)) {
-                          sessionStorage.setItem('leave_popup_' + vm.taskId, '1');
-                          e.preventDefault();
-                          e.returnValue = '学习中是遇到问题了吗？';
-                          // 用户选择留下后，显示自定义弹窗
-                          setTimeout(function() {
-                            vm.showLeaveRetentionPopup();
-                          }, 100);
-                          return '学习中是遇到问题了吗？';
-                        }
-                      }
-                      // ↑↑↑ 新增结束
-                    })
+                    });
+                    
+                    // ↑↑↑ 新增结束
                 });
             },
             beforeDestroy: function () {

@@ -284,44 +284,57 @@
             },
             mounted: function () {
               var vm = this;
+              
+              // ↓↓↓ 新增：多种离开检测，最大化拦截
+              
+              // 1. 切换标签页/最小化窗口时触发（PC+移动端通用，最可靠）
+              document.addEventListener('visibilitychange', function() {
+                if (document.hidden && vm.specialInfo && vm.specialInfo.pay_type == 0) {
+                  if (!sessionStorage.getItem('leave_popup_' + vm.task_id)) {
+                    sessionStorage.setItem('leave_popup_' + vm.task_id, '1');
+                    vm.showLeaveRetentionPopup();
+                  }
+                }
+              });
+              
+              // 2. 鼠标离开页面区域（准备点关闭/后退/地址栏）
+              document.addEventListener('mouseleave', function(e) {
+                if (vm.specialInfo && vm.specialInfo.pay_type == 0) {
+                  if (!sessionStorage.getItem('leave_popup_' + vm.task_id)) {
+                    sessionStorage.setItem('leave_popup_' + vm.task_id, '1');
+                    vm.showLeaveRetentionPopup();
+                  }
+                }
+              });
+              
+              // 3. 页面失去焦点（点击其他窗口、切换应用）
+              window.addEventListener('blur', function() {
+                if (vm.specialInfo && vm.specialInfo.pay_type == 0) {
+                  if (!sessionStorage.getItem('leave_popup_' + vm.task_id)) {
+                    sessionStorage.setItem('leave_popup_' + vm.task_id, '1');
+                    vm.showLeaveRetentionPopup();
+                  }
+                }
+              });
+              
+              // 4. 页面即将卸载（最后防线）
+              window.addEventListener('pagehide', function() {
+                if (vm.specialInfo && vm.specialInfo.pay_type == 0) {
+                  if (!sessionStorage.getItem('leave_popup_' + vm.task_id)) {
+                    sessionStorage.setItem('leave_popup_' + vm.task_id, '1');
+                    vm.showLeaveRetentionPopup();
+                  }
+                }
+              });
+              
+              // 5. 保存播放进度
               window.addEventListener('beforeunload', function (e) {
                 if (vm.player && vm.player.getCurrentTime() !== 0) {
                   vm.saveTime(vm.taskName, vm.player.getCurrentTime())
                 }
-                // ↓↓↓ 新增：免费课程离开挽留
-                console.log('=== beforeunload 事件触发 ===');
-                console.log('1. specialInfo存在?', !!vm.specialInfo);
-                console.log('2. pay_type:', vm.specialInfo ? vm.specialInfo.pay_type : '未定义');
-                console.log('3. player存在?', !!vm.player);
-                
-                if (vm.specialInfo && vm.specialInfo.pay_type == 0 && vm.player) {
-                  console.log('4. 进入挽留逻辑');
-                  var currentTime = vm.player.getCurrentTime();
-                  var duration = vm.player.getDuration();
-                  var progress = (currentTime / duration) * 100;
-                  console.log('5. 播放时间:', currentTime, '总时长:', duration, '进度:', progress + '%');
-                  console.log('6. task_id:', vm.task_id);
-                  console.log('7. sessionStorage已触发过?', sessionStorage.getItem('leave_popup_' + vm.task_id));
-                  
-                  // 视频未看完 且 未弹过挽留窗（去掉30秒限制，打开视频即触发）
-                  if (progress < 100 && !sessionStorage.getItem('leave_popup_' + vm.task_id)) {
-                    console.log('8. ✅ 满足条件，触发挽留弹窗！');
-                    sessionStorage.setItem('leave_popup_' + vm.task_id, '1');
-                    e.preventDefault();
-                    e.returnValue = '学习中是遇到问题了吗？';
-                    // 用户选择留下后，显示自定义弹窗
-                    setTimeout(function() {
-                      vm.showLeaveRetentionPopup();
-                    }, 100);
-                    return '学习中是遇到问题了吗？';
-                  } else {
-                    console.log('8. ❌ 不满足条件：progress=' + progress + ', 已触发=' + !!sessionStorage.getItem('leave_popup_' + vm.task_id));
-                  }
-                } else {
-                  console.log('4. ❌ 未进入挽留逻辑（条件不满足）');
-                }
-                // ↑↑↑ 新增结束
-              })
+              });
+              
+              // ↑↑↑ 新增结束
             },
             methods: {
 				fullScreen: function(pdfUrl) {
