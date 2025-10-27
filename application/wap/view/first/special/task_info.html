@@ -739,11 +739,11 @@
                     }, function (res) {
                         if (res.data.code === 200) {
                             that.noteList = res.data.data || [];
-                            // 临时调试：显示第一条数据的字段
+                            // 临时调试：显示第一条数据的内容
                             if (that.noteList.length > 0) {
                                 var first = that.noteList[0];
-                                var keys = Object.keys(first).join(',');
-                                layer.msg('字段:' + keys, {time: 5000});
+                                var msg = '内容:' + first.note_content + ' | 时间:' + first.add_time_str;
+                                layer.msg(msg, {time: 5000});
                             }
                         }
                     });
