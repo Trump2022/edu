@@ -737,6 +737,10 @@
                     store.basePost($h.U({c: 'note', a: 'getList'}), {
                         task_id: that.taskInfo.id
                     }, function (res) {
+                        // 临时调试：显示返回数据
+                        var debugInfo = 'code:' + res.data.code + ' | 条数:' + (res.data.data ? res.data.data.length : 0);
+                        layer.msg(debugInfo, {time: 3000});
+                        
                         if (res.data.code === 200) {
                             that.noteList = res.data.data || [];
                         }
