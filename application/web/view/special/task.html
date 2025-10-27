@@ -363,6 +363,12 @@
               console.log('===【PC端拦截初始化完成】===');
               
               // ↑↑↑ 新增结束
+              
+              // ↓↓↓ 新增：页面加载完成后，加载笔记列表
+              if (typeof this.loadNotes === 'function') {
+                  this.loadNotes();
+              }
+              // ↑↑↑ 加载笔记结束
             },
             methods: {
 				fullScreen: function(pdfUrl) {
@@ -654,13 +660,6 @@
                     }).catch(function() {});
                 },
                 // ↑↑↑ 笔记功能结束
-            },
-            mounted: function() {
-                // ↓↓↓ 页面加载完成后，加载笔记列表
-                if (typeof this.loadNotes === 'function') {
-                    this.loadNotes();
-                }
-                // ↑↑↑ 加载笔记结束
             }
         });
     });
