@@ -142,7 +142,7 @@
             </div>
             
             <div v-if="noteList.length > 0" style="border-top: 1px solid #e0e0e0; padding-top: 15px;">
-                <div style="font-size: 14px; color: #666; margin-bottom: 10px;">笔记列表：</div>
+                <div style="font-size: 14px; color: #666; margin-bottom: 10px;">笔记列表({{ noteList.length }}条)：</div>
                 <div 
                     v-for="note in noteList" 
                     :key="note.id" 
@@ -165,7 +165,7 @@
                 </div>
             </div>
             <div v-else style="text-align: center; padding: 20px; color: #999; font-size: 14px;">
-                暂无笔记，快来记录第一条吧～
+                暂无笔记({{ noteList.length }}条)，快来记录第一条吧～
             </div>
         </div>
     </div>
