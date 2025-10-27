@@ -118,7 +118,7 @@
     </div>
     <!-- ↑↑↑ 新增结束 -->
     
-    <!-- ↓↓↓ 【临时注释】笔记功能区域 - 用于测试视频播放是否正常
+    <!-- ↓↓↓ 新增：笔记功能区域 -->
     <div style="padding: 15px; background: #f5f5f5; margin-top: 10px;">
         <div style="background: white; border-radius: 8px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
             <div style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 15px; display: flex; align-items: center;">
@@ -148,9 +148,6 @@
                     :key="note.id" 
                     style="background: #f9f9f9; padding: 10px; border-radius: 4px; margin-bottom: 10px; position: relative;"
                 >
-                    <div style="font-size: 12px; color: #2C8EFF; font-weight: bold; margin-bottom: 5px;">
-                        ⏱️ {{ note.time_str }}
-                    </div>
                     <div style="font-size: 14px; color: #333; line-height: 1.5; margin-bottom: 5px;">
                         {{ note.note_content }}
                     </div>
@@ -172,7 +169,7 @@
             </div>
         </div>
     </div>
-    ↑↑↑ 笔记功能结束 -->
+    <!-- ↑↑↑ 笔记功能结束 -->
 </div>
 {/block}
 {block name="foot"}
@@ -242,10 +239,10 @@
                 player: null,
                 viewing_time: 0,
                 player: null,
-                payDialogOpen: false
-                // ↓↓↓ 【临时注释】笔记功能数据
-                // noteContent: '', // 笔记输入内容
-                // noteList: [], // 笔记列表
+                payDialogOpen: false,
+                // ↓↓↓ 新增：笔记功能数据
+                noteContent: '', // 笔记输入内容
+                noteList: [] // 笔记列表
                 // ↑↑↑ 笔记数据结束
             },
             computed: {
@@ -334,10 +331,10 @@
                         vm.linkUrl = data.link_url;
                         vm.specialInfo = data.specialInfo;
                         vm.taskInfo = data.taskInfo;
-                        // ↓↓↓ 【临时注释】加载笔记列表
-                        // if (vm.taskInfo && vm.taskInfo.id) {
-                        //     vm.loadNotes();
-                        // }
+                        // ↓↓↓ 新增：加载笔记列表
+                        if (vm.taskInfo && vm.taskInfo.id) {
+                            vm.loadNotes();
+                        }
                         // ↑↑↑ 新增结束
                         if (vm.taskInfo.videoId) {
                             vm.getPlayAuth();
@@ -733,16 +730,15 @@
                 }
                 // ↑↑↑ 新增结束
                 
-                // ↓↓↓ 【临时注释】笔记功能方法
-                /*
+                // ↓↓↓ 新增：笔记功能方法
                 // 加载笔记列表
                 loadNotes: function () {
                     var that = this;
-                    $h.post($h.U({c: 'note', a: 'getList'}), {
+                    store.basePost($h.U({c: 'note', a: 'getList'}), {
                         task_id: that.taskInfo.id
                     }, function (res) {
-                        if (res.code === 200) {
-                            that.noteList = res.data || [];
+                        if (res.data.code === 200) {
+                            that.noteList = res.data.data || [];
                         }
                     });
                 },
@@ -751,32 +747,22 @@
                 saveNote: function () {
                     var that = this;
                     if (!that.noteContent.trim()) {
-                        $h.pushMsg('请输入笔记内容');
+                        layer.msg('请输入笔记内容');
                         return;
                     }
                     
-                    // 获取当前视频播放时间
-                    var currentTime = 0;
-                    try {
-                        if (typeof player !== 'undefined' && player.getCurrentTime) {
-                            currentTime = Math.floor(player.getCurrentTime());
-                        }
-                    } catch (e) {
-                        console.log('获取播放时间失败', e);
-                    }
-                    
-                    $h.post($h.U({c: 'note', a: 'save'}), {
+                    store.basePost($h.U({c: 'note', a: 'save'}), {
                         task_id: that.taskInfo.id,
                         special_id: that.specialId,
-                        video_time: currentTime,
+                        video_time: 0,
                         note_content: that.noteContent
                     }, function (res) {
-                        if (res.code === 200) {
-                            $h.pushMsg('保存成功');
+                        if (res.data.code === 200) {
+                            layer.msg('保存成功');
                             that.noteContent = '';
-                            that.loadNotes(); // 重新加载笔记列表
+                            that.loadNotes();
                         } else {
-                            $h.pushMsg(res.msg || '保存失败');
+                            layer.msg(res.data.msg || '保存失败');
                         }
                     });
                 },
@@ -788,25 +774,17 @@
                         return;
                     }
                     
-                    $h.post($h.U({c: 'note', a: 'delete'}), {
+                    store.basePost($h.U({c: 'note', a: 'delete'}), {
                         note_id: noteId
                     }, function (res) {
-                        if (res.code === 200) {
-                            $h.pushMsg('删除成功');
-                            that.loadNotes(); // 重新加载笔记列表
+                        if (res.data.code === 200) {
+                            layer.msg('删除成功');
+                            that.loadNotes();
                         } else {
-                            $h.pushMsg(res.msg || '删除失败');
+                            layer.msg(res.data.msg || '删除失败');
                         }
                     });
                 },
-                
-                // 格式化时间
-                formatNoteTime: function (seconds) {
-                    var m = Math.floor(seconds / 60);
-                    var s = seconds % 60;
-                    return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
-                }
-                */
                 // ↑↑↑ 笔记功能结束
             }
         });
