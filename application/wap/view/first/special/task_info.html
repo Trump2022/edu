@@ -263,44 +263,32 @@
             mounted: function () {
                 this.$nextTick(function () {
                     var vm = this;
+                    var popupShown = false; // 标记弹窗是否已显示
+                    
                     this.getTaskInfo();
                     $h.EventUtil.listenTouchDirection(document, function () {
                         vm.getTaskList();
                     });
                     
-                    // ↓↓↓ 新增：多种离开检测，最大化拦截
+                    // ↓↓↓ 新增：离开挽留弹窗（移动端策略）
                     
-                    // 1. 切换标签页/切换App时触发（移动端最可靠）
-                    document.addEventListener('visibilitychange', function() {
-                      if (document.hidden && vm.specialInfo && vm.specialInfo.pay_type == 0) {
-                        if (!sessionStorage.getItem('leave_popup_' + vm.taskId)) {
-                          sessionStorage.setItem('leave_popup_' + vm.taskId, '1');
-                          vm.showLeaveRetentionPopup();
-                        }
-                      }
-                    });
-                    
-                    // 2. 页面即将卸载（最后防线）
-                    window.addEventListener('pagehide', function() {
-                      if (vm.specialInfo && vm.specialInfo.pay_type == 0) {
-                        if (!sessionStorage.getItem('leave_popup_' + vm.taskId)) {
-                          sessionStorage.setItem('leave_popup_' + vm.taskId, '1');
-                          vm.showLeaveRetentionPopup();
-                        }
-                      }
-                    });
-                    
-                    // 3. 页面失去焦点
+                    // 策略1：页面失去焦点时立即弹窗（用户还没离开）
                     window.addEventListener('blur', function() {
-                      if (vm.specialInfo && vm.specialInfo.pay_type == 0) {
-                        if (!sessionStorage.getItem('leave_popup_' + vm.taskId)) {
-                          sessionStorage.setItem('leave_popup_' + vm.taskId, '1');
-                          vm.showLeaveRetentionPopup();
-                        }
+                      if (!popupShown) {
+                        popupShown = true;
+                        vm.showLeaveRetentionPopup();
                       }
                     });
                     
-                    // 4. 保存播放进度
+                    // 策略2：页面即将隐藏时弹窗（备用）
+                    window.addEventListener('pagehide', function() {
+                      if (!popupShown) {
+                        popupShown = true;
+                        vm.showLeaveRetentionPopup();
+                      }
+                    });
+                    
+                    // 保存播放进度
                     window.addEventListener('beforeunload', function (e) {
                       if (vm.player && vm.player.getCurrentTime() !== 0) {
                         vm.saveTime(vm.taskName, vm.player.getCurrentTime())

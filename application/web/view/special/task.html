@@ -284,50 +284,38 @@
             },
             mounted: function () {
               var vm = this;
+              var popupShown = false; // 标记弹窗是否已显示
               
-              // ↓↓↓ 新增：多种离开检测，最大化拦截
+              // ↓↓↓ 新增：离开挽留弹窗（提前拦截策略）
               
-              // 1. 切换标签页/最小化窗口时触发（PC+移动端通用，最可靠）
-              document.addEventListener('visibilitychange', function() {
-                if (document.hidden && vm.specialInfo && vm.specialInfo.pay_type == 0) {
-                  if (!sessionStorage.getItem('leave_popup_' + vm.task_id)) {
-                    sessionStorage.setItem('leave_popup_' + vm.task_id, '1');
+              // 核心策略：鼠标移向页面顶部时立即弹窗（用户还在页面上）
+              document.addEventListener('mousemove', function(e) {
+                // 鼠标移到页面顶部10px区域（准备点关闭/后退/标签页）
+                if (e.clientY < 10 && !popupShown) {
+                  popupShown = true;
+                  setTimeout(function() {
                     vm.showLeaveRetentionPopup();
-                  }
+                  }, 200); // 200ms延迟，避免误触
                 }
               });
               
-              // 2. 鼠标离开页面区域（准备点关闭/后退/地址栏）
-              document.addEventListener('mouseleave', function(e) {
-                if (vm.specialInfo && vm.specialInfo.pay_type == 0) {
-                  if (!sessionStorage.getItem('leave_popup_' + vm.task_id)) {
-                    sessionStorage.setItem('leave_popup_' + vm.task_id, '1');
-                    vm.showLeaveRetentionPopup();
-                  }
+              // 备用策略1：鼠标完全离开页面
+              document.addEventListener('mouseleave', function() {
+                if (!popupShown) {
+                  popupShown = true;
+                  vm.showLeaveRetentionPopup();
                 }
               });
               
-              // 3. 页面失去焦点（点击其他窗口、切换应用）
+              // 备用策略2：窗口失去焦点（最后防线）
               window.addEventListener('blur', function() {
-                if (vm.specialInfo && vm.specialInfo.pay_type == 0) {
-                  if (!sessionStorage.getItem('leave_popup_' + vm.task_id)) {
-                    sessionStorage.setItem('leave_popup_' + vm.task_id, '1');
-                    vm.showLeaveRetentionPopup();
-                  }
+                if (!popupShown) {
+                  popupShown = true;
+                  vm.showLeaveRetentionPopup();
                 }
               });
               
-              // 4. 页面即将卸载（最后防线）
-              window.addEventListener('pagehide', function() {
-                if (vm.specialInfo && vm.specialInfo.pay_type == 0) {
-                  if (!sessionStorage.getItem('leave_popup_' + vm.task_id)) {
-                    sessionStorage.setItem('leave_popup_' + vm.task_id, '1');
-                    vm.showLeaveRetentionPopup();
-                  }
-                }
-              });
-              
-              // 5. 保存播放进度
+              // 保存播放进度
               window.addEventListener('beforeunload', function (e) {
                 if (vm.player && vm.player.getCurrentTime() !== 0) {
                   vm.saveTime(vm.taskName, vm.player.getCurrentTime())
