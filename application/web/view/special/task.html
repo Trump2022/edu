@@ -289,12 +289,23 @@
                   vm.saveTime(vm.taskName, vm.player.getCurrentTime())
                 }
                 // ↓↓↓ 新增：免费课程离开挽留
+                console.log('=== beforeunload 事件触发 ===');
+                console.log('1. specialInfo存在?', !!vm.specialInfo);
+                console.log('2. pay_type:', vm.specialInfo ? vm.specialInfo.pay_type : '未定义');
+                console.log('3. player存在?', !!vm.player);
+                
                 if (vm.specialInfo && vm.specialInfo.pay_type == 0 && vm.player) {
+                  console.log('4. 进入挽留逻辑');
                   var currentTime = vm.player.getCurrentTime();
                   var duration = vm.player.getDuration();
                   var progress = (currentTime / duration) * 100;
+                  console.log('5. 播放时间:', currentTime, '总时长:', duration, '进度:', progress + '%');
+                  console.log('6. task_id:', vm.task_id);
+                  console.log('7. sessionStorage已触发过?', sessionStorage.getItem('leave_popup_' + vm.task_id));
+                  
                   // 视频未看完 且 未弹过挽留窗（去掉30秒限制，打开视频即触发）
                   if (progress < 100 && !sessionStorage.getItem('leave_popup_' + vm.task_id)) {
+                    console.log('8. ✅ 满足条件，触发挽留弹窗！');
                     sessionStorage.setItem('leave_popup_' + vm.task_id, '1');
                     e.preventDefault();
                     e.returnValue = '学习中是遇到问题了吗？';
@@ -303,7 +314,11 @@
                       vm.showLeaveRetentionPopup();
                     }, 100);
                     return '学习中是遇到问题了吗？';
+                  } else {
+                    console.log('8. ❌ 不满足条件：progress=' + progress + ', 已触发=' + !!sessionStorage.getItem('leave_popup_' + vm.task_id));
                   }
+                } else {
+                  console.log('4. ❌ 未进入挽留逻辑（条件不满足）');
                 }
                 // ↑↑↑ 新增结束
               })
