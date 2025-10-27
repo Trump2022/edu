@@ -293,8 +293,8 @@
                   var currentTime = vm.player.getCurrentTime();
                   var duration = vm.player.getDuration();
                   var progress = (currentTime / duration) * 100;
-                  // 视频未看完 且 播放超过30秒 且 未弹过挽留窗
-                  if (progress < 100 && currentTime > 30 && !sessionStorage.getItem('leave_popup_' + vm.task_id)) {
+                  // 视频未看完 且 未弹过挽留窗（去掉30秒限制，打开视频即触发）
+                  if (progress < 100 && !sessionStorage.getItem('leave_popup_' + vm.task_id)) {
                     sessionStorage.setItem('leave_popup_' + vm.task_id, '1');
                     e.preventDefault();
                     e.returnValue = '学习中是遇到问题了吗？';
