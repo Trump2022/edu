@@ -331,10 +331,10 @@
                         vm.linkUrl = data.link_url;
                         vm.specialInfo = data.specialInfo;
                         vm.taskInfo = data.taskInfo;
-                        // ↓↓↓ 新增：加载笔记列表（临时注释，调试用）
-                        // if (vm.taskInfo && vm.taskInfo.id) {
-                        //     vm.loadNotes();
-                        // }
+                        // ↓↓↓ 新增：加载笔记列表
+                        if (vm.taskInfo && vm.taskInfo.id) {
+                            vm.loadNotes();
+                        }
                         // ↑↑↑ 新增结束
                         if (vm.taskInfo.videoId) {
                             vm.getPlayAuth();
@@ -727,7 +727,7 @@
                     vm.userConfirmedLeave = true;
                     // 可以选择：点关闭后自动返回上一页
                     // history.back();
-                }
+                },
                 // ↑↑↑ 新增结束
                 
                 // ↓↓↓ 新增：笔记功能方法
