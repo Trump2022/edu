@@ -224,10 +224,8 @@
         'router/index',
         'css!styles/audioCourse.css'
     ], function (Vue, ELEMENT, BaseHeader, BaseFooter, BaseLogin, BaseAgree, baseMixin, specialApi, util, router) {
-        console.log('===【require.js回调执行】===');
         Vue.use(ELEMENT);
         Vue.use(router);
-        console.log('===【即将创建Vue实例】===');
         new Vue({
             el: '#app',
             components: {
@@ -268,7 +266,6 @@
               }
             },
             created: function () {
-                console.log('===【Vue created钩子执行】===');
                 this.task_id = util.getParmas('task_id');
                 this.special_id = util.getParmas('specialId');
                 this.title = util.getParmas('name') || '';
@@ -291,40 +288,23 @@
               
               // ↓↓↓ 新增：强制拦截返回（history劫持）
               
-              console.log('===【PC端拦截初始化】===');
-              
               // 1. 添加一个假的历史记录
               history.pushState(null, null, window.location.href);
-              console.log('历史记录已添加');
               
               // 2. 监听返回事件
               window.addEventListener('popstate', function(e) {
-                console.log('===【popstate触发】===');
-                console.log('userConfirmedLeave:', vm.userConfirmedLeave);
-                
                 if (!vm.userConfirmedLeave) {
-                  console.log('阻止返回，显示弹窗');
                   // 用户还没确认，阻止返回并显示弹窗
                   history.pushState(null, null, window.location.href);
-                  
-                  // 确保弹窗元素存在
                   var popup = document.getElementById('leave-retention-popup');
-                  console.log('弹窗元素:', popup);
-                  
                   if (popup) {
                     popup.style.display = 'flex';
-                    console.log('弹窗已显示');
-                  } else {
-                    console.error('弹窗元素不存在！');
                   }
                 } else {
-                  console.log('用户已确认，允许离开');
                   // 主动返回上一页（因为这次popstate被监听器消耗了）
                   history.back();
                 }
               });
-              
-              console.log('popstate监听器已添加');
               
               // 3. 鼠标移到页面顶部时弹窗（准备点关闭/标签页）
               var topHoverTimer = null;
@@ -332,7 +312,6 @@
                 if (e.clientY < 10 && !vm.userConfirmedLeave) {
                   if (!topHoverTimer) {
                     topHoverTimer = setTimeout(function() {
-                      console.log('鼠标顶部触发弹窗');
                       var popup = document.getElementById('leave-retention-popup');
                       if (popup) {
                         popup.style.display = 'flex';
@@ -355,14 +334,11 @@
                 }
                 // 如果用户还没确认，显示浏览器原生确认框
                 if (!vm.userConfirmedLeave) {
-                  console.log('beforeunload触发，显示确认框');
                   e.preventDefault();
                   e.returnValue = '';
                   return '';
                 }
               });
-              
-              console.log('===【PC端拦截初始化完成】===');
               
               // ↑↑↑ 新增结束
               
