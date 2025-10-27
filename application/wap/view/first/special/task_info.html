@@ -51,36 +51,15 @@
             <button class="iconfont iconright" type="button" @click="audioTab(1)"></button>
         </div>
     </div>
-    <!-- 目录、详情 -->
+    <!-- 笔记、目录 -->
     <div class="navbar">
-        <div :class="{ on: tabIndex == 0 }" class="navbar-item" @click="tabIndex = 0">目录</div>
-        <div :class="{ on: tabIndex == 1 }" class="navbar-item" @click="tabIndex = 1">详情</div>
+        <div :class="{ on: tabIndex == 0 }" class="navbar-item" @click="tabIndex = 0">笔记</div>
+        <div :class="{ on: tabIndex == 1 }" class="navbar-item" @click="tabIndex = 1">目录</div>
     </div>
     <div class="navbar-content">
+        <!-- tabIndex=0: 笔记tab -->
         <div v-show="tabIndex == 0" class="navbar-content-item">
-            <ul class="catalog">
-                <li v-for="(item, index) in taskList" :key="item.id" :class="{ on: item.id == taskId }" class="catalog-item" @click="playTask(item)">
-                    <div>
-                        <img v-if="item.type == 1" class="catalog-item-image" src="{__WAP_PATH}zsff/images/media1.png">
-                        <img v-else-if="item.type == 2" class="catalog-item-image" src="{__WAP_PATH}zsff/images/media2.png">
-                        <img v-else-if="item.type == 3" class="catalog-item-image" src="{__WAP_PATH}zsff/images/media3.png">
-                    </div>
-                    <div class="catalog-item-text">
-                        <div class="catalog-item-title">{{ index >= 9 ? index + 1 : '0' + (index + 1) }} | {{ item.title }}</div>
-                        <div class="catalog-item-progress">
-                            <div v-if="item.watch && item.watch.percentage" class="progress-text">已学习{{ item.watch.percentage }}%</div>
-                            <div v-else class="progress-text no">未学习</div>
-                        </div>
-                    </div>
-                    <div class="catalog-item-status">
-                        <i v-if="item.is_free" :class="[item.pay_status ? 'iconsuozi' : 'iconziyuan2', 'iconfont']"></i>
-                        <span v-else class="free">免费</span>
-                    </div>
-                </li>
-            </ul>
-            
-            <!-- ↓↓↓ 笔记功能 -->
-            <div style="padding: 15px; background: #f5f5f5; margin-top: 10px;">
+            <div style="padding: 15px; background: #f5f5f5;">
                 <div style="background: white; border-radius: 8px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
                     <div style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 15px; display: flex; align-items: center;">
                         <span style="margin-right: 5px;">📝</span> 我的笔记
@@ -130,9 +109,30 @@
                     </div>
                 </div>
             </div>
-            <!-- ↑↑↑ 笔记功能结束 -->
         </div>
+        
+        <!-- tabIndex=1: 目录tab（课程列表 + 课程详情） -->
         <div v-show="tabIndex == 1" class="navbar-content-item">
+            <ul class="catalog">
+                <li v-for="(item, index) in taskList" :key="item.id" :class="{ on: item.id == taskId }" class="catalog-item" @click="playTask(item)">
+                    <div>
+                        <img v-if="item.type == 1" class="catalog-item-image" src="{__WAP_PATH}zsff/images/media1.png">
+                        <img v-else-if="item.type == 2" class="catalog-item-image" src="{__WAP_PATH}zsff/images/media2.png">
+                        <img v-else-if="item.type == 3" class="catalog-item-image" src="{__WAP_PATH}zsff/images/media3.png">
+                    </div>
+                    <div class="catalog-item-text">
+                        <div class="catalog-item-title">{{ index >= 9 ? index + 1 : '0' + (index + 1) }} | {{ item.title }}</div>
+                        <div class="catalog-item-progress">
+                            <div v-if="item.watch && item.watch.percentage" class="progress-text">已学习{{ item.watch.percentage }}%</div>
+                            <div v-else class="progress-text no">未学习</div>
+                        </div>
+                    </div>
+                    <div class="catalog-item-status">
+                        <i v-if="item.is_free" :class="[item.pay_status ? 'iconsuozi' : 'iconziyuan2', 'iconfont']"></i>
+                        <span v-else class="free">免费</span>
+                    </div>
+                </li>
+            </ul>
             <div v-html="taskInfo.content" class="content"></div>
         </div>
     </div>
