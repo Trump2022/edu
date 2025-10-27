@@ -118,15 +118,13 @@
     </div>
     <!-- ↑↑↑ 新增结束 -->
     
-    <!-- ↓↓↓ 新增：笔记功能区域 -->
+    <!-- ↓↓↓ 【临时注释】笔记功能区域 - 用于测试视频播放是否正常
     <div style="padding: 15px; background: #f5f5f5; margin-top: 10px;">
         <div style="background: white; border-radius: 8px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-            <!-- 笔记标题 -->
             <div style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 15px; display: flex; align-items: center;">
                 <span style="margin-right: 5px;">📝</span> 我的笔记
             </div>
             
-            <!-- 笔记输入框 -->
             <div style="margin-bottom: 15px;">
                 <textarea 
                     v-model="noteContent" 
@@ -143,7 +141,6 @@
                 </div>
             </div>
             
-            <!-- 笔记列表 -->
             <div v-if="noteList.length > 0" style="border-top: 1px solid #e0e0e0; padding-top: 15px;">
                 <div style="font-size: 14px; color: #666; margin-bottom: 10px;">笔记列表：</div>
                 <div 
@@ -175,7 +172,7 @@
             </div>
         </div>
     </div>
-    <!-- ↑↑↑ 笔记功能结束 -->
+    ↑↑↑ 笔记功能结束 -->
 </div>
 {/block}
 {block name="foot"}
@@ -245,10 +242,10 @@
                 player: null,
                 viewing_time: 0,
                 player: null,
-                payDialogOpen: false,
-                // ↓↓↓ 新增：笔记功能数据
-                noteContent: '', // 笔记输入内容
-                noteList: [], // 笔记列表
+                payDialogOpen: false
+                // ↓↓↓ 【临时注释】笔记功能数据
+                // noteContent: '', // 笔记输入内容
+                // noteList: [], // 笔记列表
                 // ↑↑↑ 笔记数据结束
             },
             computed: {
@@ -323,10 +320,10 @@
                         vm.linkUrl = data.link_url;
                         vm.specialInfo = data.specialInfo;
                         vm.taskInfo = data.taskInfo;
-                        // ↓↓↓ 新增：加载笔记列表
-                        if (vm.taskInfo && vm.taskInfo.id) {
-                            vm.loadNotes();
-                        }
+                        // ↓↓↓ 【临时注释】加载笔记列表
+                        // if (vm.taskInfo && vm.taskInfo.id) {
+                        //     vm.loadNotes();
+                        // }
                         // ↑↑↑ 新增结束
                         if (vm.taskInfo.videoId) {
                             vm.getPlayAuth();
@@ -714,10 +711,11 @@
                 },
                 closeLeaveRetentionPopup: function () {
                     document.getElementById('leave-retention-popup').style.display = 'none';
-                },
+                }
                 // ↑↑↑ 新增结束
                 
-                // ↓↓↓ 新增：笔记功能方法
+                // ↓↓↓ 【临时注释】笔记功能方法
+                /*
                 // 加载笔记列表
                 loadNotes: function () {
                     var that = this;
@@ -788,7 +786,8 @@
                     var m = Math.floor(seconds / 60);
                     var s = seconds % 60;
                     return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
-                },
+                }
+                */
                 // ↑↑↑ 笔记功能结束
             }
         });
