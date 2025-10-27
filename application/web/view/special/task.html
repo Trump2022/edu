@@ -224,8 +224,10 @@
         'router/index',
         'css!styles/audioCourse.css'
     ], function (Vue, ELEMENT, BaseHeader, BaseFooter, BaseLogin, BaseAgree, baseMixin, specialApi, util, router) {
+        console.log('===【require.js回调执行】===');
         Vue.use(ELEMENT);
         Vue.use(router);
+        console.log('===【即将创建Vue实例】===');
         new Vue({
             el: '#app',
             components: {
@@ -266,6 +268,7 @@
               }
             },
             created: function () {
+                console.log('===【Vue created钩子执行】===');
                 this.task_id = util.getParmas('task_id');
                 this.special_id = util.getParmas('specialId');
                 this.title = util.getParmas('name') || '';
