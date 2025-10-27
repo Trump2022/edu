@@ -792,14 +792,6 @@
                 // ↑↑↑ 笔记功能结束
             }
         });
-        
-        // ↓↓↓ 页面加载完成后，加载笔记列表
-        vm.$nextTick(function() {
-            if (typeof vm.loadNotes === 'function') {
-                vm.loadNotes();
-            }
-        });
-        // ↑↑↑ 加载笔记结束
     });
 </script>
 {/block}
