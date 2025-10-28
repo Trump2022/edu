@@ -1459,7 +1459,8 @@
                 memberLink: memberLink,
 				viewList: [],
 				lb_spread_uid: 0,
-				channel: ''
+				channel: '',
+				from: ''
             },
             watch: {
                 pay_type_num: function () {
@@ -1618,6 +1619,7 @@
 				this.get_view_list()
 				this.lb_spread_uid = parseInt(this.getCookie('waplb_spread_uid', '0'))
 				this.channel = this.GetQueryString('channel')
+				this.from = this.GetQueryString('from')
             },
             updated: function () {
                 this.$nextTick(function () {
