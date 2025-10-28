@@ -156,7 +156,7 @@
 					<a v-else :href="$router.special_cate">全部</a>
 				</el-breadcrumb-item>
 				<el-breadcrumb-item v-if="from == 'student'">
-					<a v-if="title != ''" :href="/web/index/student_my_course + '?labels=' + labels + '&school_id=' + school_id">{{title}}</a>
+					<a v-if="title != ''" :href="'/web/index/student_my_course?labels=' + labels + '&school_id=' + school_id">{{title}}</a>
 					<a v-else :href="$router.special_cate">全部</a>
 				</el-breadcrumb-item>
                 <el-breadcrumb-item v-else>
