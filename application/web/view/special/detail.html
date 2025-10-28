@@ -159,10 +159,10 @@
 					<a v-if="title != ''" :href="'/web/index/student_my_course?labels=' + labels + '&school_id=' + school_id">{{title}}</a>
 					<a v-else :href="$router.special_cate">全部</a>
 				</el-breadcrumb-item>
-                <el-breadcrumb-item v-else>
+                <!-- <el-breadcrumb-item v-else>
 					<a v-if="title != ''" :href="$router.more_list + '?type=' + type + '&recommend_id=' + recommend_id + '&name=' + title">{{title}}</a>
 					<a v-else :href="$router.special_cate">全部</a>
-				</el-breadcrumb-item>
+				</el-breadcrumb-item> -->
                 <el-breadcrumb-item>课程详情</el-breadcrumb-item>
             </el-breadcrumb>
             <div class="container_content">
