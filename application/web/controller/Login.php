@@ -227,7 +227,7 @@ class Login extends WapBasic
             SmsCode::setCodeInvalid($account, $code);
         }
         $msg = $type == 1 || $type == 3 ? '注册' : '找回密码';
-        if ((PhoneUser::userRegister($account, $pwd, $type, $nickname, $channel,$request)) !== false)
+        if ((PhoneUser::userRegister($account, $pwd, $type, $nickname,$request, $channel)) !== false)
         {
             // ============================
             // ✅ 注册成功后，调用 CRM 接口
