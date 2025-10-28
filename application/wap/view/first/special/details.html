@@ -2542,7 +2542,9 @@
                                 q: {
                                     id: item.id,
                                     specialId: item.special_id,
-                                    viewing_time: item.watch && item.watch.viewing_time || 0
+                                    viewing_time: item.watch && item.watch.viewing_time || 0,
+									from: that.from,
+									channel: that.channel
                                 }
                             }));
                         });
