@@ -791,7 +791,7 @@
 				copyPromotionUrl: function(uid) {
 					const origin = window.location.origin || window.location.protocol  + "//" + window.location.host; 
 					navigator.clipboard.writeText(`${origin}/web/special/details.html?id=${this.id}&from=promotion`)
-					  .then(() => vm.$message.success("复制成功");)
+					  .then(() => vm.$message.success("复制成功"))
 					  .catch(err => console.error(" 复制失败:", err));
 				},
 				get_view_list: function() {
