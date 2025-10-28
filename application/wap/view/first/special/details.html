@@ -1631,7 +1631,7 @@
 				},
 				copyPromotionUrl: function() {
 					const origin = window.location.origin || window.location.protocol  + "//" + window.location.host; 
-					navigator.clipboard.writeText(`${origin}/web/special/details.html?id=${this.special.id}&from=promotion&lb_spread_uid=${this.lb_spread_uid}&origin_id=3809`)
+					navigator.clipboard.writeText(`${origin}/wap/special/details.html?id=${this.special.id}&from=promotion&lb_spread_uid=${this.lb_spread_uid}&origin_id=3809`)
 					  .then(() => layer.msg("复制成功"))
 					  .catch(err => console.error(" 复制失败:", err));
 				},
