@@ -176,7 +176,7 @@
                 <div class="container_content_message">
                     <div class="content_message_title">
 						{{ special.title }}
-						<span style="cursor: pointer;" v-if="!special.spread_uid" @click="copyPromotionUrl(special.spread_uid)">推广</span>
+						<span style="cursor: pointer;font-size: 14px; color: #fe651d; margin-left: 10px;" v-if="special.spread_uid" @click="copyPromotionUrl(special.spread_uid)">推广</span>
 					</div>
                     <div class="content_message_dis">{{ special.abstract }}</div>
                     <div class="content_message_tap">
@@ -790,7 +790,7 @@
             methods: {
 				copyPromotionUrl: function(uid) {
 					const origin = window.location.origin || window.location.protocol  + "//" + window.location.host; 
-					navigator.clipboard.writeText(`${origin}/web/special/details.html?id=${this.id}&from=promotion&lb_spread_uid=${uid}`)
+					navigator.clipboard.writeText(`${origin}/web/special/details.html?id=${this.id}&from=promotion&lb_spread_uid=${uid}&origin_id=3809`)
 					  .then(() => vm.$message.success("复制成功"))
 					  .catch(err => console.error(" 复制失败:", err));
 				},
