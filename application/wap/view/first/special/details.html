@@ -2410,9 +2410,10 @@
                             if (!item.is_free || item.is_try || vm.is_pay || (!vm.special.member_pay_type && vm.isMember)) {
                                 vm.goPlayTsak(item);
                             } else {
-                                // ↓↓↓ 新增：有channel参数弹二维码
-                                var urlParams = new URLSearchParams(window.location.search);
-                                if (urlParams.has('channel')) {
+                                // ↓↓↓ 新增：from='promotion' 且 channel='课程' 时弹二维码
+                                var urlFrom = vm.GetQueryString('from') || '';
+                                var urlChannel = vm.GetQueryString('channel') || '';
+                                if (urlFrom === 'promotion' && urlChannel === '课程') {
                                     vm.showWechatQrcodePopup();
                                     return;
                                 }
@@ -2811,6 +2812,20 @@
                         })
                     });
                 },
+                // ↓↓↓ 新增：显示付费课程引导弹窗
+                showWechatQrcodePopup: function () {
+                    var urlFrom = this.GetQueryString('from') || '';
+                    var urlChannel = this.GetQueryString('channel') || '';
+                    if (urlFrom !== 'promotion' || urlChannel !== '课程') {
+                        return; // 不满足条件，不显示弹窗
+                    }
+                    document.getElementById('channel-qrcode-popup').style.display = 'flex';
+                },
+                closeWechatQrcodePopup: function () {
+                    document.getElementById('channel-qrcode-popup').style.display = 'none';
+                },
+                // ↑↑↑ 新增结束
+                
                 //关闭登录
                 loginClose: function (val) {
                     this.loginShow = false;
