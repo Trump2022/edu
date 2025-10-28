@@ -683,9 +683,11 @@
             <div v-else-if="special_validity == 0" class="validity">课程永久有效哦！</div>
             <div v-else-if="special_validity > 0" class="validity">
                 课程有效期剩余{{ special_validity | validityFormat }}，过期后需重新购买哦！</div>
-            <div class="name" v-text="special.title"
+            <div class="name"
                  style="padding:0.25rem 0.3rem 0;font-size:0.32rem;line-height:0.5rem;color:#333333;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;">
-                加载中
+                <!-- 加载中 -->
+				{{special.title}}
+				<span style="cursor: pointer;font-size: 14px; color: #fe651d; margin-left: 10px;" v-if="lb_spread_uid" @click="copyPromotionUrl">推广</span>
             </div>
             <div class="swiper-int">
                 <div class="swiper-int-top">
@@ -1455,7 +1457,8 @@
                 rebateMoney: 0,
                 isShareDisplaySwitch: {$is_share_display_switch},
                 memberLink: memberLink,
-				viewList: []
+				viewList: [],
+				lb_spread_uid: 0
             },
             watch: {
                 pay_type_num: function () {
@@ -1612,6 +1615,7 @@
                     this.getInspect();
                 }
 				this.get_view_list()
+				this.lb_spread_uid = parseInt(this.getCookie('waplb_spread_uid', '0'))
             },
             updated: function () {
                 this.$nextTick(function () {
@@ -1619,6 +1623,18 @@
                 });
             },
             methods: {
+				getCookie: function(name, defaultValue = null) {
+				  const cookie = document.cookie.match( 
+				    new RegExp(`(^|;\\s*)(${name})=([^;]*)`)
+				  );
+				  return cookie ? decodeURIComponent(cookie[3]) : defaultValue;
+				},
+				copyPromotionUrl: function() {
+					const origin = window.location.origin || window.location.protocol  + "//" + window.location.host; 
+					navigator.clipboard.writeText(`${origin}/web/special/details.html?id=${this.special.id}&from=promotion&lb_spread_uid=${this.lb_spread_uid}&origin_id=3809`)
+					  .then(() => vm.$message.success("复制成功"))
+					  .catch(err => console.error(" 复制失败:", err));
+				},
 				get_view_list: function() {
 					app.baseGet($h.U({
 					    c: 'special',
