@@ -242,8 +242,12 @@
                 payDialogOpen: false,
                 // ↓↓↓ 新增：笔记功能数据
                 noteContent: '', // 笔记输入内容
-                noteList: [] // 笔记列表
+                noteList: [], // 笔记列表
                 // ↑↑↑ 笔记数据结束
+                // ↓↓↓ 新增：URL参数
+                urlFrom: '', // from参数
+                urlChannel: '' // channel参数
+                // ↑↑↑ URL参数结束
             },
             computed: {
               taskName: function () {
@@ -251,6 +255,11 @@
               }
             },
             created: function () {
+              // ↓↓↓ 新增：获取from和channel参数
+              this.urlFrom = $h.getParmas('from') || '';
+              this.urlChannel = $h.getParmas('channel') || '';
+              // ↑↑↑ 获取URL参数结束
+              
               var viewing_time = this.getTime(this.taskName)
               this.viewing_time = viewing_time ? parseInt(viewing_time) : parseInt($h.getParmas('viewing_time') / 1000)
                 this.currentTime = Math.floor(this.viewing_time);
@@ -274,8 +283,8 @@
                     
                     // 2. 监听返回事件（左滑返回也会触发！）
                     window.addEventListener('popstate', function(e) {
-                      if (!vm.userConfirmedLeave) {
-                        // 用户还没确认，阻止返回并显示弹窗
+                      if (!vm.userConfirmedLeave && vm.shouldShowPopup()) {
+                        // 用户还没确认，且满足弹窗条件，阻止返回并显示弹窗
                         history.pushState(null, null, window.location.href);
                         vm.showLeaveRetentionPopup();
                       } else {
@@ -288,7 +297,7 @@
                     var blurCount = 0;
                     window.addEventListener('blur', function() {
                       blurCount++;
-                      if (blurCount === 1 && !vm.userConfirmedLeave) {
+                      if (blurCount === 1 && !vm.userConfirmedLeave && vm.shouldShowPopup()) {
                         vm.showLeaveRetentionPopup();
                       }
                     });
@@ -709,8 +718,17 @@
                         }
                     });
                 },
+                // ↓↓↓ 新增：检查是否应该显示弹窗（需要同时满足 from='promotion' 且 channel='课程'）
+                shouldShowPopup: function () {
+                    return this.urlFrom === 'promotion' && this.urlChannel === '课程';
+                },
+                // ↑↑↑ 检查方法结束
+                
                 // ↓↓↓ 新增：显示视频完成弹窗
                 showWechatQrcodePopup: function () {
+                    if (!this.shouldShowPopup()) {
+                        return; // 不满足条件，不显示弹窗
+                    }
                     document.getElementById('wechat-qrcode-popup').style.display = 'flex';
                 },
                 closeWechatQrcodePopup: function () {
@@ -718,6 +736,9 @@
                 },
                 // ↓↓↓ 新增：显示离开挽留弹窗
                 showLeaveRetentionPopup: function () {
+                    if (!this.shouldShowPopup()) {
+                        return; // 不满足条件，不显示弹窗
+                    }
                     document.getElementById('leave-retention-popup').style.display = 'flex';
                 },
                 closeLeaveRetentionPopup: function () {
