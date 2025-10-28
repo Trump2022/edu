@@ -117,6 +117,13 @@ define([
             });
         },
         methods: {
+			// 获取url参数正则匹配
+			GetQueryString: function (name) {
+			  var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+			  var r = decodeURI(window.location.search).substr(1).match(reg);
+			  if (r != null) return unescape(r[2]);
+			  return null;
+			},
             // 获取验证码
             getCode: function (captchaVerification) {
                 var vm = this;
