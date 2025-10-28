@@ -722,7 +722,8 @@
 				viewList: [],
 				school_id: 0,
 				labels: '',
-				spread_uid: 0
+				spread_uid: 0,
+				channel: ''
             },
             watch: {
                 selectValue: {
@@ -739,11 +740,11 @@
 				if(this.from == 'student') {
 					this.labels = util.getParmas('labels');
 					this.school_id = util.getParmas('school_id');
+					this.channel = util.getParmas('channel');
 				}
                 this.type = util.getParmas('type');
                 this.title = util.getParmas('name') || '';
                 this.recommend_id = util.getParmas('recommend_id');
-				console.log('this.from=====>', this.from);
                 this.lecturer_details();
                 this.special_data_download();
                 this.recommended_courses();
@@ -1069,7 +1070,7 @@
                             }
                             return;
                         }
-                        window.location.assign(vm.$router.task_info + '?specialId=' + vm.id + '&task_id=' + vm.courseList[0].id + '&special_title=' + vm.special.title + '&name=' + vm.title + '&recommend_id=' + vm.recommend_id + '&from=' + vm.from);
+                        window.location.assign(vm.$router.task_info + '?specialId=' + vm.id + '&task_id=' + vm.courseList[0].id + '&special_title=' + vm.special.title + '&name=' + vm.title + '&recommend_id=' + vm.recommend_id + '&from=' + vm.from + '&channel=' + vm.channel);
                     }).catch(function (err) {
                         store.setLoginAction(true);
                     });

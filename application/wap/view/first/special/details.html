@@ -1458,7 +1458,8 @@
                 isShareDisplaySwitch: {$is_share_display_switch},
                 memberLink: memberLink,
 				viewList: [],
-				lb_spread_uid: 0
+				lb_spread_uid: 0,
+				channel: ''
             },
             watch: {
                 pay_type_num: function () {
@@ -1616,6 +1617,7 @@
                 }
 				this.get_view_list()
 				this.lb_spread_uid = parseInt(this.getCookie('waplb_spread_uid', '0'))
+				this.channel = this.GetQueryString('channel')
             },
             updated: function () {
                 this.$nextTick(function () {
@@ -1623,6 +1625,13 @@
                 });
             },
             methods: {
+				// 获取url参数正则匹配
+				GetQueryString: function (name) {
+				  var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+				  var r = decodeURI(window.location.search).substr(1).match(reg);
+				  if (r != null) return unescape(r[2]);
+				  return null;
+				},
 				getCookie: function(name, defaultValue = null) {
 				  const cookie = document.cookie.match( 
 				    new RegExp(`(^|;\\s*)(${name})=([^;]*)`)
@@ -2688,6 +2697,7 @@
                                             opt.q.viewing_time = task.watch && task.watch.viewing_time || 0;
                                         }
                                         opt.q.id = task.id;
+                                        opt.q.channel = this.channel;
                                         window.location.assign($h.U(opt));
                                         break;
                                     case 6:
