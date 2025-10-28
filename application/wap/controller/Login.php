@@ -141,6 +141,9 @@ class Login extends WapBasic
         header('Access-Control-Allow-Origin: *');
         $account = input('account', '');
         $pwd = input('pwd', '');
+        $lb_spread_uid = input('lb_spread_uid', 0, 'intval');
+        Cookie::set('lb_spread_uid', $lb_spread_uid);
+        // $this->assign('lb_spread_uid', $lb_spread_uid);
         $this->assign('account', $account);
         $this->assign('pwd', $pwd);
         $this->assign('spread_uid', 0);
