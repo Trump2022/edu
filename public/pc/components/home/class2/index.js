@@ -21,6 +21,18 @@ define([
 				default: function () {
 				    return '';
 				}
+			},
+			labels: {
+				type: String,
+				default: function () {
+				    return '';
+				}
+			},
+			school_id: {
+				type: Number,
+				default: function () {
+				    return 0;
+				}
 			}
         },
         data: function () {

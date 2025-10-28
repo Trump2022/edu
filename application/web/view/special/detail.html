@@ -156,7 +156,7 @@
 					<a v-else :href="$router.special_cate">全部</a>
 				</el-breadcrumb-item>
 				<el-breadcrumb-item v-if="from == 'student'">
-					<a v-if="title != ''" href="/web/index/student_my_course">{{title}}</a>
+					<a v-if="title != ''" :href=`'/web/index/student_my_course?labels=${labels}&school_id=${school_id}`>{{title}}</a>
 					<a v-else :href="$router.special_cate">全部</a>
 				</el-breadcrumb-item>
                 <el-breadcrumb-item v-else>
@@ -719,7 +719,9 @@
                 problemList: [],
                 questionList: [],
 				title: '',
-				viewList: []
+				viewList: [],
+				school_id: 0,
+				labels: ''
             },
             watch: {
                 selectValue: {
@@ -733,6 +735,10 @@
             },
             created: function () {
                 this.from = util.getParmas('from');
+				if(this.from == 'student') {
+					this.labels = util.getParmas('from');
+					this.school_id = util.getParmas('school_id');
+				}
                 this.type = util.getParmas('type');
                 this.title = util.getParmas('name') || '';
                 this.recommend_id = util.getParmas('recommend_id');
