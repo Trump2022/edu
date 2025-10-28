@@ -1124,9 +1124,9 @@
                     homeApi.user_login().then(function () {
                         if (!vm.isPay && (vm.special.member_pay_type || !vm.isMember) && task.is_free && task.is_try) {
                             if (task.is_light) {
-                                window.location.assign(vm.$router.task_info + '?task_id=0' + '&specialId=' + task.id + '&special_title=' + vm.special.title + '&viewing_time=' + (task.watch && task.watch.viewing_time || 0) + '&from=' + vm.from);
+                                window.location.assign(vm.$router.task_info + '?task_id=0' + '&specialId=' + task.id + '&special_title=' + vm.special.title + '&viewing_time=' + (task.watch && task.watch.viewing_time || 0) + '&from=' + vm.from + '&channel=' + vm.channel);
                             } else {
-                                window.location.assign(vm.$router.task_info + '?task_id=' + task.id + '&specialId=' + task.special_id + '&special_title=' + vm.special.title + '&viewing_time=' + (task.watch && task.watch.viewing_time || 0) + '&from=' + vm.from);
+                                window.location.assign(vm.$router.task_info + '?task_id=' + task.id + '&specialId=' + task.special_id + '&special_title=' + vm.special.title + '&viewing_time=' + (task.watch && task.watch.viewing_time || 0) + '&from=' + vm.from + '&channel=' + vm.channel);
                             }
                         } else {
                             if (task.pay_status && !vm.isPay) {
@@ -1141,7 +1141,7 @@
                                 return;
                             }
                             if (task.is_light) {
-                                window.location.assign(vm.$router.task_info + '?task_id=0' + '&specialId=' + task.id + '&special_title=' + vm.special.title + '&viewing_time=' + (task.watch && task.watch.viewing_time || 0) + '&from=' + vm.from);
+                                window.location.assign(vm.$router.task_info + '?task_id=0' + '&specialId=' + task.id + '&special_title=' + vm.special.title + '&viewing_time=' + (task.watch && task.watch.viewing_time || 0) + '&from=' + vm.from + '&channel=' + vm.channel);
                                 return;
                             }
                             specialApi.get_task_link({
@@ -1152,7 +1152,7 @@
                                     task_id: task.id,
                                     special_id: task.special_id
                                 }).then(function () {
-                                    window.location.assign(vm.$router.task_info + '?task_id=' + task.id + '&specialId=' + task.special_id + '&special_title=' + vm.special.title + '&viewing_time=' + (task.watch && task.watch.viewing_time || 0) + '&recommend_id=' + vm.recommend_id + '&from=' + vm.from);
+                                    window.location.assign(vm.$router.task_info + '?task_id=' + task.id + '&specialId=' + task.special_id + '&special_title=' + vm.special.title + '&viewing_time=' + (task.watch && task.watch.viewing_time || 0) + '&recommend_id=' + vm.recommend_id + '&from=' + vm.from + '&channel=' + vm.channel);
                                 }).catch(function (err) {
                                     vm.$message.error(err.msg);
                                 });
