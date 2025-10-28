@@ -148,7 +148,7 @@
 <div v-cloak id="app">
     <div class="layout">
         <div class="container">
-            <el-breadcrumb separator-class="el-icon-arrow-right">
+            <el-breadcrumb separator-class="el-icon-arrow-right" v-show="from != 'promotion'">
                 <el-breadcrumb-item v-if="from != 'student'"><a :href="$router.home">首页</a></el-breadcrumb-item>
                 <el-breadcrumb-item v-if="from == 'live'"><a :href="$router.special_live">直播课</a></el-breadcrumb-item>
                 <el-breadcrumb-item v-else-if="from == 'special_cate'">
@@ -174,7 +174,10 @@
                     </el-carousel>
                 </div>
                 <div class="container_content_message">
-                    <div class="content_message_title">{{ special.title }}</div>
+                    <div class="content_message_title">
+						{{ special.title }}
+						<span style="cursor: pointer;" v-if="special.spread_uid > 0" @click="copyPromotionUrl(special.spread_uid)">推广</span>
+					</div>
                     <div class="content_message_dis">{{ special.abstract }}</div>
                     <div class="content_message_tap">
                         <div class="message_tap_list">
@@ -785,6 +788,12 @@
 				this.get_view_list()
             },
             methods: {
+				copyPromotionUrl: function(uid) {
+					const origin = window.location.origin || window.location.protocol  + "//" + window.location.host; 
+					navigator.clipboard.writeText(`${origin}/web/special/details.html?id=${this.id}&from=promotion`)
+					  .then(() => vm.$message.success("复制成功");)
+					  .catch(err => console.error(" 复制失败:", err));
+				},
 				get_view_list: function() {
 					specialApi.get_view_list({
 					    special_id: this.id
