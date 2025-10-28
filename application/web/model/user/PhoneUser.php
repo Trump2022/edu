@@ -140,7 +140,7 @@ class PhoneUser extends ModelBasic
                         'avatar' => '/system/images/user_log.jpg',
                         'account' => $account,
                         'phone' => $account,
-                        'channel' => $channel,
+                        'channel_source' => $channel,
                         'is_h5user' => 2,
                         'is_crm_user' => $type == 3 ? 1 : 0,
                     ]);
