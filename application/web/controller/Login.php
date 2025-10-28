@@ -209,7 +209,7 @@ class Login extends WapBasic
      */
     public function register(Request $request)
     {
-        list($account, $pwd, $code, $type, $nickname, $lb_spread_uid, $channel) = UtilService::postMore([
+        list($account, $pwd, $code, $type, $nickname, $lb_spread_uid, $channel, $comeurl) = UtilService::postMore([
             ['account', ''],
             ['pwd', ''],
             ['code', ''],
@@ -217,6 +217,7 @@ class Login extends WapBasic
             ['nickname', ''],
             ['lb_spread_uid', 0, 'intval'],
             ['channel', '', 'trim'],
+            ['comeurl', '', 'trim'],
         ], $request, true);
         if ( ! $code) return JsonService::fail('请输入验证码');
         if ( ! $account || ! $pwd) return JsonService::fail('参数有误！');
@@ -226,8 +227,39 @@ class Login extends WapBasic
             SmsCode::setCodeInvalid($account, $code);
         }
         $msg = $type == 1 || $type == 3 ? '注册' : '找回密码';
-        if ((PhoneUser::userRegister($account, $pwd, $type, $nickname, $request)) !== false){
-            //Env::get('crm.domain', '')
+        if ((PhoneUser::userRegister($account, $pwd, $type, $nickname, $request)) !== false)
+        {
+            // ============================
+            // ✅ 注册成功后，调用 CRM 接口
+            // ============================
+            $domain = Env::get('crm.domain', '');
+            $url = $domain . '/api/customer/addEduCourseCustomer';
+
+            $crmPayload = [
+                'mobile'     => $account,
+                'channel'    => $channel ?: '课程',
+                'come_url'   => $comeurl ?: '',
+                'follow_uid' => $lb_spread_uid ?: 0,
+            ];
+
+            try {
+                $ch = curl_init($url);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                    'Content-Type: application/json; charset=utf-8',
+                ]);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($crmPayload, JSON_UNESCAPED_UNICODE));
+                curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+                $crmResponse = curl_exec($ch);
+                curl_close($ch);
+
+                // 仅记录日志，不影响主流程
+                trace('CRM注册同步结果: ' . $crmResponse, 'info');
+            } catch (\Throwable $e) {
+                trace('CRM注册同步异常: ' . $e->getMessage(), 'error');
+            }
+
             return JsonService::successful($msg . '成功');
         }
         else {
