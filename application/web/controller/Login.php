@@ -207,34 +207,32 @@ class Login extends WapBasic
      * @param Request $request
      * @return null
      */
-
-    /**
-     * 账号密码注册/找回密码
-     *
-     * @param Request $request
-     * @return null
-     */
     public function register(Request $request)
     {
-        list($account, $pwd, $code, $type, $nickname) = UtilService::postMore([
+        list($account, $pwd, $code, $type, $nickname, $lb_spread_uid, $channel) = UtilService::postMore([
             ['account', ''],
             ['pwd', ''],
             ['code', ''],
             ['type', 1],//1-常规注册,2-找回密码,3-来自领播用户的注册
             ['nickname', ''],
+            ['lb_spread_uid', 0, 'intval'],
+            ['channel', '', 'trim'],
         ], $request, true);
-        if (!$code) return JsonService::fail('请输入验证码');
-        if (!$account || !$pwd) return JsonService::fail('参数有误！');
+        if ( ! $code) return JsonService::fail('请输入验证码');
+        if ( ! $account || ! $pwd) return JsonService::fail('参数有误！');
         if ($type != 3 && $code != '106275') {
             $code = md5('is_phone_code' . $code);
             if (!SmsCode::CheckCode($account, $code)) return JsonService::fail('验证码验证失败');
             SmsCode::setCodeInvalid($account, $code);
         }
         $msg = $type == 1 || $type == 3 ? '注册' : '找回密码';
-        if ((PhoneUser::userRegister($account, $pwd, $type, $nickname, $request)) !== false)
+        if ((PhoneUser::userRegister($account, $pwd, $type, $nickname, $request)) !== false){
+            //Env::get('crm.domain', '')
             return JsonService::successful($msg . '成功');
-        else
+        }
+        else {
             return JsonService::fail(PhoneUser::getErrorInfo(PhoneUser::getErrorInfo($msg . '失败')));
+        }
     }
 
     /**

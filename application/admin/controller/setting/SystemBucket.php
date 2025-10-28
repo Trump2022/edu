@@ -13,7 +13,10 @@
 namespace app\admin\controller\setting;
 
 use service\JsonService as Json;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
 use think\Env;
+use think\exception\DbException;
 use think\Request;
 use think\Url;
 use app\admin\controller\AuthController;
@@ -154,9 +157,9 @@ class SystemBucket extends AuthController
 
     /**使用储存空间
      * @param int $id
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function userUse($id = 0)
     {
@@ -175,9 +178,14 @@ class SystemBucket extends AuthController
         }
     }
 
+    /**
+     * 获取CRM系统的域名
+     *
+     * @return null
+     */
     public function get_crm_domain()
     {
-        return \service\JsonService::successlayui(['crm_doamin' => Env::get('crm.domain', '')]);
+        return \service\JsonService::successlayui(['crm_domain' => Env::get('crm.domain', '')]);
     }
 
 }
