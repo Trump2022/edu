@@ -102,6 +102,13 @@ define([
           });
         },
         methods: {
+			// 获取url参数正则匹配
+			GetQueryString: function (name) {
+			  var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+			  var r = decodeURI(window.location.search).substr(1).match(reg);
+			  if (r != null) return unescape(r[2]);
+			  return null;
+			},
           // 验证手机号
           verifyPhone: function () {
             var flag = true;
@@ -196,7 +203,10 @@ define([
                     account: this.phone,
                     pwd: hex_md5(this.pwd),
                     code: this.code,
-                    type: this.state
+                    type: this.state,
+					lb_spread_uid: this.GetQueryString('lb_spread_uid') || 0,
+					channel: this.GetQueryString('channel') || '',
+					comeurl: window.location.href
                 }, function (res) {
                     helper.loadClear();
                     helper.pushMsg(res.data.msg, function () {

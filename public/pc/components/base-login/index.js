@@ -248,7 +248,10 @@ define([
                     account: this.phone,
                     pwd: md5(this.pwd),
                     code: this.code,
-                    type: this.state
+                    type: this.state,
+					lb_spread_uid: this.GetQueryString('lb_spread_uid') || 0,
+					channel: this.GetQueryString('channel') || '',
+					comeurl: window.location.href
                 }).then(function (res) {
                     vm.$message.success(res.msg);
                     vm.phone = '';

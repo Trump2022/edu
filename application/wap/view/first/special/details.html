@@ -687,7 +687,7 @@
                  style="padding:0.25rem 0.3rem 0;font-size:0.32rem;line-height:0.5rem;color:#333333;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;">
                 <!-- 加载中 -->
 				{{special.title}}
-				<span style="cursor: pointer;font-size: 14px; color: #fe651d; margin-left: 10px;" v-if="lb_spread_uid" @click="copyPromotionUrl">推广</span>
+				<span style="cursor: pointer;font-size: 14px; color: #fe651d; margin-left: 10px;text-decoration: underline;" v-if="lb_spread_uid" @click="copyPromotionUrl">推广</span>
             </div>
             <div class="swiper-int">
                 <div class="swiper-int-top">
@@ -1631,7 +1631,7 @@
 				},
 				copyPromotionUrl: function() {
 					const origin = window.location.origin || window.location.protocol  + "//" + window.location.host; 
-					navigator.clipboard.writeText(`${origin}/wap/special/details.html?id=${this.special.id}&from=promotion&lb_spread_uid=${this.lb_spread_uid}&origin_id=3809`)
+					navigator.clipboard.writeText(`${origin}/wap/special/details.html?id=${this.special.id}&from=promotion&lb_spread_uid=${this.lb_spread_uid}&channel=课程`)
 					  .then(() => layer.msg("复制成功"))
 					  .catch(err => console.error(" 复制失败:", err));
 				},
