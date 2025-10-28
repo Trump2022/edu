@@ -2698,8 +2698,6 @@
                                             opt.q.viewing_time = task.watch && task.watch.viewing_time || 0;
                                         }
                                         opt.q.id = task.id;
-                                        opt.q.channel = this.channel;
-										console.log('opt=======>', opt);
                                         window.location.assign($h.U(opt));
                                         break;
                                     case 6:
@@ -2778,6 +2776,7 @@
                                         opt.q.viewing_time = task.watch && task.watch.viewing_time || 0;
                                     }
                                     opt.q.id = task.id;
+                                    opt.q.channel = this.channel;
                                     window.location.assign($h.U(opt));
                                     break;
                                 case 6:
