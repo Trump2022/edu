@@ -803,10 +803,20 @@
 				  return cookie ? decodeURIComponent(cookie[3]) : defaultValue;
 				},
 				copyPromotionUrl: function() {
-					const origin = window.location.origin || window.location.protocol  + "//" + window.location.host; 
-					navigator.clipboard.writeText(`${origin}/web/special/details.html?id=${this.id}&from=promotion&lb_spread_uid=${this.spread_uid}&channel=课程`)
+					const origin = window.location.origin || window.location.protocol  + "//" + window.location.host;
+					 let copyUrl = `${origin}/web/special/details.html?id=${this.id}&from=promotion&lb_spread_uid=${this.spread_uid}&channel=课程`
+					navigator.clipboard.writeText(copyUrl)
 					  .then(() => vm.$message.success("复制成功"))
-					  .catch(err => console.error(" 复制失败:", err));
+					  .catch(err => this.fallbackCopy(copyUrl));
+				},
+				fallbackCopy: function(text) {
+				  const tempInput = document.createElement("textarea"); 
+				  tempInput.value  = text;
+				  document.body.appendChild(tempInput); 
+				  tempInput.select(); 
+				  document.execCommand("copy");  // 同步复制 
+				  document.body.removeChild(tempInput); 
+				  vm.$message.success("复制成功")
 				},
 				get_view_list: function() {
 					specialApi.get_view_list({
