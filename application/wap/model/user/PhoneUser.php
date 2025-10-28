@@ -106,9 +106,10 @@ class PhoneUser extends ModelBasic
      * @param $type
      * @param $nickname
      * @param $request
+     * @param string $channel
      * @return bool
      */
-    public static function userRegister($account, $pwd, $type, $nickname, $request): bool
+    public static function userRegister($account, $pwd, $type, $nickname, $request, string $channel = ''): bool
     {
         self::beginTrans();
         try {
