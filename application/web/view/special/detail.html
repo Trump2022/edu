@@ -176,7 +176,7 @@
                 <div class="container_content_message">
                     <div class="content_message_title">
 						{{ special.title }}
-						<span style="cursor: pointer;font-size: 14px; color: #fe651d; margin-left: 10px;" v-if="special.spread_uid" @click="copyPromotionUrl(special.spread_uid)">推广</span>
+						<span style="cursor: pointer;font-size: 14px; color: #fe651d; margin-left: 10px;" v-if="spread_uid" @click="copyPromotionUrl">推广</span>
 					</div>
                     <div class="content_message_dis">{{ special.abstract }}</div>
                     <div class="content_message_tap">
@@ -721,7 +721,8 @@
 				title: '',
 				viewList: [],
 				school_id: 0,
-				labels: ''
+				labels: '',
+				spread_uid: 0
             },
             watch: {
                 selectValue: {
@@ -784,6 +785,7 @@
                         }
                     }
                 }
+				this.spread_uid = parseInt(this.getCookie('weblb_spread_uid', '0'))
             },
             mounted: function () {
                 this.$nextTick(function () {
@@ -794,9 +796,15 @@
 				this.get_view_list()
             },
             methods: {
-				copyPromotionUrl: function(uid) {
+				getCookie: function(name, defaultValue = null) {
+				  const cookie = document.cookie.match( 
+				    new RegExp(`(^|;\\s*)(${name})=([^;]*)`)
+				  );
+				  return cookie ? decodeURIComponent(cookie[3]) : defaultValue;
+				},
+				copyPromotionUrl: function() {
 					const origin = window.location.origin || window.location.protocol  + "//" + window.location.host; 
-					navigator.clipboard.writeText(`${origin}/web/special/details.html?id=${this.id}&from=promotion&lb_spread_uid=${uid}&origin_id=3809`)
+					navigator.clipboard.writeText(`${origin}/web/special/details.html?id=${this.id}&from=promotion&lb_spread_uid=${this.spread_uid}&origin_id=3809`)
 					  .then(() => vm.$message.success("复制成功"))
 					  .catch(err => console.error(" 复制失败:", err));
 				},
