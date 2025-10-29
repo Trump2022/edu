@@ -805,7 +805,7 @@
 				},
 				copyPromotionUrl: function() {
 					const origin = window.location.origin || window.location.protocol  + "//" + window.location.host;
-					 let copyUrl = `${origin}/web/special/details.html?id=${this.id}&from=promotion&lb_spread_uid=${this.spread_uid}&channel=课程`
+					 let copyUrl = `${origin}/web/special/details.html?id=${this.id}&from=promotion&lb_spread_uid=${this.spread_uid}&channel=${encodeURI('课程')}`
 					navigator.clipboard.writeText(copyUrl)
 					  .then(() => vm.$message.success("复制成功"))
 					  .catch(err => this.fallbackCopy(copyUrl));
