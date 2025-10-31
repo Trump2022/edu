@@ -542,7 +542,7 @@
                     </div>
                 </div>
                 <!-- 推荐课程 -->
-                <div v-if="recommendedCourses.length" class="propaganda_recommend">
+                <div v-if="recommendedCourses.length && !spread_uid" class="propaganda_recommend">
                     <div class="propaganda_recommend_more">
                         <div class="propaganda_recommend_more_title">推荐课程</div>
                         <div class="propaganda_recommend_more_icon" @click="goSpecialCate">更多<i class="el-icon-arrow-right"></i></div>
