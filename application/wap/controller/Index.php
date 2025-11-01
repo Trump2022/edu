@@ -87,6 +87,17 @@ class Index extends AuthController
      */
     public function index()
     {
+        $arr = explode('/', $this->request->path());
+        if (count($arr) > 3) {
+            $pathUrl = $arr[0] . '/' . $arr[1] . '/' . $arr[2];
+        } else {
+            $pathUrl = $this->request->path();
+        }
+        if ($pathUrl == 'wap/index/index') {
+            $url = Cookie::get('lb_spread_url');
+            $this->redirect($url);
+        }
+
         $keep_on_record = SystemConfigService::get('yd_keep_on_record');//网站备案信息
         $live_one_id = Session::get('live_one_id');
         $is_show_or_hide = SystemConfigService::get('is_show_or_hide');
