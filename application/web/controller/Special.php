@@ -176,6 +176,13 @@ class Special extends AuthController
             'liveInfo' => json_encode($liveInfo),
             'special' => json_encode($special)
         ]);
+
+        $lb_spread_uid = input('lb_spread_uid', 0, 'intval');
+        if ($lb_spread_uid) {
+            $url = request()->url(true);   // 输出：https://example.com/wap/user/detail?id=5&page=2  ← 带完整域名
+            Cookie::set('lb_spread_url', $url);
+        }
+
         return $this->fetch('detail');
     }
 

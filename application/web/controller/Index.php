@@ -22,6 +22,7 @@ use service\JsonService;
 use service\SystemConfigService;
 use service\UploadService as Upload;
 use app\web\model\recommend\WebRecommendRelation;
+use think\Cookie;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\ModelNotFoundException;
 use think\Env;
@@ -59,6 +60,16 @@ class Index extends AuthController
      */
     public function index()
     {
+        $arr = explode('/', $this->request->path());
+        if (count($arr) > 3) {
+            $pathUrl = $arr[0] . '/' . $arr[1] . '/' . $arr[2];
+        } else {
+            $pathUrl = $this->request->path();
+        }
+        if ($pathUrl == 'web/index/index' || $pathUrl == '/') {
+            $url = Cookie::get('lb_spread_url');
+            $this->redirect($url);
+        }
         $this->assign([
             'title' => SystemConfigService::get('site_name')
         ]);

@@ -231,7 +231,6 @@ class Special extends AuthController
         $this->assign('BarrageShowTime', SystemConfigService::get('barrage_show_time'));
         $this->assign('barrage_index', Cookie::get('barrage_index'));
 
-
         $lb_spread_uid = input('lb_spread_uid', 0, 'intval');
         if ($lb_spread_uid) {
             $url = request()->url(true);   // 输出：https://example.com/wap/user/detail?id=5&page=2  ← 带完整域名
