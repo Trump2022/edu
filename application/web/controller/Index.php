@@ -68,7 +68,9 @@ class Index extends AuthController
         }
         if ($pathUrl == 'web/index/index' || $pathUrl == '/') {
             $url = Cookie::get('lb_spread_url');
-            $this->redirect($url);
+            if ($url) {
+                $this->redirect($url);
+            }
         }
         $this->assign([
             'title' => SystemConfigService::get('site_name')

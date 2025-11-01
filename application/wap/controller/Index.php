@@ -95,7 +95,9 @@ class Index extends AuthController
         }
         if ($pathUrl == 'wap/index/index' || $pathUrl == '/') {
             $url = Cookie::get('lb_spread_url');
-            $this->redirect($url);
+            if ($url) {
+                $this->redirect($url);
+            }
         }
 
         $keep_on_record = SystemConfigService::get('yd_keep_on_record');//网站备案信息
