@@ -93,8 +93,7 @@ class Index extends AuthController
         } else {
             $pathUrl = $this->request->path();
         }
-        var_dump($pathUrl);exit;
-        if ($pathUrl == 'wap/index/index') {
+        if ($pathUrl == 'wap/index/index' || $pathUrl == '/') {
             $url = Cookie::get('lb_spread_url');
             $this->redirect($url);
         }
