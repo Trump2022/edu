@@ -288,7 +288,8 @@ class Login extends WapBasic
         $msg = $type == 1 || $type == 3 ? '注册' : '找回密码';
         if ((PhoneUser::userRegister($account, $pwd, $type, $nickname,$request, $channel)) !== false)
         {
-            if ($lb_spread_uid && $channel) {
+            if ($lb_spread_uid > 0 && $channel == '课程')
+            {
                 // ============================
                 // ✅ 注册成功后，调用 CRM 接口
                 // ============================
@@ -297,9 +298,9 @@ class Login extends WapBasic
 
                 $crmPayload = [
                     'mobile'     => $account,
-                    'channel'    => $channel ?: '课程',
+                    'channel'    => $channel,
                     'come_url'   => $comeurl ?: '',
-                    'follow_uid' => $lb_spread_uid ?: 0,
+                    'follow_uid' => $lb_spread_uid,
                 ];
 
                 try {
