@@ -101,12 +101,13 @@ class PhoneUser extends ModelBasic
      * @param $account
      * @param $pwd
      * @param $type
+     * @param $identity_type
      * @param $nickname
      * @param $request
      * @param string $channel
      * @return bool
      */
-    public static function userRegister($account, $pwd, $type, $nickname, $request, string $channel = ''): bool
+    public static function userRegister($account, $pwd, $type, $identity_type, $nickname, $request, string $channel = ''): bool
     {
         self::beginTrans();
         try {
@@ -142,12 +143,14 @@ class PhoneUser extends ModelBasic
                         'phone' => $account,
                         'channel_source' => $channel,
                         'is_h5user' => 2,
-                        'is_crm_user' => $type == 3 ? 1 : 0,
+                        'identity_type' => $identity_type,
                     ]);
                 } else {
                     if ($type == 3) {
                         //修改密码和昵称
+
                         //user表
+                        $userinfo['identity_type'] = $identity_type;
                         $userinfo['pwd'] = $pwd;
                         if ($nickname != $userinfo['nickname'] || ! $userinfo['nickname']) {
                             $userinfo['nickname'] = $nickname;
@@ -161,9 +164,7 @@ class PhoneUser extends ModelBasic
                         if ($nickname != $user['nickname'] || ! $user['nickname']) {
                             $upData['nickname'] = $nickname;
                         }
-                        if ($upData) {
-                            self::where('phone', $account)->update($upData);
-                        }
+                        self::where('phone', $account)->update($upData);
 
                         self::commitTrans();
                         return true;
@@ -174,18 +175,29 @@ class PhoneUser extends ModelBasic
                 }
                 $user = self::where('phone', $account)->find();
                 if ($user) {
-                    return self::setErrorInfo('账号已被使用', true);
+                    //phone_user表
+                    $upData = [];
+                    $upData['pwd'] = $pwd;
+                    if ($nickname != $user['nickname'] || ! $user['nickname']) {
+                        $upData['nickname'] = $nickname;
+                    }
+                    self::where('phone', $account)->update($upData);
+
+                    // return self::setErrorInfo('账号已被使用', true);
+                    $user = self::where('phone', $account)->find();
+                } else {
+                    $user = self::set([
+                        'phone' => $account,
+                        'avatar' => '/system/images/user_log.jpg',
+                        'nickname' => $nickname,
+                        'uid' => $userinfo['uid'],
+                        'add_ip' => $request->ip(),
+                        'add_time' => time(),
+                        'pwd' => $pwd,
+                    ]);
                 }
-                $user = self::set([
-                    'phone' => $account,
-                    'avatar' => '/system/images/user_log.jpg',
-                    'nickname' => $nickname,
-                    'uid' => $userinfo['uid'],
-                    'add_ip' => $request->ip(),
-                    'add_time' => time(),
-                    'pwd' => $pwd,
-                ]);
-                if (!$user) return self::setErrorInfo('手机用户信息写入失败', true);
+
+                if ( ! $user) return self::setErrorInfo('手机用户信息写入失败', true);
                 self::commitTrans();
                 return true;
             }

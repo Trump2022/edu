@@ -36,6 +36,11 @@ use think\Url;
  */
 class Index extends AuthController
 {
+    public function _initialize(){
+        parent::_initialize();
+
+
+    }
 
     /**
      * 白名单

@@ -209,11 +209,12 @@ class Login extends WapBasic
      */
     public function register(Request $request)
     {
-        list($account, $pwd, $code, $type, $nickname, $lb_spread_uid, $channel, $comeurl) = UtilService::postMore([
+        list($account, $pwd, $code, $type, $identity_type, $nickname, $lb_spread_uid, $channel, $comeurl) = UtilService::postMore([
             ['account', ''],
             ['pwd', ''],
             ['code', ''],
-            ['type', 1],//1-常规注册,2-找回密码,3-来自领播用户的注册
+            ['type', 1, 'intval'],//1-常规注册,2-找回密码,3-来自领播用户的注册
+            ['identity_type', 0, 'intval'],//身份类型:0-普通用户,1-员工,2-学员
             ['nickname', ''],
             ['lb_spread_uid', 0, 'intval'],
             ['channel', '', 'trim'],
@@ -227,7 +228,7 @@ class Login extends WapBasic
             SmsCode::setCodeInvalid($account, $code);
         }
         $msg = $type == 1 || $type == 3 ? '注册' : '找回密码';
-        if ((PhoneUser::userRegister($account, $pwd, $type, $nickname,$request, $channel)) !== false)
+        if ((PhoneUser::userRegister($account, $pwd, $type, $identity_type, $nickname,$request, $channel)) !== false)
         {
             if ($lb_spread_uid > 0 && $channel == '课程')
             {
