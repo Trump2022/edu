@@ -75,6 +75,11 @@ class Index extends AuthController
             $url = Cookie::get('lb_spread_url');
             if ($url) {
                 $this->redirect($url);
+            }  else {
+                $userInfo = $this->userInfo;
+                echo '<pre>';
+                var_dump($userInfo);
+                exit;
             }
         }
         $this->assign([
