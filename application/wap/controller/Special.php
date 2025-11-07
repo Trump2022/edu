@@ -216,6 +216,9 @@ class Special extends AuthController
         $site_url = SystemConfigService::get('site_url') . Url::build('special/details') . '?id=' . $id . '&spread_uid=' . $this->uid;
         $cookie = Config::get('cookie', '');
 
+        echo '<pr>';
+        var_dump($special['special']['second_subject']->toArray());exit;
+
         $this->assign($special);
         $this->assign('pinkId', $pinkId);
         $this->assign('spread_uid', $spread_uid);
