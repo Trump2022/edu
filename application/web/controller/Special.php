@@ -182,7 +182,6 @@ class Special extends AuthController
             'liveInfo' => json_encode($liveInfo),
             'special' => json_encode($special)
         ]);
-        var_dump($special['recommend'], $special['web_recommend']);exit;
 
         $lb_spread_uid = input('lb_spread_uid', 0, 'intval');
         if ($lb_spread_uid) {
