@@ -42,6 +42,9 @@ use service\SystemConfigService;
 use service\UtilService;
 use think\cache\driver\Redis;
 use think\Cookie;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
+use think\exception\DbException;
 use think\exception\HttpException;
 use think\response\Json;
 use think\Session;
@@ -142,9 +145,9 @@ class Special extends AuthController
     /**获取专题价格
      * @param $id
      * @return void
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function getSpecialPrice($id = 0)
     {
@@ -244,9 +247,9 @@ class Special extends AuthController
     /**获取课程可以使用时间
      * @param $id
      * @throws \think\Exception
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function special_validity($id)
     {
@@ -277,9 +280,9 @@ class Special extends AuthController
      * @param int $gift
      * @param int $link_pay
      * @return mixed
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function single_details($id = 0, $pinkId = 0, $gift_uid = 0, $gift_order_id = null, $link_pay_uid = 0, $partake = 0, $gift = 0, $link_pay = 0, $spread_uid = 0)
     {
@@ -351,9 +354,9 @@ class Special extends AuthController
     /**获取图文轻专题的内容
      * @param int $id
      * @throws \think\Exception
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function single_img_content($id = 0)
     {
@@ -393,9 +396,9 @@ class Special extends AuthController
     /**获取音视频轻专题的内容
      * @param int $id
      * @throws \think\Exception
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function single_con_content($id = 0)
     {
@@ -461,9 +464,9 @@ class Special extends AuthController
     /**获取浏览人
      * @param $id
      * @throws \think\Exception
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function learningRecords($id)
     {
@@ -512,9 +515,9 @@ class Special extends AuthController
     /**记录专题浏览人
      * @param $id
      * @throws \think\Exception
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function addLearningRecords($id)
     {
@@ -533,9 +536,9 @@ class Special extends AuthController
 
     /**用户专题评价
      * @param int $special_id
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function user_comment_special($special_id = 0)
     {
@@ -569,9 +572,9 @@ class Special extends AuthController
      * @param int $page
      * @param int $limit
      * @param string $filter
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function special_reply_list($special_id = '', $page = 1, $limit = 8, $filter = 'all')
     {
@@ -835,9 +838,9 @@ class Special extends AuthController
     }
 
     /**支付接口
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function create_order()
     {
@@ -1002,9 +1005,9 @@ class Special extends AuthController
      * 创建专题支付订单
      * @param int $special_id 专题id
      * @param int $pay_type 购买类型 1=礼物,2=普通购买,3=开团或者拼团
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function create_special_order($special_id, $pay_type_num, $payType, $pinkId, $total_num, $link_pay_uid, $from = 'weixin')
     {
@@ -1091,9 +1094,9 @@ class Special extends AuthController
     /**会员订单创建
      * @param $id
      * @param $payType
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function create_member_order($id, $payType, $from = 'weixin')
     {
@@ -1224,9 +1227,9 @@ class Special extends AuthController
     /**查看领取记录
      * @param $orderId
      * @return mixed
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function gift_receive($orderId = null)
     {
@@ -1364,9 +1367,9 @@ class Special extends AuthController
     /**拼团列表
      * @param $special_id
      * @return void
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function groupLists($special_id = 0)
     {
@@ -1424,9 +1427,9 @@ class Special extends AuthController
 
     /**
      * 获取课程分类
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function get_grade_cate()
     {
@@ -1494,9 +1497,9 @@ class Special extends AuthController
      * @param $id
      * @return mixed|void
      * @throws \think\Exception
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function task_info($id = 0, $specialId = 0)
     {
@@ -1528,9 +1531,9 @@ class Special extends AuthController
 
     /**
      * @throws \think\Exception
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      * special_id 专题ID task_id素材ID
      */
     public function getTaskInfo()
@@ -1968,9 +1971,9 @@ class Special extends AuthController
 
     /**相关课程
      * @param int $source_id
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function relatedCourses($source_id = 0)
     {
