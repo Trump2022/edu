@@ -40,6 +40,17 @@ class SpecialSubject extends ModelBasic
         ]);
     }
 
+    /**
+     * @return HasMany
+     * @descr: I am on my way to future,where you are there.
+     * @date : 2025/11/07 15:54
+     * @author: Trump
+     */
+    public function children(): HasMany
+    {
+        return $this->hasMany('SpecialSubject', 'grade_id', 'id')->where(['is_del' => 0, 'is_show' => 1])->order('sort DESC,id DESC');
+    }
+
     /**获取全部分类
      * @param int $type
      * @return array

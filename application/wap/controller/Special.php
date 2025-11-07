@@ -12,8 +12,6 @@
 namespace app\wap\controller;
 
 use app\admin\model\special\SpecialBarrage;
-use app\admin\model\system\RecommendRelation;
-use app\admin\model\system\WebRecommendRelation;
 use app\wap\model\activity\EventRegistration;
 use app\wap\model\activity\EventSignUp;
 use app\wap\model\activity\EventPrice;
@@ -1432,7 +1430,7 @@ class Special extends AuthController
      */
     public function get_grade_cate()
     {
-        $cateogry = SpecialSubject::with('children')->where(['is_show' => 1, 'is_del' => 0])->order('sort desc,id desc')->where('grade_id', 0)->select();
+        $cateogry = SpecialSubject::with(['children'])->where(['is_show' => 1, 'is_del' => 0])->order('sort desc,id desc')->where('grade_id', 0)->select();
         return JsonService::successful($cateogry->toArray());
     }
 

@@ -571,7 +571,7 @@ class Special extends AuthController
      */
     public function get_grade_cate()
     {
-        $cateogry = SpecialSubject::with('children')->where(['is_show' => 1, 'is_del' => 0])->order('sort desc,id desc')->where('grade_id', 0)->select();
+        $cateogry = SpecialSubject::with(['children'])->where(['is_show' => 1, 'is_del' => 0])->order('sort desc,id desc')->where('grade_id', 0)->select();
         $cateogry = count($cateogry) > 0 ? $cateogry->toArray() : [];
         $is_member = isset($this->userInfo['level']) ? $this->userInfo['level'] : 0;
         foreach ($cateogry as $key => &$item) {

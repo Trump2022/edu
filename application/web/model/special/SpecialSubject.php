@@ -12,6 +12,7 @@
 namespace app\web\model\special;
 
 use basic\ModelBasic;
+use think\model\relation\HasMany;
 use think\model\relation\HasOne;
 use traits\ModelTrait;
 
@@ -36,7 +37,13 @@ class SpecialSubject extends ModelBasic
         ]);
     }
 
-    public function children()
+    /**
+     * @return HasMany
+     * @descr: I am on my way to future,where you are there.
+     * @date : 2025/11/07 15:53
+     * @author: Trump
+     */
+    public function children(): HasMany
     {
         return $this->hasMany('SpecialSubject', 'grade_id', 'id')->where(['is_del' => 0, 'is_show' => 1])->order('sort DESC,id DESC');
     }
