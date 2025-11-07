@@ -59,8 +59,7 @@ class Special extends ModelBasic
      */
     public function secondSubject(): HasOne
     {
-        return $this->hasOne(SpecialSubject::class, 'id', 'subject_id')->field('id,name second_name,grade_id')
-            ->with(['firstSubject']);
+        return $this->hasOne(SpecialSubject::class, 'id', 'subject_id')->field('id,name second_name,grade_id')->with(['firstSubject']);
     }
 
     public static function getAddTimeAttr($value)
@@ -103,7 +102,7 @@ class Special extends ModelBasic
      * */
     public static function getOneSpecial($uid, $id)
     {
-        $special = self::PreWhere()->where('is_light', 0)->find($id);
+        $special = self::PreWhere()->where('is_light', 0)->with(['secondSubject'])->find($id);
         if (!$special) return self::setErrorInfo('您要查看的专题不存在!');
         if ($special->is_show == 0) return self::setErrorInfo('您要查看的专题已下架!');
         $title = $special->title;

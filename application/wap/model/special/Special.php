@@ -17,6 +17,7 @@ use app\wap\model\store\StorePink;
 use app\wap\model\user\User;
 use basic\ModelBasic;
 use service\SystemConfigService;
+use think\model\relation\HasOne;
 use think\Url;
 use traits\ModelTrait;
 use think\Db;
@@ -42,6 +43,17 @@ class Special extends ModelBasic
     public function singleProfile()
     {
         return $this->hasOne('SpecialContent', 'special_id', 'id')->field('link,videoId,is_try,try_time,try_content');
+    }
+
+    /**
+     * @return HasOne
+     * @descr: I am on my way to future,where you are there.
+     * @date : 2025/11/07 14:40
+     * @author: Trump
+     */
+    public function secondSubject(): HasOne
+    {
+        return $this->hasOne(\app\web\model\special\SpecialSubject::class, 'id', 'subject_id')->field('id,name second_name,grade_id')->with(['firstSubject']);
     }
 
     //动态赋值
@@ -130,7 +142,7 @@ class Special extends ModelBasic
      * */
     public static function getOneSpecial($uid, $id)
     {
-        $special = self::PreWhere()->where('is_light', 0)->find($id);
+        $special = self::PreWhere()->where('is_light', 0)->with(['secondSubject'])->find($id);
         if (!$special) return self::setErrorInfo('您要查看的专题不存在!');
         if ($special->is_show == 0) return self::setErrorInfo('您要查看的专题已下架!');
         $title = $special->title;

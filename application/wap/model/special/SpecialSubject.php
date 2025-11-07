@@ -16,6 +16,7 @@ use think\db\exception\DataNotFoundException;
 use think\db\exception\ModelNotFoundException;
 use think\exception\DbException;
 use think\model\relation\HasMany;
+use think\model\relation\HasOne;
 use traits\ModelTrait;
 
 /**专题分类
@@ -26,12 +27,17 @@ class SpecialSubject extends ModelBasic
 {
     use ModelTrait;
 
-    /**获取二级分类
-     * @return HasMany
+    /**
+     * @return HasOne
+     * @descr: I am on my way to future,where you are there.
+     * @date : 2025/11/07 14:37
+     * @author: Trump
      */
-    public function children()
+    public function firstSubject(): HasOne
     {
-        return $this->hasMany('SpecialSubject', 'grade_id', 'id')->where(['is_del' => 0, 'is_show' => 1])->order('sort DESC,id DESC');
+        return $this->hasOne('SpecialSubject', 'id', 'grade_id')->field('id,name,grade_id')->bind([
+            'grade_name' => 'name'
+        ]);
     }
 
     /**获取全部分类
