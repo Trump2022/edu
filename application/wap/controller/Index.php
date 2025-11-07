@@ -95,12 +95,12 @@ class Index extends AuthController
         }
         if ($pathUrl == 'wap/index/index' || $pathUrl == '/') {
             $url = Cookie::get('lb_spread_url');
-            if ($url) {
-                $this->redirect($url);
-            }  else {
-                $userInfo = $this->userInfo;
-                if ( ! $userInfo || $userInfo['identity_type'] != 1 ) {
-                    return $this->failed('请求页面不存在!', $url);
+            $userInfo = $this->userInfo;
+            if ( ! $userInfo || $userInfo['identity_type'] != 1 ) {
+                if ($url) {
+                    $this->redirect($url);
+                }  else {
+                    return $this->failed('请求页面不存在!');
                 }
             }
         }
