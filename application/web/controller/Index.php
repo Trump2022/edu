@@ -39,7 +39,7 @@ class Index extends AuthController
     public function _initialize(){
         parent::_initialize();
 
-
+        $action = $this->request->action();
     }
 
     /**
@@ -77,9 +77,9 @@ class Index extends AuthController
                 $this->redirect($url);
             }  else {
                 $userInfo = $this->userInfo;
-                echo '<pre>';
-                var_dump($userInfo);
-                exit;
+                if ( ! $userInfo || $userInfo['identity_type'] != 1 ) {
+                    return $this->failed('请求页面不存在!', $url);
+                }
             }
         }
         $this->assign([
