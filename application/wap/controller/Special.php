@@ -217,6 +217,7 @@ class Special extends AuthController
         $cookie = Config::get('cookie', '');
 
         echo '<pr>';
+        $special = json_decode($special, true);
         var_dump($special['special']['second_subject']->toArray());exit;
 
         $this->assign($special);
