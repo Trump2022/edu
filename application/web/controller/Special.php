@@ -163,7 +163,7 @@ class Special extends AuthController
         $mobile_url = SystemConfigService::get('site_url') . Url::build('wap/login/view') . '?account=' . $account.'&pwd='.$pwd.'&url='.urlencode('/wap/special/details?id='.$id);
         $cookie = Config::get('cookie', '');
 
-        var_dump($special['second_subject']);exit;
+        var_dump($special);exit;
         $this->assign([
             'id' => $id,
             'title' => $special['title'],
