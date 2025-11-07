@@ -218,7 +218,7 @@ class Special extends AuthController
 
         echo '<pr>';
         $special = json_decode($special['special'], true);
-        var_dump($special['second_subject']->toArray());exit;
+        var_dump($special['second_subject']);exit;
 
         $this->assign($special);
         $this->assign('pinkId', $pinkId);
