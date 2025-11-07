@@ -275,7 +275,7 @@ class Index extends AuthController
 
             return $this->fetch();
         }
-        $school_id = input('school_id', '', 'intval');
+        $school_id = input('school_id', 0, 'intval');
         $labels = input('labels', '', 'trim');
         $labels = parse_comma_input($labels);
         $is_member = $this->userInfo['level'] ?? 0;
