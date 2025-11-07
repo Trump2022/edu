@@ -33,7 +33,7 @@
                 <el-breadcrumb-item v-if="from != 'student'"><a :href="$router.home">首页</a></el-breadcrumb-item>
                 <!-- <el-breadcrumb-item><a :href="$router.special_cate">{{title}}</a></el-breadcrumb-item> -->
 				<template v-if="from == 'student'">
-					<el-breadcrumb-item v-if="title"><a href="/web/index/student_my_course.html + '?from=' + urlFrom + '&labels=' + labels">{{title}}</a></el-breadcrumb-item>
+					<el-breadcrumb-item v-if="title"><a :href="/web/index/student_my_course.html + '?from=' + urlFrom + '&labels=' + labels">{{title}}</a></el-breadcrumb-item>
 				</template>
 				<template v-else>
 					<el-breadcrumb-item v-if="title"><a :href="$router.more_list + '?type=' + type + '&recommend_id=' + recommend_id + '&name=' + title">{{title}}</a></el-breadcrumb-item>
