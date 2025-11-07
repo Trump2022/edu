@@ -33,7 +33,7 @@
                 <el-breadcrumb-item v-if="from != 'student'"><a :href="$router.home">首页</a></el-breadcrumb-item>
                 <!-- <el-breadcrumb-item><a :href="$router.special_cate">{{title}}</a></el-breadcrumb-item> -->
 				<template v-if="from == 'student'">
-					<el-breadcrumb-item v-if="title"><a href="/web/index/student_my_course.html">{{title}}</a></el-breadcrumb-item>
+					<el-breadcrumb-item v-if="title"><a href="/web/index/student_my_course.html + '?from=' + urlFrom + '&labels=' + labels">{{title}}</a></el-breadcrumb-item>
 				</template>
 				<template v-else>
 					<el-breadcrumb-item v-if="title"><a :href="$router.more_list + '?type=' + type + '&recommend_id=' + recommend_id + '&name=' + title">{{title}}</a></el-breadcrumb-item>
@@ -255,6 +255,7 @@
 				type: 0,
 				recommend_id: 0,
 				from: '',
+				labels: '',
                 // ↓↓↓ 新增：笔记功能数据
                 noteContent: '', // 笔记输入内容
                 noteList: [], // 笔记列表
@@ -276,6 +277,7 @@
                 this.type = util.getParmas('type') || '';
                 this.recommend_id = util.getParmas('recommend_id') || '';
                 this.from = util.getParmas('from') || '';
+                this.labels = util.getParmas('labels') || '';
                 // ↓↓↓ 新增：获取from和channel参数
                 this.urlFrom = util.getParmas('from') || '';
                 this.urlChannel = util.getParmas('channel') || '';

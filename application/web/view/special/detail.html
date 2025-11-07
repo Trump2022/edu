@@ -1070,7 +1070,7 @@
                             }
                             return;
                         }
-                        window.location.assign(vm.$router.task_info + '?specialId=' + vm.id + '&task_id=' + vm.courseList[0].id + '&special_title=' + vm.special.title + '&name=' + vm.title + '&recommend_id=' + vm.recommend_id + '&from=' + vm.from + '&channel=' + vm.channel);
+                        window.location.assign(vm.$router.task_info + '?specialId=' + vm.id + '&task_id=' + vm.courseList[0].id + '&special_title=' + vm.special.title + '&name=' + vm.title + '&recommend_id=' + vm.recommend_id + '&from=' + vm.from + '&channel=' + vm.channel + '&labels=' + vm.labels);
                     }).catch(function (err) {
                         store.setLoginAction(true);
                     });
@@ -1124,9 +1124,9 @@
                     homeApi.user_login().then(function () {
                         if (!vm.isPay && (vm.special.member_pay_type || !vm.isMember) && task.is_free && task.is_try) {
                             if (task.is_light) {
-                                window.location.assign(vm.$router.task_info + '?task_id=0' + '&specialId=' + task.id + '&special_title=' + vm.special.title + '&viewing_time=' + (task.watch && task.watch.viewing_time || 0) + '&from=' + vm.from + '&channel=' + vm.channel);
+                                window.location.assign(vm.$router.task_info + '?task_id=0' + '&specialId=' + task.id + '&title=' + vm.special.title + '&viewing_time=' + (task.watch && task.watch.viewing_time || 0) + '&from=' + vm.from + '&channel=' + vm.channel);
                             } else {
-                                window.location.assign(vm.$router.task_info + '?task_id=' + task.id + '&specialId=' + task.special_id + '&special_title=' + vm.special.title + '&viewing_time=' + (task.watch && task.watch.viewing_time || 0) + '&from=' + vm.from + '&channel=' + vm.channel);
+                                window.location.assign(vm.$router.task_info + '?task_id=' + task.id + '&specialId=' + task.special_id + '&title=' + vm.special.title + '&viewing_time=' + (task.watch && task.watch.viewing_time || 0) + '&from=' + vm.from + '&channel=' + vm.channel);
                             }
                         } else {
                             if (task.pay_status && !vm.isPay) {
