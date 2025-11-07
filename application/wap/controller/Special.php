@@ -1661,10 +1661,22 @@ class Special extends AuthController
             ['special_id', 0]
         ], $this->request, true);
         $res = SpecialWatch::viewList($special_id);
+
+        $identity_type = 0;
+        $userInfo = $this->userInfo;
+        if ($userInfo) {
+            $identity_type = $userInfo['identity_type'];
+        }
+
         $time = time();
         foreach ($res as &$item) {
             $item['add_time'] = friendlyDate($item['add_time'],'mohu',$time);
             $item['task_title'] = $item['task_title'] ?? '';
+
+            //当前用户不是员工
+            if ($identity_type != 1) {
+                $item['nickname'] = substr_replace($item['phone'],'*********',1,9);
+            }
         }
         return JsonService::successful($res);
     }

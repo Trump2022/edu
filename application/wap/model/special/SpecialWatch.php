@@ -85,8 +85,10 @@ class SpecialWatch extends ModelBasic
      */
     public function user(): HasOne
     {
-        return $this->hasOne(User::class, 'uid', 'uid')->field('uid, nickname')->bind([
-            'nickname' => 'nickname'
+        return $this->hasOne(User::class, 'uid', 'uid')->field('uid, nickname, identity_type, phone')->bind([
+            'nickname' => 'nickname',
+            'identity_type' => 'identity_type',
+            'phone' => 'phone'
         ]);
     }
 
