@@ -165,6 +165,7 @@ class Special extends AuthController
         $mobile_url = SystemConfigService::get('site_url') . Url::build('wap/login/view') . '?account=' . $account.'&pwd='.$pwd.'&url='.urlencode('/wap/special/details?id='.$id);
         $cookie = Config::get('cookie', '');
 
+        var_dump($special);exit;
         $special['recommend'] = RecommendRelation::where('a.link_id', $special['id'])->where('a.type', 'in', [0, 2, 8])->alias('a')
             ->join('__RECOMMEND__ r', 'a.recommend_id=r.id')->column('r.title');
         $special['web_recommend'] = WebRecommendRelation::where('a.link_id', $special['id'])->where('a.type', 'in', [0, 1])->alias('a')
