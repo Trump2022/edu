@@ -202,6 +202,11 @@ class Index extends AuthController
     {
         header('Access-Control-Allow-Origin: *');
         if ( ! request()->isAjax()) {
+            $userInfo = $this->userInfo;
+            if ( ! $userInfo || $userInfo['identity_type'] != 2 ) {
+                return $this->failed('请求页面不存在!');
+            }
+
             return $this->fetch();
         }
         $school_id = input('school_id', '', 'intval');
