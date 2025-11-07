@@ -45,6 +45,8 @@ use think\Url;
 use think\Db;
 use think\Request;
 use think\Config;
+use app\admin\model\system\RecommendRelation;
+use app\admin\model\system\WebRecommendRelation;
 
 /**专题控制器
  * Class Special
@@ -162,6 +164,11 @@ class Special extends AuthController
         // var_dump($account, $pwd, 111111);exit;
         $mobile_url = SystemConfigService::get('site_url') . Url::build('wap/login/view') . '?account=' . $account.'&pwd='.$pwd.'&url='.urlencode('/wap/special/details?id='.$id);
         $cookie = Config::get('cookie', '');
+
+        $special['recommend'] = RecommendRelation::where('a.link_id', $special['id'])->where('a.type', 'in', [0, 2, 8])->alias('a')
+            ->join('__RECOMMEND__ r', 'a.recommend_id=r.id')->column('r.title');
+        $special['web_recommend'] = WebRecommendRelation::where('a.link_id', $special['id'])->where('a.type', 'in', [0, 1])->alias('a')
+            ->join('__WEB_RECOMMEND__ r', 'a.recommend_id=r.id')->column('r.title');
         $this->assign([
             'id' => $id,
             'title' => $special['title'],
@@ -176,6 +183,7 @@ class Special extends AuthController
             'liveInfo' => json_encode($liveInfo),
             'special' => json_encode($special)
         ]);
+        var_dump($special['recommend'], $special['web_recommend']);exit;
 
         $lb_spread_uid = input('lb_spread_uid', 0, 'intval');
         if ($lb_spread_uid) {
