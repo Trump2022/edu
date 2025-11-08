@@ -228,7 +228,6 @@ class Special extends AuthController
 
         $spread_total = 0;
         $lb_spread_uid = Cookie::get('lb_spread_uid');
-        var_dump($lb_spread_uid, $id);exit;
         if ($lb_spread_uid) {
             $spread_total = Db::name('spread_url_clicks')
                 ->where('special_id', $id)
