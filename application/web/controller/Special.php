@@ -226,10 +226,14 @@ class Special extends AuthController
             ->where('special_id', $id)
             ->count();
 
-        $spread_total = Db::name('spread_url_clicks')
-            ->where('special_id', $id)
-            ->where('lb_spread_uid', $lb_spread_uid)
-            ->count();
+        $spread_total = 0;
+        $lb_spread_uid = Cookie::get('lb_spread_uid');
+        if ($lb_spread_uid) {
+            $spread_total = Db::name('spread_url_clicks')
+                ->where('special_id', $id)
+                ->where('lb_spread_uid', $lb_spread_uid)
+                ->count();
+        }
 
         // 分配到模板变量
         $this->assign(compact('special_total', 'spread_total'));
