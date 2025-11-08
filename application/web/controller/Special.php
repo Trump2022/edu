@@ -189,7 +189,7 @@ class Special extends AuthController
             try {
                 $visitor_id = Cookie::get('visitor_id');
                 if (!$visitor_id) {
-                    $visitor_id = uuid_create(UUID_TYPE_RANDOM); // 生成访客ID
+                    $visitor_id = $this->getUuid(); // 生成访客ID
                     Cookie::set('visitor_id', $visitor_id, 86400 * 365); // 保存一年
                 }
 
@@ -227,6 +227,24 @@ class Special extends AuthController
         $this->assign(compact('special_total', 'spread_total'));
 
         return $this->fetch('detail');
+    }
+
+    /**
+     * 生成UUID（兼容无uuid扩展环境）
+     * @return string
+     */
+    private function getUuid()
+    {
+        // 优先使用系统自带函数
+        if (function_exists('uuid_create')) {
+            return uuid_create(UUID_TYPE_RANDOM);
+        }
+
+        // 否则用随机算法生成
+        $data = random_bytes(16);
+        $data[6] = chr((ord($data[6]) & 0x0f) | 0x40); // 版本号 4
+        $data[8] = chr((ord($data[8]) & 0x3f) | 0x80); // 变体标志 10
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
     }
 
     /**轻专题获取播放记录
