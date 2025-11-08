@@ -262,7 +262,7 @@ class Special extends AuthController
                 // 写入数据库（忽略重复）
                 try {
                     Db::execute("
-                        INSERT IGNORE INTO __SPREAD_URL_CLICKS__ (url, special_id, lb_spread_uid, visitor_id, ip, user_agent, created_at)
+                        INSERT IGNORE INTO eb_spread_url_clicks (url, special_id, lb_spread_uid, visitor_id, ip, user_agent, created_at)
                         VALUES (:url, :special_id, :lb_spread_uid, :visitor_id, :ip, :user_agent, NOW())
                     ", $data);
                 } catch (\Exception $e) {
