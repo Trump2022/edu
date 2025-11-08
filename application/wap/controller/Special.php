@@ -260,8 +260,14 @@ class Special extends AuthController
                 ];
 
                 // 写入数据库（忽略重复）
-                Db::name('eb_spread_url_clicks')
-                    ->insertOrIgnore($data);
+                try {
+                    Db::execute("
+                        INSERT IGNORE INTO __SPREAD_URL_CLICKS__ (url, special_id, lb_spread_uid, visitor_id, ip, user_agent, created_at)
+                        VALUES (:url, :special_id, :lb_spread_uid, :visitor_id, :ip, :user_agent, NOW())
+                    ", $data);
+                } catch (\Exception $e) {
+                    trace('推广点击记录失败：' . $e->getMessage(), 'error');
+                }
 
             } catch (\Throwable $e) {
                 // 可以选择性记录日志，不影响主流程
