@@ -177,7 +177,7 @@
                     <div class="content_message_title">
 						{{ special.title }}
 						<span style="cursor: pointer;font-size: 14px; color: #fe651d; margin-left: 10px;text-decoration: underline;" v-if="special.second_subject && special.second_subject.grade_name=='技能提升'" @click="copyPromotionUrl">推广</span>
-						<span  v-if="special.second_subject && special.second_subject.grade_name=='技能提升'" >({$spread_total}}次, 共 {$special_total}次)</span>
+						<span  style="color: grey" v-if="special.second_subject && special.second_subject.grade_name=='技能提升'" >({$spread_total}次, 共 {$special_total}次)</span>
 					</div>
                     <div class="content_message_dis">{{ special.abstract }}</div>
                     <div class="content_message_tap">
