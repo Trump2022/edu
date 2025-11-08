@@ -184,6 +184,48 @@ class Special extends AuthController
             Cookie::set('lb_spread_url', $url);
         }
 
+        // ↓↓↓ 记录推广链接点击
+        if ($lb_spread_uid) {
+            try {
+                $visitor_id = Cookie::get('visitor_id');
+                if (!$visitor_id) {
+                    $visitor_id = uuid_create(UUID_TYPE_RANDOM); // 生成访客ID
+                    Cookie::set('visitor_id', $visitor_id, 86400 * 365); // 保存一年
+                }
+
+                $data = [
+                    'url'           => $url,
+                    'special_id'    => $id,
+                    'lb_spread_uid' => $lb_spread_uid,
+                    'visitor_id'    => $visitor_id,
+                    'ip'            => request()->ip(),
+                    'user_agent'    => substr(request()->header('user-agent'), 0, 250),
+                ];
+
+                // 写入数据库（忽略重复）
+                Db::name('eb_spread_url_clicks')
+                    ->insertOrIgnore($data);
+
+            } catch (\Throwable $e) {
+                // 可以选择性记录日志，不影响主流程
+                trace('推广点击记录失败：' . $e->getMessage(), 'error');
+            }
+        }
+        // ↑↑↑ 记录推广链接点击结束
+
+        // === 新增：点击量统计 ===
+        $special_total = Db::name('spread_url_clicks')
+            ->where('special_id', $id)
+            ->count();
+
+        $spread_total = Db::name('spread_url_clicks')
+            ->where('special_id', $id)
+            ->where('lb_spread_uid', $lb_spread_uid)
+            ->count();
+
+        // 分配到模板变量
+        $this->assign(compact('special_total', 'spread_total'));
+
         return $this->fetch('detail');
     }
 
