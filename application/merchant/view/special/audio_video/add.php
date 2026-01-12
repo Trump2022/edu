@@ -96,7 +96,7 @@
                                         <i class="layui-icon">&#xe654;</i>
                                     </button>
                                 </div>
-                                <div class="layui-form-mid layui-word-aux">输入标签名称后点击”+“号按钮添加；最多写入6个字；点击标签即可删除</div>
+                                <div class="layui-form-mid layui-word-aux">输入标签名称后点击”+“号按钮添加；最多写入6个字；点击标签即可删除777</div>
                             </div>
                             <div v-if="formData.label.length" class="layui-form-item">
                                 <div class="layui-input-block">
