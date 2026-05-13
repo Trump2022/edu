@@ -162,18 +162,6 @@ class Login extends WapBasic
      */
     public function check(Request $request)
     {
-        // $allow_domain = Env::get('AccessControl.Access-Control-Allow-Origin', 'https://lb.fanchenai.com');
-        // header('Access-Control-Allow-Origin: '.$allow_domain); //设置允许跨域访问
-        // header('Access-Control-Allow-Origin: https://lb.fanchenai.com'); //设置允许跨域访问
-        // header('Access-Control-Allow-Origin: https://lb.fanxinghy.com'); //设置允许跨域访问
-        // header("Access-Control-Allow-Credentials: true"); // 允许携带 credentials（cookie）
-
-        // $allowed_origins = explode(',', $allow_domain);
-        // if (is_array($allowed_origins) && isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
-        //     header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
-        //     header('Access-Control-Allow-Credentials: true');
-        //     header('Vary: Origin');
-        // }
         header('Access-Control-Allow-Origin: *');
         list($account, $pwd, $spread_uid) = UtilService::postMore(['account', 'pwd', ['spread_uid', 0]], $request, true);
         if (!$account || !$pwd) return JsonService::fail('请输入登录账号');
